@@ -30,7 +30,21 @@ def get_booking_overview(month=None, year=None):
     headers = []
     weekday = first_weekday
     for i in range(0, days_per_month):
-        headers.append({ 'day': i + 1, 'weekday': weekday})
+        if weekday == 0:
+            wd = "Mo"
+        elif weekday == 1:
+            wd = "Di"
+        elif weekday == 2:
+            wd = "Mi"
+        elif weekday == 3:
+            wd = "Do"
+        elif weekday == 4:
+            wd = "Fr"
+        elif weekday == 5:
+            wd = "Sa"
+        else:
+            wd = "So"            
+        headers.append({ 'day': i + 1, 'weekday': wd})
         weekday += 1
         if weekday > 6:
             weekday = 0
@@ -54,10 +68,12 @@ def get_booking_overview(month=None, year=None):
             if booking:
                 display = booking[0]['booking_type'][0]
                 name = booking[0]['name']
-                if display == "R":
+                if display == "B":
                     color = "#5DADE2"
                 elif display == "C":
                     color = "#7DCEA0"
+                elif display == "R":
+                    color = "#F1948A"
             days.append({ 
                 'booking': display, 
                 'date': '{0}-{1}-{2}'.format(year, month, (i + 1)),

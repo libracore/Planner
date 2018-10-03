@@ -2,7 +2,7 @@
     <tr>
         <th>{{ __("Appartment") }}</th>
         {% for header in headers %}
-            <th>{{ header.day }}</th>
+            <th>{{ __( header.weekday) }}<br>{{ header.day }}</th>
         {% endfor %}
     </tr>
     {% for appartment in appartments %}

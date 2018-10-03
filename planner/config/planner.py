@@ -9,7 +9,7 @@ def get_data():
             "items": [
                    {
                        "type": "page",
-                       "name": "booking_planner",
+                       "name": "booking-planner",
                        "label": _("Booking Planner"),
                        "description": _("Booking Planner")
                    }
