@@ -10,11 +10,11 @@
         <td>{{ appartment.title }}</td>
         {% for day in appartment.days %}
           {% if day.booking == "-" %}
-			<td data-date="{{ day.date }}" data-appartment="{{ appartment.title }}" class="cell-calendar" onclick="frappe.booking_planner.new_booking(this)">
+			<td data-date="{{ day.date }}" data-appartment="{{ appartment.title }}" class="cell-calendar" onclick="frappe.booking_planner.new_booking(this)" >
 				{{ day.booking }}
 			</td>
           {% else %}
-            <td>
+            <td  style="background-color: {{ day.color }}; ">
               <a href="/desk#Form/Booking/{{ day.name }}">{{ day.booking }}</a>
             </td>
           {% endif %}

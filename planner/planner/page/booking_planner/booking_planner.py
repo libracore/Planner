@@ -50,13 +50,19 @@ def get_booking_overview(month=None, year=None):
                 ], fields=['booking_type', 'name'])
             display = "-"
             name = ""
+            color = "#FFFFFF"
             if booking:
                 display = booking[0]['booking_type'][0]
                 name = booking[0]['name']
+                if display == "R":
+                    color = "#5DADE2"
+                elif display == "C":
+                    color = "#7DCEA0"
             days.append({ 
                 'booking': display, 
                 'date': '{0}-{1}-{2}'.format(year, month, (i + 1)),
-                'name': name
+                'name': name,
+                'color': color
             })
         # add record
         appartments.append({'title': aptmt['title'], 'days': days})
