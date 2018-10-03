@@ -9,9 +9,15 @@
     <tr id="row-transaction-">
         <td>{{ appartment.title }}</td>
         {% for day in appartment.days %}
-        <td data-date="{{ day.date }}" data-appartment="{{ appartment.title }}" class="cell-calendar" onclick="frappe.booking_planner.new_booking(this)">
-            {{ day.booking }}
-        </td>
+          {% if day.booking == "-" %}
+			<td data-date="{{ day.date }}" data-appartment="{{ appartment.title }}" class="cell-calendar" onclick="frappe.booking_planner.new_booking(this)">
+				{{ day.booking }}
+			</td>
+          {% else %}
+            <td>
+              <a href="/desk#Form/Booking/{{ day.name }}">{{ day.booking }}</a>
+            </td>
+          {% endif %}
         {% endfor %}
     </tr>
     {% endfor %}

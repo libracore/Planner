@@ -37,6 +37,7 @@ frappe.booking_planner = {
         frappe.booking_planner.update(page);
     },
     update: function(page) {
+		frappe.booking_planner.start_wait();
         // get form data
         var month = parseInt(document.getElementById("month").value);
         var year = parseInt(document.getElementById("year").value);
@@ -73,6 +74,8 @@ frappe.booking_planner = {
             // update view
             frappe.booking_planner.new_booking(d);
         });*/
+        
+        frappe.booking_planner.end_wait();
     },
     new_booking: function(d) {
         console.log(d.getAttribute("data-date"));
@@ -83,5 +86,11 @@ frappe.booking_planner = {
             "end_date": "03-10-2018" /* d.getAttribute("data-date") */
 		}
 		frappe.new_doc("Booking");
-    }
+    },
+	start_wait: function() {
+        document.getElementById("waitingScreen").classList.remove("hidden");
+    },
+    end_wait: function() {
+        document.getElementById("waitingScreen").classList.add("hidden");
+    },
 }

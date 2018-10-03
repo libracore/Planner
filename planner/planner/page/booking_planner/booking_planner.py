@@ -47,11 +47,17 @@ def get_booking_overview(month=None, year=None):
                     ['appartment', '=', aptmt['name']], 
                     ['start_date', '<=', '{0}-{1}-{2}'.format(year, month, (i + 1))],
                     ['end_date', '>=', '{0}-{1}-{2}'.format(year, month, (i + 1))]
-                ], fields=['booking_type'])
+                ], fields=['booking_type', 'name'])
             display = "-"
+            name = ""
             if booking:
                 display = booking[0]['booking_type'][0]
-            days.append({ 'booking': display, 'date': '{0}-{1}-{2}'.format(year, month, (i + 1)) })
+                name = booking[0]['name']
+            days.append({ 
+                'booking': display, 
+                'date': '{0}-{1}-{2}'.format(year, month, (i + 1)),
+                'name': name
+            })
         # add record
         appartments.append({'title': aptmt['title'], 'days': days})
         

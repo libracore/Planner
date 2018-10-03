@@ -7,7 +7,7 @@ def get_data():
 		{
 			"module_name": "Planner",
 			"color": "#a2c8ed",
-			"icon": "octicon octicon-tasklist",
+			"icon": "octicon octicon-calendar",
 			"type": "module",
 			"label": _("Planner")
 		}
