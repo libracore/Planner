@@ -1,0 +1,21 @@
+<table class="table">
+    <tr>
+        <th>{{ __("Appartment") }}</th>
+        {% for header in headers %}
+            <th>{{ header.day }}</th>
+        {% endfor %}
+    </tr>
+    {% for appartment in appartments %}
+    <tr id="row-transaction-">
+        <td>{{ appartment.title }}</td>
+        {% for day in appartment.days %}
+        <td data-date="{{ day.date }}" data-appartment="{{ appartment.title }}" class="cell-calendar" onclick="frappe.booking_planner.new_booking(this)">
+            {{ day.booking }}
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+
+

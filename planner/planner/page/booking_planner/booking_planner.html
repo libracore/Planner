@@ -1,0 +1,27 @@
+<div style="margin: 5px; margin-top: 0px; border-top: 1px solid white; ">
+  <div class="section-body">
+    <div class="row"> 
+        <div class="col-sm-12">
+            <p>{{ __("Filter") }}
+            <select id="bank_account">
+                <option value="booking">Booking</option>
+                <option value="cleaning">Cleaning</option>
+            </select>
+            {{ __("Month") }}
+            <input id="month" />
+            {{ __("Year") }}
+            <input id="year" />
+            <button type="submit" class="btn btn-xs btn-primary btn-update">{{ __("Update") }}</button>
+            </p>
+        </div>
+    </div>
+	  
+    <div class="row">
+        <div class="col-sm-12">
+            <div id="table_placeholder"></div>	    
+        </div>
+    </div>
+  </div>
+  
+</div>
+
