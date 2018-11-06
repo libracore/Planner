@@ -10,6 +10,7 @@ frappe.pages['booking-planner'].on_page_load = function(wrapper) {
     
     // add the application reference
     frappe.breadcrumbs.add("Planner");
+	
 }
 
 frappe.booking_planner = {
@@ -20,38 +21,28 @@ frappe.booking_planner = {
         me.body = $('<div></div>').appendTo(me.page.main);
         var data = "";
         $(frappe.render_template('booking_planner', data)).appendTo(me.body);
-        
-        // attach button handlers
-        this.page.main.find(".btn-update").on('click', function() {
+        this.page.main.find("#update-btn").on('click', function() {
             // update view
-            frappe.booking_planner.update(page);
+            frappe.booking_planner.update_table_data(page);
         });
     },
     run: function(page) {
-        // prepare form data
+		// prepare form data
         var now = new Date();
-        document.getElementById("month").value = (now.getMonth() + 1);
-        document.getElementById("year").value = now.getFullYear();
-        
-        // update table
-        frappe.booking_planner.update(page);
+		var day = now.getDate();
+		if (day < 10) {
+			day = "0" + day;
+		}
+		document.getElementById("start_date").value = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + day;
+		console.log(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + day);
+        frappe.booking_planner.update_table_data(page);
     },
-    update: function(page) {
-		frappe.booking_planner.start_wait();
-        // get form data
-        var month = parseInt(document.getElementById("month").value);
-        var year = parseInt(document.getElementById("year").value);
-        // compensate input errors
-        if (month < 1) { month = 1; document.getElementById("month").value = 1; }
-        if (month > 12) { month = 12; document.getElementById("month").value = 12; }
-        if (year < 2000) { year = 2000; document.getElementById("year").value = 2000; }
-        if (year > 2100) { year = 2100; document.getElementById("year").value = 2100; }
-        // collect booking data
-        frappe.call({
-            method: 'planner.planner.page.booking_planner.booking_planner.get_booking_overview',
+	update_table_data: function(page) {
+		var inpStartDate = document.getElementById("start_date").value;
+		frappe.call({
+            method: 'planner.planner.page.booking_planner.booking_planner.get_table_data',
             args: {
-                'year': year,
-                'month': month
+                'inpStartDate': inpStartDate
             },
             callback: function(r) {
                 if (r.message) {
@@ -60,22 +51,14 @@ frappe.booking_planner = {
                 } 
             }
         });
-    },
+	},
     show_table: function(page, message) {
         // display the transactions as table
         var container = document.getElementById("table_placeholder");
         //console.log("Container: " + container);
         var content = frappe.render_template('booking_table', message);
         //console.log("Content: " + content);
-        container.innerHTML = content; 
-        
-        // attach button handlers
-        /*this.page.main.find(".cell-calendar").on('click', function(d) {
-            // update view
-            frappe.booking_planner.new_booking(d);
-        });*/
-        
-        frappe.booking_planner.end_wait();
+        container.innerHTML = content;
     },
     new_booking: function(d) {
         console.log(d.getAttribute("data-date"));
@@ -94,3 +77,4 @@ frappe.booking_planner = {
         document.getElementById("waitingScreen").classList.add("hidden");
     },
 }
+

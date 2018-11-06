@@ -1,20 +1,35 @@
 <div style="margin: 5px; margin-top: 0px; border-top: 1px solid white; ">
   <div class="section-body">
-    <div class="row"> 
-        <div class="col-sm-12">
-            <p>{{ __("Filter") }}
-            <select id="bank_account">
-                <option value="booking">{{ __("Booking") }}</option>
-                <option value="cleaning">{{ __("Cleaning") }}</option>
-            </select>
-            {{ __("Month") }}
-            <input id="month" />
-            {{ __("Year") }}
-            <input id="year" />
-            <button type="submit" class="btn btn-xs btn-primary btn-update">{{ __("Update") }}</button>
+	<div class="row" style="margin-top: 5px;"> 
+        <div class="col-sm-3">
+			<div class="form-group">
+				<label for="filter_type">{{ __("Selection") }}:</label>
+				<select class="form-control" id="filter_type">
+					<option value="booking">{{ __("Booking") }}</option>
+					<option value="cleaning">{{ __("Cleaning") }}</option>
+				</select>
+			</div>
+		</div>
+		<div class="col-sm-3">
+			<div class="form-group">
+				<label for="start_dtae">{{ __("Start Date") }}:</label>
+				<input type="date" class="form-control" id="start_date">
+			</div>
+		</div>
+		<div class="col-sm-3">
+			<div class="form-group">
+				<label for="filter_house">{{ __("House") }}:</label>
+				<select class="form-control" id="filter_house">
+					<option value="all">{{ __("All") }}</option>
+					<option value="booking">{{ __("House 1") }}</option>
+					<option value="cleaning">{{ __("House 2") }}</option>
+				</select>
+			</div>
+		</div>
+		<div class="col-sm-3">
+			<button type="submit" class="btn btn-xs btn-primary btn-update" id="update-btn">{{ __("Update") }}</button>
             <i id="waitingScreen" class="fa fa-spinner fa-spin hidden"></i>
-            </p>
-        </div>
+		</div>
     </div>
 	  
     <div class="row">

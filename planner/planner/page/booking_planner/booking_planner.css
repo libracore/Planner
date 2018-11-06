@@ -1,0 +1,68 @@
+/* #filtertable {
+	width: 100%;
+}
+thead {
+	display: block;
+}
+tbody {
+	display: block;
+}
+tr {
+	display: block;
+}
+td {
+	display: block;
+}
+th {
+	display: block;
+}
+tr:after {
+	content: ' ';
+	display: block;
+	visibility: hidden;
+	clear: both;
+}
+thead th {
+	height: 30px;
+}
+tbody {
+	height: 120px;
+	overflow-y: auto;
+}
+tbody td {
+	width: 10%;
+	float: left;
+} 
+thead th {
+	width: 10%;
+	float: left;
+}  */
+.container.page-body {
+	width: 100%;
+	overflow-x: auto;
+}
+
+.table-fixed tbody {
+	height: 65vh;
+	overflow-y: auto;
+	width: 100%;
+}
+.table-fixed thead {
+	display: ruby-text-container;
+}
+.table-fixed tbody,
+.table-fixed tr,
+.table-fixed td,
+.table-fixed th {
+	display: block;
+}
+.table-fixed tr:after {
+	content: "";
+	display: block;
+	visibility: hidden;
+	clear: both;
+}
+.table-fixed tbody td,
+.table-fixed thead > tr > th {
+	float: left;
+}

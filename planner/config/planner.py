@@ -21,15 +21,27 @@ def get_data():
             "items": [
                    {
                        "type": "doctype",
+                       "name": "House",
+                       "label": _("House"),
+                       "description": _("House")
+                   },
+				   {
+                       "type": "doctype",
                        "name": "Appartment",
-                       "label": _("Appartment"),
-                       "description": _("Appartment")
+                       "label": _("Apartment"),
+                       "description": _("Apartment")
                    },
                    {
                        "type": "doctype",
                        "name": "Booking",
                        "label": _("Booking"),
                        "description": _("Booking")
+                   },
+                   {
+                       "type": "doctype",
+                       "name": "Cleaning",
+                       "label": _("Cleaning"),
+                       "description": _("Cleaning")
                    }
             ]
         }
