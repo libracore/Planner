@@ -8,17 +8,122 @@ from frappe import throw, _
 from datetime import datetime
 import calendar
 from frappe.utils.data import getdate, add_days, add_to_date, date_diff, add_months
+from collections import namedtuple
+
+def testdatum():
+	#buchungsdatum / auswahldatum
+	print(date_diff("2018-01-30", "2018-01-29"))
 
 @frappe.whitelist()
 def get_table_data(inpStartDate):
 	calStartDate = getdate(inpStartDate)
 	calcEndDate = add_to_date(calStartDate, days=60, as_string=True)
+	
+	#table style
+	# master_data = {
+		# 'headers': createHeaders(calStartDate, add_to_date(calStartDate, months=1)),
+		# 'rows': get_rows(calStartDate)
+	# }
+	
+	#div style
 	master_data = {
 		'headers': createHeaders(calStartDate, add_to_date(calStartDate, months=1)),
-		'rows': get_rows(calStartDate)
+		'rows': get_rows_for_div(calStartDate)
 	}
 		
 	return master_data
+	
+def get_rows_for_div(calStartDate):
+	rows = []
+	
+	#houses = alle haeuser
+	houses = frappe.db.sql("""SELECT `name` FROM `tabHouse`""", as_list=True)
+	for _house in houses:
+		house = _house[0]
+		row_string = '<div class="planner-zeile">'
+		
+		# hinzufuegen zeile: haus
+		apartment_qty = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{0}'""".format(house), as_list=True)[0][0])
+		row_string += '<div class="house a{0}"><span>{1}</span></div>'.format(apartment_qty, house)
+		
+		#hinzufuegen appartments inkl. infos
+		apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day` FROM `tabAppartment` WHERE `house` = '{0}'""".format(house), as_list=True)
+		apartment_int = 1
+		for _apartment in apartments:
+			apartment = _apartment[0]
+			apartment_size = _apartment[1]
+			position = _apartment[2]
+			price_per_month = _apartment[3]
+			service_price_per_month = _apartment[4]
+			price_per_day = _apartment[5]
+			service_price_per_day = _apartment[6]
+			row_string += '<div class="apartment pos-{0}" onclick="new_booking({2})"><span>{1}</span></div>'.format(apartment_int, apartment, "'" + apartment + "'")
+			row_string += '<div class="room pos-{0}"><span>{1}</span></div>'.format(apartment_int, apartment_size)
+			row_string += '<div class="position pos-{0}"><span>{1}</span></div>'.format(apartment_int, position)
+			row_string += '<div class="pricePM pos-{0}"><span>{1} + {2}</span></div>'.format(apartment_int, price_per_month, service_price_per_month)
+			row_string += '<div class="pricePD pos-{0}"><span>{1} + {2}</span></div>'.format(apartment_int, price_per_day, service_price_per_day)
+			
+			#hinzufuegen buchungen pro appartment
+			qty_bookings = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}'""".format(apartment, calStartDate), as_list=True)[0][0])
+			if qty_bookings > 0:
+				overlap_control_list = []
+				bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}'""".format(apartment, calStartDate), as_list=True)
+				z_index = 1
+				for _booking in bookings:
+					booking = _booking[0]
+					start = _booking[1]
+					end = _booking[2]
+					bookingType = _booking[3]
+					datediff = date_diff(start, calStartDate)
+					if datediff <= 0:
+						s_start = 1
+						dauer = date_diff(end, calStartDate) + 1
+					else:
+						s_start = datediff + 1
+						dauer = date_diff(end, start) + 1
+					if bookingType == 'Reserved':
+						color = 'b-yellow'
+					elif bookingType == 'Booked':
+						color = 'b-blue'
+					elif bookingType == 'End-Cleaning':
+						#check if checked
+						#checked = green
+						#unchecked = red
+						color = 'b-orange'
+					elif bookingType == 'Sub-Cleaning':
+						color = 'b-purple'
+					elif bookingType == 'Renovation':
+						color = 'b-darkgrey'
+					if dauer > 61:
+						dauer = 61
+					
+					if qty_bookings > 1:
+						if overlap_control_list:
+							for control_date in overlap_control_list:
+								if overlap_control(control_date, [[start.strftime("%Y"), start.strftime("%-m"), start.strftime("%d")], [end.strftime("%Y"), end.strftime("%-m"), end.strftime("%d")]]) > 0:
+									z_index += 1
+						
+						overlap_control_list.append([[start.strftime("%Y"), start.strftime("%-m"), start.strftime("%d")], [end.strftime("%Y"), end.strftime("%-m"), end.strftime("%d")]])
+					row_string += '<div class="buchung pos-{0} s{1} d{2} z{4} {3}" onclick="show_booking({5})"></div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'")
+					#z_index = 1
+			
+			apartment_int += 1
+			
+					
+		row_string += '</div>'
+		rows.append(row_string)
+	
+	return rows
+	
+def overlap_control(date_list=[], ref_date=[]):
+	Range = namedtuple('Range', ['start', 'end'])
+	r1 = Range(start=datetime(int(date_list[0][0]), int(date_list[0][1]), int(date_list[0][2])), end=datetime(int(date_list[1][0]), int(date_list[1][1]), int(date_list[1][2])))
+	r2 = Range(start=datetime(int(ref_date[0][0]), int(ref_date[0][1]), int(ref_date[0][2])), end=datetime(int(ref_date[1][0]), int(ref_date[1][1]), int(ref_date[1][2])))
+	latest_start = max(r1.start, r2.start)
+	earliest_end = min(r1.end, r2.end)
+	delta = (earliest_end - latest_start).days + 1
+	overlap = max(0, delta)
+	return overlap
 	
 def get_rows(calStartDate):
 	rows = []
@@ -328,3 +433,8 @@ def createHeaders(firstDate, secondDate):
 				weekday = 0
 				
 	return ( {'headers': headers} )
+	
+@frappe.whitelist()
+def update_booking(apartment, end_date, start_date, booking_status, name):
+	update = frappe.db.sql("""UPDATE `tabBooking` SET `appartment` = '{0}', `end_date` = '{1}', `start_date` = '{2}', `booking_status` = '{3}' WHERE `name` = '{4}'""".format(apartment, end_date, start_date, booking_status, name), as_list=True)
+	return "OK"

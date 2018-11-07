@@ -1,0 +1,18 @@
+<div class="allover-container">
+	<div class="header-container">
+		<div class="header-100">Haus</div>
+		<div class="header-200">Apartment</div>
+		<div class="header-80">Rooms</div>
+		<div class="header-80">Position</div>
+		<div class="header-80">Price per month</div>
+		<div class="header-80">Price per Day</div>
+		{% for header in headers.headers %}
+			<div class="header-t">{{ __(header.weekday) }}<br>{{ __(header.day) }}</div>
+		{% endfor %}
+	</div>
+	<div class="planner-container">
+		{% for row in rows %}
+			{{ row }}
+		{% endfor %}
+	</div>
+</div>

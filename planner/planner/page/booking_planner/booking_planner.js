@@ -34,7 +34,7 @@ frappe.booking_planner = {
 			day = "0" + day;
 		}
 		document.getElementById("start_date").value = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + day;
-		console.log(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + day);
+		//console.log(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + day);
         frappe.booking_planner.update_table_data(page);
     },
 	update_table_data: function(page) {
@@ -46,7 +46,7 @@ frappe.booking_planner = {
             },
             callback: function(r) {
                 if (r.message) {
-                    console.log(r.message);
+                    //console.log(r.message);
                     frappe.booking_planner.show_table(page, r.message);
                 } 
             }
@@ -56,20 +56,14 @@ frappe.booking_planner = {
         // display the transactions as table
         var container = document.getElementById("table_placeholder");
         //console.log("Container: " + container);
-        var content = frappe.render_template('booking_table', message);
+		// table style
+        //var content = frappe.render_template('booking_table', message);
+		// div style
+		var content = frappe.render_template('booking_div_overview', message);
+		
         //console.log("Content: " + content);
         container.innerHTML = content;
     },
-    //new_booking: function(d) {
-    //    console.log(d.getAttribute("data-date"));
-    //    var now = new Date();
-	//	frappe.route_options = {
-	//		"appartment": d.getAttribute("data-appartment"),
-    //        "start_date": now/* d.getAttribute("data-date") */,
-    //        "end_date": "03-10-2018" /* d.getAttribute("data-date") */
-	//	}
-	//	frappe.new_doc("Booking");
-    //},
 	start_wait: function() {
         document.getElementById("waitingScreen").classList.remove("hidden");
     },
@@ -80,7 +74,7 @@ frappe.booking_planner = {
 
 function new_booking(apartment) {
 	frappe.route_options = {
-		"appartment": apartment.getAttribute("data-appartment")
+		"appartment": apartment
 	}
 	frappe.new_doc("Booking");
 }
@@ -98,6 +92,7 @@ function show_booking(_booking) {
                 var d = new frappe.ui.Dialog({
 					title: __('Update Booking Details'),
 					'fields': [
+						{'fieldname': 'Name', 'fieldtype': 'Data', label:__('Booking'), 'read_only': 1, 'default': _booking},
 						{'fieldname': 'House', 'fieldtype': 'Link', 'options': 'House', 'default': booking.house, label:__('House')},
 						{'fieldname': 'Apartment', 'fieldtype': 'Link', 'options': 'Appartment', 'default': booking.appartment, label:__('Apartment')},
 						{'fieldname': 'Status', 'fieldtype': 'Select', 'options': ["Reserved", "Booked", "End-Cleaning", "Sub-Cleaning", "Renovation"].join('\n'), 'default': booking.booking_status, label:__('Status')},
@@ -107,11 +102,28 @@ function show_booking(_booking) {
 					],
 					primary_action: function(){
 						d.hide();
-						console.log(d.get_values());
+						//console.log(d.get_values());
+						frappe.call({
+							method: "planner.planner.page.booking_planner.booking_planner.update_booking",
+							args: {
+								apartment: d.get_values().Apartment,
+								end_date: d.get_values().End,
+								start_date: d.get_values().Start,
+								booking_status: d.get_values().Status,
+								name: d.get_values().Name
+							},
+							callback(r) {
+								if(r.message == "OK") {
+									frappe.msgprint("Die Buchung wurde angepasst", "Erfolg");
+									document.getElementById("update-btn").click();
+								} else {
+									frappe.msgprint("Bitte wenden Sie sich an libracore", "Erorr");
+								}
+							}
+						});
 					},
 					primary_action_label: __('Update')
 				});
-				//d.fields_dict.ht.$wrapper.html('Hello World');
 				d.show()
             }
         }
