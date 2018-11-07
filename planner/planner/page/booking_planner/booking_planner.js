@@ -60,16 +60,16 @@ frappe.booking_planner = {
         //console.log("Content: " + content);
         container.innerHTML = content;
     },
-    new_booking: function(d) {
-        console.log(d.getAttribute("data-date"));
-        var now = new Date();
-		frappe.route_options = {
-			"appartment": d.getAttribute("data-appartment"),
-            "start_date": now/* d.getAttribute("data-date") */,
-            "end_date": "03-10-2018" /* d.getAttribute("data-date") */
-		}
-		frappe.new_doc("Booking");
-    },
+    //new_booking: function(d) {
+    //    console.log(d.getAttribute("data-date"));
+    //    var now = new Date();
+	//	frappe.route_options = {
+	//		"appartment": d.getAttribute("data-appartment"),
+    //        "start_date": now/* d.getAttribute("data-date") */,
+    //        "end_date": "03-10-2018" /* d.getAttribute("data-date") */
+	//	}
+	//	frappe.new_doc("Booking");
+    //},
 	start_wait: function() {
         document.getElementById("waitingScreen").classList.remove("hidden");
     },
@@ -78,3 +78,42 @@ frappe.booking_planner = {
     },
 }
 
+function new_booking(apartment) {
+	frappe.route_options = {
+		"appartment": apartment.getAttribute("data-appartment")
+	}
+	frappe.new_doc("Booking");
+}
+
+function show_booking(_booking) {
+	frappe.call({
+        method: "frappe.client.get",
+        args: {
+            doctype: "Booking",
+            name: _booking,
+        },
+        callback(r) {
+            if(r.message) {
+                var booking = r.message;
+                var d = new frappe.ui.Dialog({
+					title: __('Update Booking Details'),
+					'fields': [
+						{'fieldname': 'House', 'fieldtype': 'Link', 'options': 'House', 'default': booking.house, label:__('House')},
+						{'fieldname': 'Apartment', 'fieldtype': 'Link', 'options': 'Appartment', 'default': booking.appartment, label:__('Apartment')},
+						{'fieldname': 'Status', 'fieldtype': 'Select', 'options': ["Reserved", "Booked", "End-Cleaning", "Sub-Cleaning", "Renovation"].join('\n'), 'default': booking.booking_status, label:__('Status')},
+						{'fieldname': 'Start', 'fieldtype': 'Date', 'default': booking.start_date, label:__('Start')},
+						{'fieldname': 'End', 'fieldtype': 'Date', 'default': booking.end_date, label:__('End')},
+						{'fieldname': 'Remarks', 'fieldtype': 'Small Text', 'default': booking.remark, label:__('Remarks')}
+					],
+					primary_action: function(){
+						d.hide();
+						console.log(d.get_values());
+					},
+					primary_action_label: __('Update')
+				});
+				//d.fields_dict.ht.$wrapper.html('Hello World');
+				d.show()
+            }
+        }
+    });
+}

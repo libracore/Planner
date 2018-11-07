@@ -26,94 +26,102 @@ def get_rows(calStartDate):
 	houses = frappe.db.sql("""SELECT `name` FROM `tabHouse`""", as_list=True)
 	for _house in houses:
 		house = _house[0]
-		first_house = True
+		#first_house = True
+		set_house = True
 		#apartments = alle apartments
 		apartments = frappe.db.sql("""SELECT `name` FROM `tabAppartment` WHERE `house` = '{0}'""".format(house), as_list=True)
 		if apartments:
 			#allover_qty_bookings = anzahl buchungen aller apartment dieses hauses
-			allover_qty_bookings = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `house` = '{0}' AND `end_date` >= {1}""".format(house, calStartDate), as_list=True)[0][0])
+			allover_qty_bookings = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `house` = '{0}' AND `end_date` >= '{1}'""".format(house, calStartDate), as_list=True)[0][0])
 			#print(allover_qty_bookings)
 			if allover_qty_bookings > 0:
-				first_apartment = True
+				#first_apartment = True
 				for _apartment in apartments:
 					apartment = _apartment[0]
+					set_apartment = True
 					#print(apartment)
 					#bookings = alle buchungen pro apartment
-					bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= {1}""".format(apartment, calStartDate), as_list=True)
+					bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}'""".format(apartment, calStartDate), as_list=True)
 					#qty_bookings = anzahl buchungen pro apartment
-					qty_bookings = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= {1}""".format(apartment, calStartDate), as_list=True)[0][0])
+					qty_bookings = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}'""".format(apartment, calStartDate), as_list=True)[0][0])
 					if qty_bookings > 0:
 						for _booking in bookings:
 							booking = _booking[0]
 							start = _booking[1]
 							end = _booking[2]
 							bookingType = _booking[3]
-							if first_house:
-								first_house = False
+							if set_house:
+								#first_house = False
+								#first_apartment = False
+								set_house = False
+								set_apartment = False
 								#add komplette zeile inkl. haus
 								info_row = '<td style="width: 5%;" class="filterable-cell">{1}</td><td style="width: 5%;" class="filterable-cell">{2}</td><td style="width: 3%;" class="filterable-cell">1.5</td><td style="width: 3%;" class="filterable-cell">li</td><td style="width: 3%;" class="filterable-cell">3000</td><td style="width: 3%;" class="filterable-cell">300</td>'.format(allover_qty_bookings, house, apartment)
-								booking_row = get_booking_row(calStartDate, start, end, bookingType=bookingType)
+								booking_row = get_booking_row(calStartDate, start, end, bookingType=bookingType, apartment=apartment, booking=booking)
 								rows.append('<tr>' + info_row + booking_row + '</tr>')
 							else:
 								#add zeile ohne haus mit apartment
-								if first_apartment:
-									first_apartment = False
+								if set_apartment:
+									set_apartment = False
 									info_row = '<td style="width: 5%;" class="filterable-cell"></td><td style="width: 5%;" class="filterable-cell">{2}</td><td style="width: 3%;" class="filterable-cell">1.5</td><td style="width: 3%;" class="filterable-cell">li</td><td style="width: 3%;" class="filterable-cell">3000</td><td style="width: 3%;" class="filterable-cell">300</td>'.format(allover_qty_bookings, house, apartment)
-									booking_row = get_booking_row(calStartDate, start, end, bookingType=bookingType)
+									booking_row = get_booking_row(calStartDate, start, end, bookingType=bookingType, apartment=apartment, booking=booking)
 									rows.append('<tr>' + info_row + booking_row + '</tr>')
 								else:
 									#add zeile ohne haus ohne apartment
 									info_row = '<td style="width: 5%;" class="filterable-cell"></td><td style="width: 5%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td>'
-									booking_row = get_booking_row(calStartDate, start, end, bookingType=bookingType)
+									booking_row = get_booking_row(calStartDate, start, end, bookingType=bookingType, apartment=apartment, booking=booking)
 									rows.append('<tr>' + info_row + booking_row + '</tr>')
 					else:
-						if first_house:
-							first_house = False
+						if set_house:
+							set_house = False
+							set_apartment = False
 							#add komplette zeile inkl. haus
 							info_row = '<td style="width: 5%;" class="filterable-cell">{1}</td><td style="width: 5%;" class="filterable-cell">{2}</td><td style="width: 3%;" class="filterable-cell">1.5</td><td style="width: 3%;" class="filterable-cell">li</td><td style="width: 3%;" class="filterable-cell">3000</td><td style="width: 3%;" class="filterable-cell">300</td>'.format(allover_qty_bookings, house, apartment)
-							booking_row = get_booking_row(getdate("2099-01-01"), getdate("2000-01-01"), getdate("2000-01-01"))
+							booking_row = get_booking_row(getdate("2099-01-01"), getdate("2000-01-01"), getdate("2000-01-01"), apartment=apartment)
 							rows.append('<tr>' + info_row + booking_row + '</tr>')
 						else:
-							if first_apartment:
+							if set_apartment:
 								#return einzelne, leere zeile ohne haus
-								first_apartment = False
+								set_apartment = False
 								info_row = '<td style="width: 5%;" class="filterable-cell"></td><td style="width: 5%;" class="filterable-cell">{2}</td><td style="width: 3%;" class="filterable-cell">1.5</td><td style="width: 3%;" class="filterable-cell">li</td><td style="width: 3%;" class="filterable-cell">3000</td><td style="width: 3%;" class="filterable-cell">300</td>'.format(allover_qty_bookings, house, apartment)
-								booking_row = get_booking_row(getdate("2099-01-01"), getdate("2000-01-01"), getdate("2000-01-01"))
+								booking_row = get_booking_row(getdate("2099-01-01"), getdate("2000-01-01"), getdate("2000-01-01"), apartment=apartment)
 								rows.append('<tr>' + info_row + booking_row + '</tr>')
 							else:
 								#add zeile ohne haus ohne apartment
 								info_row = '<td style="width: 5%;" class="filterable-cell"></td><td style="width: 5%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td>'
-								booking_row = get_booking_row(getdate("2099-01-01"), getdate("2000-01-01"), getdate("2000-01-01"))
+								booking_row = get_booking_row(getdate("2099-01-01"), getdate("2000-01-01"), getdate("2000-01-01"), apartment=apartment)
 								rows.append('<tr>' + info_row + booking_row + '</tr>')
 			else:
-				first_apartment = True
+				#first_apartment = True
 				for _apartment in apartments[0]:
 					apartment = _apartment[0]
-					if first_house:
-						first_house = False
+					if set_house:
+						set_house = False
+						#first_apartment = False
 						#add komplette zeile inkl. haus
 						info_row = '<td style="width: 5%;" class="filterable-cell">{1}</td><td style="width: 5%;" class="filterable-cell">{2}</td><td style="width: 3%;" class="filterable-cell">1.5</td><td style="width: 3%;" class="filterable-cell">li</td><td style="width: 3%;" class="filterable-cell">3000</td><td style="width: 3%;" class="filterable-cell">300</td>'.format(allover_qty_bookings, house, apartment)
-						booking_row = get_booking_row(getdate("2099-01-01"), getdate("2000-01-01"), getdate("2000-01-01"))
+						booking_row = get_booking_row(getdate("2099-01-01"), getdate("2000-01-01"), getdate("2000-01-01"), apartment=apartment)
 						rows.append('<tr>' + info_row + booking_row + '</tr>')
 					else:
-						if first_apartment:
-							#return einzelne, leere zeile ohne haus
-							first_apartment = False
-							info_row = '<td style="width: 5%;" class="filterable-cell"></td><td style="width: 5%;" class="filterable-cell">{2}</td><td style="width: 3%;" class="filterable-cell">1.5</td><td style="width: 3%;" class="filterable-cell">li</td><td style="width: 3%;" class="filterable-cell">3000</td><td style="width: 3%;" class="filterable-cell">300</td>'.format(allover_qty_bookings, house, apartment)
-							booking_row = get_booking_row(getdate("2099-01-01"), getdate("2000-01-01"), getdate("2000-01-01"))
-							rows.append('<tr>' + info_row + booking_row + '</tr>')
-						else:
-							#add zeile ohne haus ohne apartment
-							info_row = '<td style="width: 5%;" class="filterable-cell"></td><td style="width: 5%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td>'
-							booking_row = get_booking_row(getdate("2099-01-01"), getdate("2000-01-01"), getdate("2000-01-01"))
-							rows.append('<tr>' + info_row + booking_row + '</tr>')
+						#if first_apartment:
+						#return einzelne, leere zeile ohne haus
+						#first_apartment = False
+						info_row = '<td style="width: 5%;" class="filterable-cell"></td><td style="width: 5%;" class="filterable-cell">{2}</td><td style="width: 3%;" class="filterable-cell">1.5</td><td style="width: 3%;" class="filterable-cell">li</td><td style="width: 3%;" class="filterable-cell">3000</td><td style="width: 3%;" class="filterable-cell">300</td>'.format(allover_qty_bookings, house, apartment)
+						booking_row = get_booking_row(getdate("2099-01-01"), getdate("2000-01-01"), getdate("2000-01-01"), apartment=apartment)
+						rows.append('<tr>' + info_row + booking_row + '</tr>')
+						# else:
+							# #add zeile ohne haus ohne apartment
+							# info_row = '<td style="width: 5%;" class="filterable-cell"></td><td style="width: 5%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td><td style="width: 3%;" class="filterable-cell"></td>'
+							# booking_row = get_booking_row(getdate("2099-01-01"), getdate("2000-01-01"), getdate("2000-01-01"), apartment=apartment)
+							# rows.append('<tr>' + info_row + booking_row + '</tr>')
 		#else:
 			#nichts!
 	
 	return rows
 	
-def get_booking_row(calStartDate, start, end, bookingType=False, booking="none"):
+def get_booking_row(calStartDate, start, end, bookingType=False, booking="none", apartment="none"):
 	import itertools
+	booking = "'" + booking + "'"
 	rows = ''
 	if not bookingType:
 		if start >= calStartDate:
@@ -125,13 +133,13 @@ def get_booking_row(calStartDate, start, end, bookingType=False, booking="none")
 			rows = ''
 			
 			for _ in itertools.repeat(None, first_row_qty):
-				rows += '<td style="width: 1%;" class="filterable-cell">&nbsp;</td>'
+				rows += '<td style="width: 1%;" class="filterable-cell" data-appartment="{0}" onclick="new_booking(this)">&nbsp;</td>'.format(apartment)
 				
 			for _ in itertools.repeat(None, second_row_qty):
-				rows += '<td style="width: 1%;" class="filterable-cell">&nbsp;</td>'
+				rows += '<td style="width: 1%;" class="filterable-cell" onclick="show_booking({0})">&nbsp;</td>'.format(booking)
 				
 			for _ in itertools.repeat(None, third_row_qty):
-				rows += '<td style="width: 1%;" class="filterable-cell">&nbsp;</td>'
+				rows += '<td style="width: 1%;" class="filterable-cell" data-appartment="{0}" onclick="new_booking(this)">&nbsp;</td>'.format(apartment)
 		
 		elif end >= calStartDate:
 			second_row_qty = date_diff(end, calStartDate) + 1
@@ -139,10 +147,10 @@ def get_booking_row(calStartDate, start, end, bookingType=False, booking="none")
 			rows = ''
 			
 			for _ in itertools.repeat(None, second_row_qty):
-				rows += '<td style="width: 1%;" class="filterable-cell">&nbsp;</td>'
+				rows += '<td style="width: 1%;" class="filterable-cell" onclick="show_booking({0})">&nbsp;</td>'.format(booking)
 				
 			for _ in itertools.repeat(None, third_row_qty):
-				rows += '<td style="width: 1%;" class="filterable-cell">&nbsp;</td>'
+				rows += '<td style="width: 1%;" class="filterable-cell" data-appartment="{0}" onclick="new_booking(this)">&nbsp;</td>'.format(apartment)
 		
 		#fallback
 		else:
@@ -150,7 +158,7 @@ def get_booking_row(calStartDate, start, end, bookingType=False, booking="none")
 			rows = ''
 			
 			for _ in itertools.repeat(None, third_row_qty):
-				rows += '<td style="width: 1%;" class="filterable-cell">&nbsp;</td>'
+				rows += '<td style="width: 1%;" class="filterable-cell" data-appartment="{0}" onclick="new_booking(this)">&nbsp;</td>'.format(apartment)
 	
 	else:
 		if bookingType == 'Reserved':
@@ -176,13 +184,13 @@ def get_booking_row(calStartDate, start, end, bookingType=False, booking="none")
 			rows = ''
 			
 			for _ in itertools.repeat(None, first_row_qty):
-				rows += '<td style="width: 1%;" class="filterable-cell">&nbsp;</td>'
+				rows += '<td style="width: 1%;" class="filterable-cell" data-appartment="{0}" onclick="new_booking(this)">&nbsp;</td>'.format(apartment)
 				
 			for _ in itertools.repeat(None, second_row_qty):
-				rows += '<td style="width: 1%; border: 1px solid {0}; background-color: {0};" class="filterable-cell">&nbsp;</td>'.format(color)
+				rows += '<td style="width: 1%; border: 1px solid {0}; background-color: {0};" class="filterable-cell" onclick="show_booking({1})">&nbsp;</td>'.format(color, booking)
 				
 			for _ in itertools.repeat(None, third_row_qty):
-				rows += '<td style="width: 1%;" class="filterable-cell">&nbsp;</td>'
+				rows += '<td style="width: 1%;" class="filterable-cell" data-appartment="{0}" onclick="new_booking(this)">&nbsp;</td>'.format(apartment)
 		
 		elif end >= calStartDate:
 			second_row_qty = date_diff(end, calStartDate) + 1
@@ -190,10 +198,10 @@ def get_booking_row(calStartDate, start, end, bookingType=False, booking="none")
 			rows = ''
 			
 			for _ in itertools.repeat(None, second_row_qty):
-				rows += '<td style="width: 1%; border: 1px solid {0}; background-color: {0};" class="filterable-cell">&nbsp;</td>'.format(color)
+				rows += '<td style="width: 1%; border: 1px solid {0}; background-color: {0};" class="filterable-cell" onclick="show_booking({1})">&nbsp;</td>'.format(color, booking)
 				
 			for _ in itertools.repeat(None, third_row_qty):
-				rows += '<td style="width: 1%;" class="filterable-cell">&nbsp;</td>'
+				rows += '<td style="width: 1%;" class="filterable-cell" data-appartment="{0}" onclick="new_booking(this)">&nbsp;</td>'.format(apartment)
 		
 		#fallback
 		else:
@@ -201,7 +209,7 @@ def get_booking_row(calStartDate, start, end, bookingType=False, booking="none")
 			rows = ''
 			
 			for _ in itertools.repeat(None, third_row_qty):
-				rows += '<td style="width: 1%;" class="filterable-cell">&nbsp;</td>'
+				rows += '<td style="width: 1%;" class="filterable-cell" data-appartment="{0}" onclick="new_booking(this)">&nbsp;</td>'.format(apartment)
 	
 	return rows
 		
