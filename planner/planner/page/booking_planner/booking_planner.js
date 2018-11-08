@@ -6,12 +6,10 @@ frappe.pages['booking-planner'].on_page_load = function(wrapper) {
 	});
     
     frappe.booking_planner.make(page);
-    frappe.booking_planner.run(page);
+	frappe.booking_planner.run(page);
     
     // add the application reference
-    frappe.breadcrumbs.add("Planner");
-	
-	
+    frappe.breadcrumbs.add("Planner");	
 }
 
 frappe.booking_planner = {
@@ -26,6 +24,7 @@ frappe.booking_planner = {
             // update view
             frappe.booking_planner.update_table_data(page);
         });
+		
     },
     run: function(page) {
 		// prepare form data
@@ -64,13 +63,26 @@ frappe.booking_planner = {
 		
         //console.log("Content: " + content);
         container.innerHTML = content;
+		$("#allovercontainer").scroll(function(e){
+			horizontal = e.currentTarget.scrollLeft;
+			if (horizontal > 300) {
+				$(".apartment").css("z-index", 9999);
+				$(".apartment").css("background-color", "#F5F5F5");
+				$(".apartment").css("left", horizontal);
+			} else {
+				$(".apartment").css("z-index", "auto");
+				$(".apartment").css("background-color", "#F5F5F5");
+				$(".apartment").css("left", 100);
+			}
+			/* console.log(horizontal); */
+		});
     },
 	start_wait: function() {
         document.getElementById("waitingScreen").classList.remove("hidden");
     },
     end_wait: function() {
         document.getElementById("waitingScreen").classList.add("hidden");
-    },
+    }
 }
 
 function new_booking(apartment) {
