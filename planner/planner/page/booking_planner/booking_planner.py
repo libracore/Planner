@@ -9,6 +9,7 @@ from datetime import datetime
 import calendar
 from frappe.utils.data import getdate, add_days, add_to_date, date_diff, add_months
 from collections import namedtuple
+import itertools
 
 def testdatum():
 	#buchungsdatum / auswahldatum
@@ -57,17 +58,21 @@ def get_rows_for_div(calStartDate):
 			service_price_per_month = _apartment[4]
 			price_per_day = _apartment[5]
 			service_price_per_day = _apartment[6]
+			sum_per_month = float(price_per_month) + float(service_price_per_month)
+			sum_per_day = float(price_per_day) + float(service_price_per_day)
 			row_string += '<div class="apartment pos-{0}" onclick="new_booking({2})"><span>{1}</span></div>'.format(apartment_int, apartment, "'" + apartment + "'")
 			row_string += '<div class="room pos-{0}"><span>{1}</span></div>'.format(apartment_int, apartment_size)
 			row_string += '<div class="position pos-{0}"><span>{1}</span></div>'.format(apartment_int, position)
-			row_string += '<div class="pricePM pos-{0}"><span>{1} + {2}</span></div>'.format(apartment_int, price_per_month, service_price_per_month)
-			row_string += '<div class="pricePD pos-{0}"><span>{1} + {2}</span></div>'.format(apartment_int, price_per_day, service_price_per_day)
+			row_string += '<div class="pricePM pos-{0}"><span>{1}</span></div>'.format(apartment_int, sum_per_month)
+			row_string += '<div class="pricePD pos-{0}"><span>{1}</span></div>'.format(apartment_int, sum_per_day)
+			
+			row_string += '<div class="newBookingPlaceHolder a1 s1 d61 z0 pos-{0}" onclick="new_booking({1})"></div>'.format(apartment_int, "'" + apartment + "'")
 			
 			#hinzufuegen buchungen pro appartment
 			qty_bookings = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}'""".format(apartment, calStartDate), as_list=True)[0][0])
 			if qty_bookings > 0:
 				overlap_control_list = []
-				bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' ORDER BY (CASE `booking_status` WHEN 'Booked' THEN 1 WHEN 'Reserved' THEN 2 ELSE 10 END)""".format(apartment, calStartDate), as_list=True)
+				bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked`, `customer` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' ORDER BY (CASE `booking_status` WHEN 'Booked' THEN 1 WHEN 'Reserved' THEN 2 ELSE 10 END)""".format(apartment, calStartDate), as_list=True)
 				z_index = 1
 				for _booking in bookings:
 					booking = _booking[0]
@@ -75,6 +80,7 @@ def get_rows_for_div(calStartDate):
 					end = _booking[2]
 					bookingType = _booking[3]
 					is_checked = _booking[4]
+					customer = _booking[5]
 					datediff = date_diff(start, calStartDate)
 					if datediff <= 0:
 						s_start = 1
@@ -108,7 +114,10 @@ def get_rows_for_div(calStartDate):
 									z_index += 1
 						
 						overlap_control_list.append([[start.strftime("%Y"), start.strftime("%-m"), start.strftime("%d")], [end.strftime("%Y"), end.strftime("%-m"), end.strftime("%d")]])
-					row_string += '<div class="buchung pos-{0} s{1} d{2} z{4} {3}" onclick="show_booking({5})"></div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'")
+					if customer:
+						row_string += '<div class="buchung pos-{0} s{1} d{2} z{4} {3}" onclick="show_booking({5})">{6}</div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'", customer)
+					else:
+						row_string += '<div class="buchung pos-{0} s{1} d{2} z{4} {3}" onclick="show_booking({5})">{6}</div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'", bookingType)
 					z_index = 1
 			
 			apartment_int += 1
@@ -439,6 +448,6 @@ def createHeaders(firstDate, secondDate):
 	return ( {'headers': headers} )
 	
 @frappe.whitelist()
-def update_booking(apartment, end_date, start_date, booking_status, name, is_checked):
-	update = frappe.db.sql("""UPDATE `tabBooking` SET `appartment` = '{0}', `end_date` = '{1}', `start_date` = '{2}', `booking_status` = '{3}', `is_checked` = '{5}' WHERE `name` = '{4}'""".format(apartment, end_date, start_date, booking_status, name, is_checked), as_list=True)
+def update_booking(apartment, end_date, start_date, booking_status, name, customer='', is_checked=0):
+	update = frappe.db.sql("""UPDATE `tabBooking` SET `appartment` = '{0}', `end_date` = '{1}', `start_date` = '{2}', `booking_status` = '{3}', `is_checked` = {5}, `customer` = '{6}' WHERE `name` = '{4}'""".format(apartment, end_date, start_date, booking_status, name, is_checked, customer), as_list=True)
 	return "OK"
