@@ -129,7 +129,7 @@ thead th {
 	}
 	.planner-container {
 		border:1px solid black;
-		height: 60vh;
+		height: 65vh;
 		width: 3732px;
 		overflow-y: scroll;
 		overflow-x: hidden;

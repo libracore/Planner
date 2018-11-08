@@ -67,13 +67,14 @@ def get_rows_for_div(calStartDate):
 			qty_bookings = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}'""".format(apartment, calStartDate), as_list=True)[0][0])
 			if qty_bookings > 0:
 				overlap_control_list = []
-				bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}'""".format(apartment, calStartDate), as_list=True)
+				bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' ORDER BY (CASE `booking_status` WHEN 'Booked' THEN 1 WHEN 'Reserved' THEN 2 ELSE 10 END)""".format(apartment, calStartDate), as_list=True)
 				z_index = 1
 				for _booking in bookings:
 					booking = _booking[0]
 					start = _booking[1]
 					end = _booking[2]
 					bookingType = _booking[3]
+					is_checked = _booking[4]
 					datediff = date_diff(start, calStartDate)
 					if datediff <= 0:
 						s_start = 1
@@ -87,9 +88,12 @@ def get_rows_for_div(calStartDate):
 						color = 'b-blue'
 					elif bookingType == 'End-Cleaning':
 						#check if checked
-						#checked = green
-						#unchecked = red
-						color = 'b-orange'
+						if is_checked == 1:
+							color = 'b-green'
+						elif is_checked == 0:
+							color = 'b-red'
+						else:
+							color = 'b-orange'
 					elif bookingType == 'Sub-Cleaning':
 						color = 'b-purple'
 					elif bookingType == 'Renovation':
@@ -105,7 +109,7 @@ def get_rows_for_div(calStartDate):
 						
 						overlap_control_list.append([[start.strftime("%Y"), start.strftime("%-m"), start.strftime("%d")], [end.strftime("%Y"), end.strftime("%-m"), end.strftime("%d")]])
 					row_string += '<div class="buchung pos-{0} s{1} d{2} z{4} {3}" onclick="show_booking({5})"></div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'")
-					#z_index = 1
+					z_index = 1
 			
 			apartment_int += 1
 			
@@ -435,6 +439,6 @@ def createHeaders(firstDate, secondDate):
 	return ( {'headers': headers} )
 	
 @frappe.whitelist()
-def update_booking(apartment, end_date, start_date, booking_status, name):
-	update = frappe.db.sql("""UPDATE `tabBooking` SET `appartment` = '{0}', `end_date` = '{1}', `start_date` = '{2}', `booking_status` = '{3}' WHERE `name` = '{4}'""".format(apartment, end_date, start_date, booking_status, name), as_list=True)
+def update_booking(apartment, end_date, start_date, booking_status, name, is_checked):
+	update = frappe.db.sql("""UPDATE `tabBooking` SET `appartment` = '{0}', `end_date` = '{1}', `start_date` = '{2}', `booking_status` = '{3}', `is_checked` = '{5}' WHERE `name` = '{4}'""".format(apartment, end_date, start_date, booking_status, name, is_checked), as_list=True)
 	return "OK"

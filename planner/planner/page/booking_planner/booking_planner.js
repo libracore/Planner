@@ -88,43 +88,86 @@ function show_booking(_booking) {
         },
         callback(r) {
             if(r.message) {
-                var booking = r.message;
-                var d = new frappe.ui.Dialog({
-					title: __('Update Booking Details'),
-					'fields': [
-						{'fieldname': 'Name', 'fieldtype': 'Data', label:__('Booking'), 'read_only': 1, 'default': _booking},
-						{'fieldname': 'House', 'fieldtype': 'Link', 'options': 'House', 'default': booking.house, label:__('House')},
-						{'fieldname': 'Apartment', 'fieldtype': 'Link', 'options': 'Appartment', 'default': booking.appartment, label:__('Apartment')},
-						{'fieldname': 'Status', 'fieldtype': 'Select', 'options': ["Reserved", "Booked", "End-Cleaning", "Sub-Cleaning", "Renovation"].join('\n'), 'default': booking.booking_status, label:__('Status')},
-						{'fieldname': 'Start', 'fieldtype': 'Date', 'default': booking.start_date, label:__('Start')},
-						{'fieldname': 'End', 'fieldtype': 'Date', 'default': booking.end_date, label:__('End')},
-						{'fieldname': 'Remarks', 'fieldtype': 'Small Text', 'default': booking.remark, label:__('Remarks')}
-					],
-					primary_action: function(){
-						d.hide();
-						//console.log(d.get_values());
-						frappe.call({
-							method: "planner.planner.page.booking_planner.booking_planner.update_booking",
-							args: {
-								apartment: d.get_values().Apartment,
-								end_date: d.get_values().End,
-								start_date: d.get_values().Start,
-								booking_status: d.get_values().Status,
-								name: d.get_values().Name
-							},
-							callback(r) {
-								if(r.message == "OK") {
-									frappe.msgprint("Die Buchung wurde angepasst", "Erfolg");
-									document.getElementById("update-btn").click();
-								} else {
-									frappe.msgprint("Bitte wenden Sie sich an libracore", "Erorr");
+				var booking = r.message;
+				if (booking.booking_status == "End-Cleaning") {
+					var d = new frappe.ui.Dialog({
+						title: __('Update Booking Details'),
+						fields: [
+							{fieldname: 'name', fieldtype: 'Link', label:__('Booking'), read_only: 1, default: _booking, options: 'Booking'},
+							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House')},
+							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
+							{fieldname: 'booking_status', fieldtype: 'Select', options: ["Reserved", "Booked", "End-Cleaning", "Sub-Cleaning", "Renovation"].join('\n'), default: booking.booking_status, label:__('Status')},
+							{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: booking.is_checked },
+							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
+							{fieldname: 'end_date', fieldtype: 'Date', default: booking.end_date, label:__('End')},
+							{fieldname: 'remark', fieldtype: 'Small Text', default: booking.remark, label:__('Remarks')}
+						],
+						primary_action: function(){
+							d.hide();
+							//console.log(d.get_values());
+							frappe.call({
+								method: "planner.planner.page.booking_planner.booking_planner.update_booking",
+								args: {
+									apartment: d.get_values().apartment,
+									end_date: d.get_values().end_date,
+									start_date: d.get_values().start_date,
+									booking_status: d.get_values().booking_status,
+									name: d.get_values().name,
+									is_checked: d.get_values().is_checked
+								},
+								callback(r) {
+									if(r.message == "OK") {
+										frappe.msgprint("Die Buchung wurde angepasst", "Erfolg");
+										document.getElementById("update-btn").click();
+									} else {
+										frappe.msgprint("Bitte wenden Sie sich an libracore", "Erorr");
+									}
 								}
-							}
-						});
-					},
-					primary_action_label: __('Update')
-				});
-				d.show()
+							});
+						},
+						primary_action_label: __('Update')
+					});
+					d.show()
+				} else {
+					var d = new frappe.ui.Dialog({
+						title: __('Update Booking Details'),
+						fields: [
+							{fieldname: 'name', fieldtype: 'Link', label:__('Booking'), read_only: 1, default: _booking, options: 'Booking'},
+							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House')},
+							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
+							{fieldname: 'booking_status', fieldtype: 'Select', options: ["Reserved", "Booked", "End-Cleaning", "Sub-Cleaning", "Renovation"].join('\n'), default: booking.booking_status, label:__('Status')},
+							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
+							{fieldname: 'end_date', fieldtype: 'Date', default: booking.end_date, label:__('End')},
+							{fieldname: 'remark', fieldtype: 'Small Text', default: booking.remark, label:__('Remarks')}
+						],
+						primary_action: function(){
+							d.hide();
+							//console.log(d.get_values());
+							frappe.call({
+								method: "planner.planner.page.booking_planner.booking_planner.update_booking",
+								args: {
+									apartment: d.get_values().apartment,
+									end_date: d.get_values().end_date,
+									start_date: d.get_values().start_date,
+									booking_status: d.get_values().booking_status,
+									name: d.get_values().name,
+									is_checked: 0
+								},
+								callback(r) {
+									if(r.message == "OK") {
+										frappe.msgprint("Die Buchung wurde angepasst", "Erfolg");
+										document.getElementById("update-btn").click();
+									} else {
+										frappe.msgprint("Bitte wenden Sie sich an libracore", "Erorr");
+									}
+								}
+							});
+						},
+						primary_action_label: __('Update')
+					});
+					d.show()
+				}
+                
             }
         }
     });
