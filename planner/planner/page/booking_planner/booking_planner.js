@@ -66,7 +66,7 @@ frappe.booking_planner = {
 		$("#allovercontainer").scroll(function(e){
 			horizontal = e.currentTarget.scrollLeft;
 			if (horizontal > 300) {
-				$(".apartment").css("z-index", 9999);
+				$(".apartment").css("z-index", 1000);
 				$(".apartment").css("background-color", "#F5F5F5");
 				$(".apartment").css("left", horizontal);
 			} else {
