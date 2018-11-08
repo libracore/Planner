@@ -56,8 +56,6 @@ frappe.booking_planner = {
         // display the transactions as table
         var container = document.getElementById("table_placeholder");
         //console.log("Container: " + container);
-		// table style
-        //var content = frappe.render_template('booking_table', message);
 		// div style
 		var content = frappe.render_template('booking_div_overview', message);
 		
