@@ -90,9 +90,9 @@ thead th {
 
 /*----------------------------------------------------------------------------------------*/
 .allover-container {
-		overflow-x: auto;
-		overflow-y: hidden;
-		position: relative;
+	overflow-x: auto;
+	overflow-y: hidden;
+	position: relative;
 }
 .header-container {
 	border-top: 1px solid black;
@@ -144,8 +144,9 @@ thead th {
 	width: 3732px;
 }
 .house {
-	border: 1px solid black;
+	border: 1px dotted black;
 	border-left-width: 0px;
+	border-top-width: 0px;
 	margin-top: 5px;
 	margin-bottom: 5px;
 	width: 100px;
@@ -163,32 +164,38 @@ thead th {
 	border-color: black;
 }
 .apartment {
-	border:1px solid black;
+	border: 1px dotted black;
 	border-left-width: 0px;
+	border-top-width: 0px;
 	height: 36px;
 	width: 200px;
 	text-align: center;
+	position: absolute;
+	left: 100px;
 }
 .apartment:hover {
 	cursor: pointer;
 }
-.apartment.pos-1 {
-	position: absolute;
-	left: 100px;
+/* .apartment {
+	
 }
 .apartment.pos-2 {
 	position: absolute;
 	left: 100px;
 	border-top-width: 0px;
-}
+} */
 .position {
-	border:1px solid black;
+	border: 1px dotted black;
 	border-left-width: 0px;
+	border-top-width: 0px;
 	height: 36px;
 	width: 80px;
 	text-align: center;
+	position: absolute;
+	left: 380px;
+	border-top-width: 0px;
 }
-.position.pos-1 {
+/* .position.pos-1 {
 	position: absolute;
 	left: 380px;
 }
@@ -196,15 +203,19 @@ thead th {
 	position: absolute;
 	left: 380px;
 	border-top-width: 0px;
-}
+} */
 .pricePM {
-	border:1px solid black;
+	border: 1px dotted black;
 	border-left-width: 0px;
+	border-top-width: 0px;
 	height: 36px;
 	width: 80px;
 	text-align: center;
+	position: absolute;
+	left: 460px;
+	border-top-width: 0px;
 }
-.pricePM.pos-1 {
+/* .pricePM.pos-1 {
 	position: absolute;
 	left: 460px;
 }
@@ -212,15 +223,19 @@ thead th {
 	position: absolute;
 	left: 460px;
 	border-top-width: 0px;
-}
+} */
 .pricePD {
-	border:1px solid black;
+	border: 1px dotted black;
 	border-left-width: 0px;
+	border-top-width: 0px;
 	height: 36px;
 	width: 80px;
 	text-align: center;
+	position: absolute;
+	left: 540px;
+	border-top-width: 0px;
 }
-.pricePD.pos-1 {
+/* .pricePD.pos-1 {
 	position: absolute;
 	left: 540px;
 }
@@ -228,15 +243,19 @@ thead th {
 	position: absolute;
 	left: 540px;
 	border-top-width: 0px;
-}
+} */
 .room {
-	border:1px solid black;
+	border: 1px dotted black;
 	border-left-width: 0px;
+	border-top-width: 0px;
 	padding-left: 32px;
 	height: 36px;
 	width: 80px;
+	position: absolute;
+	left: 300px;
+	border-top-width: 0px;
 }
-.room.pos-1 {
+/* .room.pos-1 {
 	position: absolute;
 	left: 300px;
 }
@@ -244,7 +263,7 @@ thead th {
 	position: absolute;
 	left: 300px;
 	border-top-width: 0px;
-}
+} */
 .buchung {
 	/*border:1px solid black;*/
 	height: 36px;
