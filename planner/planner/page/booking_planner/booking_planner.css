@@ -95,6 +95,16 @@
 .apartment:hover {
 	cursor: pointer;
 }
+.remarks {
+	border: 1px dotted black;
+	border-left-width: 0px;
+	border-top-width: 0px;
+	height: 36px;
+	width: 520px;
+	text-align: center;
+	position: absolute;
+	left: 100px;
+}
 .position {
 	border: 1px dotted black;
 	border-left-width: 0px;
@@ -140,10 +150,11 @@
 	border-top-width: 0px;
 }
 .buchung {
-	height: 36px;
+	height: 72px;
 	width: 51px;
 	border-radius: 5px;
 	cursor: pointer;
+	word-wrap: break-word;
 }
 
 .b-green {

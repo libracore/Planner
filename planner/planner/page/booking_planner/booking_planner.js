@@ -71,10 +71,12 @@ frappe.booking_planner = {
 				$(".apartment").css("z-index", 1000);
 				$(".apartment").css("background-color", "#F5F5F5");
 				$(".apartment").css("left", horizontal);
+				$(".apartment").css("height", 72);
 			} else {
 				$(".apartment").css("z-index", "auto");
 				$(".apartment").css("background-color", "#F5F5F5");
 				$(".apartment").css("left", 100);
+				$(".apartment").css("height", 36);
 			}
 			/* console.log(horizontal); */
 		});

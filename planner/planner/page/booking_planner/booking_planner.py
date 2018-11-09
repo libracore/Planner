@@ -35,10 +35,10 @@ def get_rows_for_div(calStartDate):
 		
 		# hinzufuegen zeile: haus
 		apartment_qty = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{0}'""".format(house), as_list=True)[0][0])
-		row_string += '<div class="house a{0}"><span>{1}</span></div>'.format(apartment_qty, house)
+		row_string += '<div class="house a{0}"><span>{1}</span></div>'.format(apartment_qty * 2, house)
 		
 		#hinzufuegen appartments inkl. infos
-		apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day` FROM `tabAppartment` WHERE `house` = '{0}'""".format(house), as_list=True)
+		apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day`, `remarks` FROM `tabAppartment` WHERE `house` = '{0}'""".format(house), as_list=True)
 		apartment_int = 1
 		for _apartment in apartments:
 			apartment = _apartment[0]
@@ -48,6 +48,7 @@ def get_rows_for_div(calStartDate):
 			service_price_per_month = _apartment[4]
 			price_per_day = _apartment[5]
 			service_price_per_day = _apartment[6]
+			remarks = _apartment[7]
 			sum_per_month = float(price_per_month) + float(service_price_per_month)
 			sum_per_day = float(price_per_day) + float(service_price_per_day)
 			row_string += '<div class="apartment pos-{0}" onclick="new_booking({2})"><span>{1}</span></div>'.format(apartment_int, apartment, "'" + apartment + "'")
@@ -56,7 +57,9 @@ def get_rows_for_div(calStartDate):
 			row_string += '<div class="pricePM pos-{0}"><span>{1}</span></div>'.format(apartment_int, sum_per_month)
 			row_string += '<div class="pricePD pos-{0}"><span>{1}</span></div>'.format(apartment_int, sum_per_day)
 			
-			row_string += '<div class="newBookingPlaceHolder a1 s1 d61 z0 pos-{0}" onclick="new_booking({1})"></div>'.format(apartment_int, "'" + apartment + "'")
+			row_string += '<div class="newBookingPlaceHolder a2 s1 d61 z0 pos-{0}" onclick="new_booking({1})"></div>'.format(apartment_int, "'" + apartment + "'")
+			row_string += '<div class="remarks pos-{0}">{1}</div>'.format(apartment_int + 1, remarks)
+			
 			
 			#hinzufuegen buchungen pro appartment
 			qty_bookings = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}'""".format(apartment, calStartDate), as_list=True)[0][0])
@@ -110,7 +113,7 @@ def get_rows_for_div(calStartDate):
 						row_string += '<div class="buchung pos-{0} s{1} d{2} z{4} {3}" onclick="show_booking({5})">{6}</div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'", _(bookingType))
 					z_index = 1
 			
-			apartment_int += 1
+			apartment_int += 2
 			
 					
 		row_string += '</div>'
