@@ -1,3 +1,7 @@
+#update-btn {
+	margin-top: 25px;
+	height: 30px;
+}
 .container.page-body {
 	width: 100%;
 	overflow-x: auto;
@@ -33,6 +37,8 @@
 	min-width: 80px;
 	border-right: 1px solid black;
 	text-align: center;
+	padding-left: 2px;
+	padding-right: 2px;
 }
 .header-t {
 	min-width: 50px;

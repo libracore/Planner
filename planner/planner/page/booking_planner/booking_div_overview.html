@@ -1,11 +1,11 @@
 <div class="allover-container" id="allovercontainer">
 	<div class="header-container">
-		<div class="header-100">Haus</div>
-		<div class="header-200">Apartment</div>
-		<div class="header-80">Rooms</div>
-		<div class="header-80">Position</div>
-		<div class="header-80">Price per month</div>
-		<div class="header-80">Price per Day</div>
+		<div class="header-100">{{ __("House") }}</div>
+		<div class="header-200">{{ __("Apartment") }}</div>
+		<div class="header-80">{{ __("Rooms") }}</div>
+		<div class="header-80">{{ __("Position") }}</div>
+		<div class="header-80">{{ __("Price per month") }}</div>
+		<div class="header-80">{{ __("Price per Day") }}</div>
 		{% for header in headers.headers %}
 			<div class="header-t">{{ __(header.weekday) }}<br>{{ __(header.day) }}</div>
 		{% endfor %}

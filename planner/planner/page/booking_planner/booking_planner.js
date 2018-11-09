@@ -24,6 +24,10 @@ frappe.booking_planner = {
             // update view
             frappe.booking_planner.update_table_data(page);
         });
+		this.page.main.find("#start_date").on('change', function() {
+            // update view
+            frappe.booking_planner.update_table_data(page);
+        });
 		
     },
     run: function(page) {
