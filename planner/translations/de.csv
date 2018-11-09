@@ -1,9 +1,14 @@
 Page: booking_planner,Price per month,Preis pro Monat
-Page: booking_planner,House, Haus
-Page: booking_planner,Apartment, Appartment
-Page: booking_planner,Rooms, Zimmer
-Page: booking_planner,Price per Day, Preis pro Tag
-Page: booking_planner,Position, Position
-Page: booking_planner,Selection, Auswahl
-Page: booking_planner,Booking, Buchung
-Page: booking_planner,Cleaning, Reinigung
+Page: booking_planner,House,Haus
+Page: booking_planner,Apartment,Appartment
+Page: booking_planner,Rooms,Zimmer
+Page: booking_planner,Price per Day,Preis pro Tag
+Page: booking_planner,Position,Position
+Page: booking_planner,Selection,Auswahl
+Page: booking_planner,Booking,Buchung
+Page: booking_planner,Cleaning,Reinigung
+Page: booking_planner,Reserved,Reserviert
+Page: booking_planner,Booked,Gebucht
+Page: booking_planner,End-Cleaning,Endreinigung
+Page: booking_planner,Sub-Cleaning,Zwischenreinigung
+Page: booking_planner,Renovation,Renorvation
