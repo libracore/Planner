@@ -5,6 +5,10 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from frappe import _, msgprint, throw
 
 class Booking(Document):
-	pass
+	#pass
+	def validate(self):
+		if self.end_date < self.start_date:
+			frappe.throw(_("The Start Date can not be after the End Date."))

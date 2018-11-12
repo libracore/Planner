@@ -100,6 +100,7 @@ def get_rows_for_div(calStartDate):
 						color = 'b-blue'
 					elif bookingType == 'End-Cleaning':
 						#check if checked
+						bookingType = "End"
 						if is_checked == 1:
 							color = 'b-green'
 						elif is_checked == 0:
@@ -107,6 +108,7 @@ def get_rows_for_div(calStartDate):
 						else:
 							color = 'b-orange'
 					elif bookingType == 'Sub-Cleaning':
+						bookingType = "Sub"
 						color = 'b-purple'
 					elif bookingType == 'Renovation':
 						color = 'b-darkgrey'
@@ -183,7 +185,7 @@ def get_cleaning_rows_for_div(calStartDate):
 			
 			#hinzufuegen buchungen pro appartment
 			bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' AND (`booking_status` = 'End-Cleaning' OR `booking_status` = 'Sub-Cleaning')""".format(apartment, calStartDate), as_list=True)
-			z_index = 2
+			z_index = 1
 			for _booking in bookings:
 				booking = _booking[0]
 				start = _booking[1]
@@ -221,7 +223,7 @@ def get_cleaning_rows_for_div(calStartDate):
 			s_start = 1
 			for days in all_days["headers"]:
 				if days["weekday"] == cleaning_day:
-					row_string += '<div class="clean-buchung pos-{0} s{1} d{2} z{4} {3}" onclick="new_cleaning_booking({5})">Default</div>'.format(apartment_int, s_start, 1, 'b-darkgrey', 1, "'" + apartment + "'")
+					row_string += '<div class="clean-buchung pos-{0} s{1} d{2} z{4} {3}" onclick="new_cleaning_booking({5})">Default</div>'.format(apartment_int, s_start, 1, 'b-darkgrey', 0, "'" + apartment + "'")
 				s_start += 1
 			apartment_int += 1
 			
@@ -348,6 +350,44 @@ def createHeaders(firstDate, secondDate):
 	return ( {'headers': headers} )
 	
 @frappe.whitelist()
-def update_booking(apartment, end_date, start_date, booking_status, name, customer='', is_checked=0):
-	update = frappe.db.sql("""UPDATE `tabBooking` SET `appartment` = '{0}', `end_date` = '{1}', `start_date` = '{2}', `booking_status` = '{3}', `is_checked` = {5}, `customer` = '{6}' WHERE `name` = '{4}'""".format(apartment, end_date, start_date, booking_status, name, is_checked, customer), as_list=True)
+def update_booking(apartment, end_date, start_date, booking_status, name, customer='', is_checked=0, cleaning_team='', remark=''):
+	booking = frappe.get_doc("Booking", name)
+	booking.update({
+		"appartment": apartment,
+		"end_date": end_date,
+		"start_date": start_date,
+		"booking_status": booking_status,
+		"customer": customer,
+		"is_checked": is_checked,
+		'cleaning_team': cleaning_team,
+		'remark': remark
+	})
+	booking.save()
+	frappe.db.commit()
+	#update = frappe.db.sql("""UPDATE `tabBooking` SET `appartment` = '{0}', `end_date` = '{1}', `start_date` = '{2}', `booking_status` = '{3}', `is_checked` = {5}, `customer` = '{6}' WHERE `name` = '{4}'""".format(apartment, end_date, start_date, booking_status, name, is_checked, customer), as_list=True)
+	return "OK"
+
+@frappe.whitelist()
+def create_booking(apartment, end_date, start_date, booking_status, customer='', is_checked=0, cleaning_team='', remark=''):
+	booking = frappe.new_doc("Booking")
+
+	booking.update({
+		"appartment": apartment,
+		"end_date": end_date,
+		"start_date": start_date,
+		"booking_status": booking_status,
+		"customer": customer,
+		"is_checked": is_checked,
+		'cleaning_team': cleaning_team,
+		'remark': remark
+	})
+	
+	booking.insert(ignore_permissions=True)
+	frappe.db.commit()
+	return booking.name
+	
+@frappe.whitelist()
+def delete_booking(booking):
+	frappe.delete_doc("Booking", booking)
+	frappe.db.commit()
 	return "OK"

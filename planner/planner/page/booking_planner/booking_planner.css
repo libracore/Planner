@@ -1,4 +1,4 @@
-#update-btn {
+#update-btn, #transform-btn {
 	margin-top: 25px;
 	height: 30px;
 }
@@ -81,6 +81,7 @@
 	border-top-width: 0px;
 	border-left-width: 0px;
 	border-color: black;
+	cursor: copy;
 }
 .apartment {
 	border: 1px dotted black;
@@ -93,7 +94,7 @@
 	left: 100px;
 }
 .apartment:hover {
-	cursor: pointer;
+	cursor: copy;
 }
 .remarks {
 	border: 1px dotted black;
@@ -155,6 +156,12 @@
 	border-radius: 5px;
 	cursor: pointer;
 	word-wrap: break-word;
+}
+.buchung:hover {
+	height: 72px;
+	z-index: 100;
+	margin-top: 0px;
+	opacity: 0.9;
 }
 .clean-buchung {
 	height: 36px;
@@ -365,8 +372,108 @@
 /* z-index 1-100 */
 .z0 {z-index: 0;}
 .z1 {z-index: 1;}
-.z2 {z-index: 2; height: 30px; margin-top: 3px; margin-bottom: 3px;}
-.z3 {z-index: 3; height: 24px; margin-top: 6px; margin-bottom: 6px;}
+.z2 {z-index: 2; height: 50px; margin-top: 22px;}
+.z3 {z-index: 3; height: 28px; margin-top: 44px;}
+.z4 {z-index: 3; height: 28px; margin-top: 44px;}
+.z5 {z-index: 3; height: 28px; margin-top: 44px;}
+.z6 {z-index: 3; height: 28px; margin-top: 44px;}
+.z7 {z-index: 3; height: 28px; margin-top: 44px;}
+.z8 {z-index: 3; height: 28px; margin-top: 44px;}
+.z9 {z-index: 3; height: 28px; margin-top: 44px;}
+.z10 {z-index: 3; height: 28px; margin-top: 44px;}
+.z11 {z-index: 3; height: 28px; margin-top: 44px;}
+.z12 {z-index: 3; height: 28px; margin-top: 44px;}
+.z13 {z-index: 3; height: 28px; margin-top: 44px;}
+.z14 {z-index: 3; height: 28px; margin-top: 44px;}
+.z15 {z-index: 3; height: 28px; margin-top: 44px;}
+.z16 {z-index: 3; height: 28px; margin-top: 44px;}
+.z17 {z-index: 3; height: 28px; margin-top: 44px;}
+.z18 {z-index: 3; height: 28px; margin-top: 44px;}
+.z19 {z-index: 3; height: 28px; margin-top: 44px;}
+.z20 {z-index: 3; height: 28px; margin-top: 44px;}
+.z21 {z-index: 3; height: 28px; margin-top: 44px;}
+.z22 {z-index: 3; height: 28px; margin-top: 44px;}
+.z23 {z-index: 3; height: 28px; margin-top: 44px;}
+.z24 {z-index: 3; height: 28px; margin-top: 44px;}
+.z25 {z-index: 3; height: 28px; margin-top: 44px;}
+.z26 {z-index: 3; height: 28px; margin-top: 44px;}
+.z27 {z-index: 3; height: 28px; margin-top: 44px;}
+.z28 {z-index: 3; height: 28px; margin-top: 44px;}
+.z29 {z-index: 3; height: 28px; margin-top: 44px;}
+.z30 {z-index: 3; height: 28px; margin-top: 44px;}
+.z31 {z-index: 3; height: 28px; margin-top: 44px;}
+.z32 {z-index: 3; height: 28px; margin-top: 44px;}
+.z33 {z-index: 3; height: 28px; margin-top: 44px;}
+.z34 {z-index: 3; height: 28px; margin-top: 44px;}
+.z35 {z-index: 3; height: 28px; margin-top: 44px;}
+.z36 {z-index: 3; height: 28px; margin-top: 44px;}
+.z37 {z-index: 3; height: 28px; margin-top: 44px;}
+.z38 {z-index: 3; height: 28px; margin-top: 44px;}
+.z39 {z-index: 3; height: 28px; margin-top: 44px;}
+.z40 {z-index: 3; height: 28px; margin-top: 44px;}
+.z41 {z-index: 3; height: 28px; margin-top: 44px;}
+.z42 {z-index: 3; height: 28px; margin-top: 44px;}
+.z43 {z-index: 3; height: 28px; margin-top: 44px;}
+.z44 {z-index: 3; height: 28px; margin-top: 44px;}
+.z45 {z-index: 3; height: 28px; margin-top: 44px;}
+.z46 {z-index: 3; height: 28px; margin-top: 44px;}
+.z47 {z-index: 3; height: 28px; margin-top: 44px;}
+.z48 {z-index: 3; height: 28px; margin-top: 44px;}
+.z49 {z-index: 3; height: 28px; margin-top: 44px;}
+.z50 {z-index: 3; height: 28px; margin-top: 44px;}
+.z51 {z-index: 3; height: 28px; margin-top: 44px;}
+.z52 {z-index: 3; height: 28px; margin-top: 44px;}
+.z53 {z-index: 3; height: 28px; margin-top: 44px;}
+.z54 {z-index: 3; height: 28px; margin-top: 44px;}
+.z55 {z-index: 3; height: 28px; margin-top: 44px;}
+.z56 {z-index: 3; height: 28px; margin-top: 44px;}
+.z57 {z-index: 3; height: 28px; margin-top: 44px;}
+.z58 {z-index: 3; height: 28px; margin-top: 44px;}
+.z59 {z-index: 3; height: 28px; margin-top: 44px;}
+.z60 {z-index: 3; height: 28px; margin-top: 44px;}
+.z61 {z-index: 3; height: 28px; margin-top: 44px;}
+.z62 {z-index: 3; height: 28px; margin-top: 44px;}
+.z63 {z-index: 3; height: 28px; margin-top: 44px;}
+.z64 {z-index: 3; height: 28px; margin-top: 44px;}
+.z65 {z-index: 3; height: 28px; margin-top: 44px;}
+.z66 {z-index: 3; height: 28px; margin-top: 44px;}
+.z67 {z-index: 3; height: 28px; margin-top: 44px;}
+.z68 {z-index: 3; height: 28px; margin-top: 44px;}
+.z69 {z-index: 3; height: 28px; margin-top: 44px;}
+.z70 {z-index: 3; height: 28px; margin-top: 44px;}
+.z71 {z-index: 3; height: 28px; margin-top: 44px;}
+.z72 {z-index: 3; height: 28px; margin-top: 44px;}
+.z73 {z-index: 3; height: 28px; margin-top: 44px;}
+.z74 {z-index: 3; height: 28px; margin-top: 44px;}
+.z75 {z-index: 3; height: 28px; margin-top: 44px;}
+.z76 {z-index: 3; height: 28px; margin-top: 44px;}
+.z77 {z-index: 3; height: 28px; margin-top: 44px;}
+.z78 {z-index: 3; height: 28px; margin-top: 44px;}
+.z79 {z-index: 3; height: 28px; margin-top: 44px;}
+.z80 {z-index: 3; height: 28px; margin-top: 44px;}
+.z81 {z-index: 3; height: 28px; margin-top: 44px;}
+.z82 {z-index: 3; height: 28px; margin-top: 44px;}
+.z83 {z-index: 3; height: 28px; margin-top: 44px;}
+.z84 {z-index: 3; height: 28px; margin-top: 44px;}
+.z85 {z-index: 3; height: 28px; margin-top: 44px;}
+.z86 {z-index: 3; height: 28px; margin-top: 44px;}
+.z87 {z-index: 3; height: 28px; margin-top: 44px;}
+.z88 {z-index: 3; height: 28px; margin-top: 44px;}
+.z89 {z-index: 3; height: 28px; margin-top: 44px;}
+.z90 {z-index: 3; height: 28px; margin-top: 44px;}
+.z91 {z-index: 3; height: 28px; margin-top: 44px;}
+.z92 {z-index: 3; height: 28px; margin-top: 44px;}
+.z93 {z-index: 3; height: 28px; margin-top: 44px;}
+.z94 {z-index: 3; height: 28px; margin-top: 44px;}
+.z95 {z-index: 3; height: 28px; margin-top: 44px;}
+.z96 {z-index: 3; height: 28px; margin-top: 44px;}
+.z97 {z-index: 3; height: 28px; margin-top: 44px;}
+.z98 {z-index: 3; height: 28px; margin-top: 44px;}
+.z99 {z-index: 3; height: 28px; margin-top: 44px;}
+.z100 {z-index: 3; height: 28px; margin-top: 44px;}
+
+/*.z2 {z-index: 2; height: 30px; margin-top: 30px; margin-bottom: 3px;}
+.z3 {z-index: 3; height: 24px; margin-top: 36px; margin-bottom: 6px;}
 .z4 {z-index: 4; height: 18px; margin-top: 9px; margin-bottom: 9px;}
 .z5 {z-index: 5; height: 12px; margin-top: 12px; margin-bottom: 12px;}
 .z6 {z-index: 6; height: 12px; margin-top: 12px; margin-bottom: 12px;}
@@ -463,7 +570,7 @@
 .z97 {z-index: 97; height: 12px; margin-top: 12px; margin-bottom: 12px;}
 .z98 {z-index: 98; height: 12px; margin-top: 12px; margin-bottom: 12px;}
 .z99 {z-index: 99; height: 12px; margin-top: 12px; margin-bottom: 12px;}
-.z100 {z-index: 100; height: 12px; margin-top: 12px; margin-bottom: 12px;}
+.z100 {z-index: 100; height: 12px; margin-top: 12px; margin-bottom: 12px;}*/
 /* top-position 1-100 */
 .pos-1 {top: 5px;}
 .pos-2 {top: 41px;}
