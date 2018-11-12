@@ -22,13 +22,34 @@ frappe.booking_planner = {
         $(frappe.render_template('booking_planner', data)).appendTo(me.body);
         this.page.main.find("#update-btn").on('click', function() {
             // update view
-            frappe.booking_planner.update_table_data(page);
+            selected_type = document.getElementById("filter_type").value;
+			console.log(selected_type);
+			if (selected_type == "booking") {
+				frappe.booking_planner.update_table_data(page);
+			} else {
+				frappe.booking_planner.update_cleaning_table_data(page);
+			}
         });
 		this.page.main.find("#start_date").on('change', function() {
             // update view
-            frappe.booking_planner.update_table_data(page);
+            selected_type = document.getElementById("filter_type").value;
+			console.log(selected_type);
+			if (selected_type == "booking") {
+				frappe.booking_planner.update_table_data(page);
+			} else {
+				frappe.booking_planner.update_cleaning_table_data(page);
+			}
         });
-		
+		this.page.main.find("#filter_type").on('change', function() {
+            // update view
+            selected_type = document.getElementById("filter_type").value;
+			console.log(selected_type);
+			if (selected_type == "booking") {
+				frappe.booking_planner.update_table_data(page);
+			} else {
+				frappe.booking_planner.update_cleaning_table_data(page);
+			}
+        });
     },
     run: function(page) {
 		// prepare form data
@@ -39,12 +60,33 @@ frappe.booking_planner = {
 		}
 		document.getElementById("start_date").value = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + day;
 		//console.log(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + day);
-        frappe.booking_planner.update_table_data(page);
+        selected_type = document.getElementById("filter_type").value;
+		console.log(selected_type);
+		if (selected_type == "booking") {
+			frappe.booking_planner.update_table_data(page);
+		} else {
+			frappe.booking_planner.update_cleaning_table_data(page);
+		}
     },
 	update_table_data: function(page) {
 		var inpStartDate = document.getElementById("start_date").value;
 		frappe.call({
             method: 'planner.planner.page.booking_planner.booking_planner.get_table_data',
+            args: {
+                'inpStartDate': inpStartDate
+            },
+            callback: function(r) {
+                if (r.message) {
+                    //console.log(r.message);
+                    frappe.booking_planner.show_table(page, r.message);
+                } 
+            }
+        });
+	},
+	update_cleaning_table_data: function(page) {
+		var inpStartDate = document.getElementById("start_date").value;
+		frappe.call({
+            method: 'planner.planner.page.booking_planner.booking_planner.get_cleaning_table_data',
             args: {
                 'inpStartDate': inpStartDate
             },
@@ -92,6 +134,13 @@ frappe.booking_planner = {
 function new_booking(apartment) {
 	frappe.route_options = {
 		"appartment": apartment
+	}
+	frappe.new_doc("Booking");
+}
+function new_cleaning_booking(apartment) {
+	frappe.route_options = {
+		"appartment": apartment,
+		"booking_status": "End-Cleaning"
 	}
 	frappe.new_doc("Booking");
 }
@@ -159,6 +208,114 @@ function show_booking(_booking) {
 							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House'), read_only: 1},
 							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
 							{fieldname: 'booking_status', fieldtype: 'Select', options: ["Reserved", "Booked", "End-Cleaning", "Sub-Cleaning", "Renovation"].join('\n'), default: booking.booking_status, label:__('Status')},
+							{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: booking.is_checked, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
+							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
+							{fieldname: 'end_date', fieldtype: 'Date', default: booking.end_date, label:__('End')},
+							{fieldname: 'customer', fieldtype: 'Link', default: booking.customer, label:__('Customer'), options: 'Customer'},
+							{fieldname: 'remark', fieldtype: 'Small Text', default: booking.remark, label:__('Remarks')}
+						],
+						primary_action: function(){
+							d.hide();
+							//console.log(d.get_values());
+							//console.log(d.get_values().customer);
+							var customer = '';
+							if (d.get_values().customer) {
+								customer = d.get_values().customer;
+							}
+							frappe.call({
+								method: "planner.planner.page.booking_planner.booking_planner.update_booking",
+								args: {
+									apartment: d.get_values().apartment,
+									end_date: d.get_values().end_date,
+									start_date: d.get_values().start_date,
+									booking_status: d.get_values().booking_status,
+									name: d.get_values().name,
+									is_checked: d.get_values().is_checked,
+									customer: d.get_values().customer
+								},
+								callback(r) {
+									if(r.message == "OK") {
+										frappe.msgprint("Die Buchung wurde angepasst", "Erfolg");
+										document.getElementById("update-btn").click();
+									} else {
+										frappe.msgprint("Bitte wenden Sie sich an libracore", "Error");
+									}
+								}
+							});
+						},
+						primary_action_label: __('Update')
+					});
+					d.show()
+				}
+                
+            }
+        }
+    });
+}
+
+function show_cleaning_booking(_booking) {
+	frappe.call({
+        method: "frappe.client.get",
+        args: {
+            doctype: "Booking",
+            name: _booking,
+        },
+        callback(r) {
+            if(r.message) {
+				var booking = r.message;
+				if (booking.booking_status == "End-Cleaning") {
+					var d = new frappe.ui.Dialog({
+						title: __('Update Booking Details'),
+						fields: [
+							{fieldname: 'name', fieldtype: 'Link', label:__('Booking'), read_only: 1, default: _booking, options: 'Booking'},
+							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House'), read_only: 1},
+							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
+							{fieldname: 'booking_status', fieldtype: 'Select', options: ["End-Cleaning", "Sub-Cleaning"].join('\n'), default: booking.booking_status, label:__('Status')},
+							{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: booking.is_checked },
+							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
+							{fieldname: 'end_date', fieldtype: 'Date', default: booking.end_date, label:__('End')},
+							{fieldname: 'customer', fieldtype: 'Link', default: booking.customer, label:__('Customer'), options: 'Customer'},
+							{fieldname: 'remark', fieldtype: 'Small Text', default: booking.remark, label:__('Remarks')}
+						],
+						primary_action: function(){
+							d.hide();
+							//console.log(d.get_values());
+							var customer = '';
+							if (d.get_values().customer) {
+								customer = d.get_values().customer;
+							}
+							frappe.call({
+								method: "planner.planner.page.booking_planner.booking_planner.update_booking",
+								args: {
+									apartment: d.get_values().apartment,
+									end_date: d.get_values().end_date,
+									start_date: d.get_values().start_date,
+									booking_status: d.get_values().booking_status,
+									name: d.get_values().name,
+									is_checked: d.get_values().is_checked,
+									customer: d.get_values().customer
+								},
+								callback(r) {
+									if(r.message == "OK") {
+										frappe.msgprint("Die Buchung wurde angepasst", "Erfolg");
+										document.getElementById("update-btn").click();
+									} else {
+										frappe.msgprint("Bitte wenden Sie sich an libracore", "Error");
+									}
+								}
+							});
+						},
+						primary_action_label: __('Update')
+					});
+					d.show()
+				} else {
+					var d = new frappe.ui.Dialog({
+						title: __('Update Booking Details'),
+						fields: [
+							{fieldname: 'name', fieldtype: 'Link', label:__('Booking'), read_only: 1, default: _booking, options: 'Booking'},
+							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House'), read_only: 1},
+							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
+							{fieldname: 'booking_status', fieldtype: 'Select', options: ["End-Cleaning", "Sub-Cleaning"].join('\n'), default: booking.booking_status, label:__('Status')},
 							{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: booking.is_checked, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
 							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
 							{fieldname: 'end_date', fieldtype: 'Date', default: booking.end_date, label:__('End')},

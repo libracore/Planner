@@ -156,6 +156,13 @@
 	cursor: pointer;
 	word-wrap: break-word;
 }
+.clean-buchung {
+	height: 36px;
+	width: 51px;
+	border-radius: 5px;
+	cursor: pointer;
+	word-wrap: break-word;
+}
 
 .b-green {
 	background-color: MediumSeaGreen;/*green;*/
