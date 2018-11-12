@@ -70,8 +70,13 @@ def get_rows_for_div(calStartDate):
 			row_string += '<div class="pricePM pos-{0}"><span>{1}</span></div>'.format(apartment_int, sum_per_month)
 			row_string += '<div class="pricePD pos-{0}"><span>{1}</span></div>'.format(apartment_int, sum_per_day)
 			
-			row_string += '<div class="newBookingPlaceHolder a2 s1 d61 z0 pos-{0}" onclick="new_booking({1})"></div>'.format(apartment_int, "'" + apartment + "'")
+			#row_string += '<div class="newBookingPlaceHolder a2 s1 d61 z0 pos-{0}" onclick="new_booking({1})"></div>'.format(apartment_int, "'" + apartment + "'")
 			row_string += '<div class="remarks pos-{0}">{1}</div>'.format(apartment_int + 1, remarks)
+			
+			for_loop_count = 1
+			while for_loop_count < 62:
+				row_string += '<div class="newBookingPlaceHolder a2 s{2} d1 z0 pos-{0}" onclick="new_booking({1}, {2})"></div>'.format(apartment_int, "'" + apartment + "'", for_loop_count)
+				for_loop_count += 1
 			
 			
 			#hinzufuegen buchungen pro appartment
@@ -180,8 +185,11 @@ def get_cleaning_rows_for_div(calStartDate):
 			row_string += '<div class="pricePM pos-{0}"><span>{1}</span></div>'.format(apartment_int, sum_per_month)
 			row_string += '<div class="pricePD pos-{0}"><span>{1}</span></div>'.format(apartment_int, sum_per_day)
 			
-			row_string += '<div class="newBookingPlaceHolder a1 s1 d61 z0 pos-{0}" onclick="new_cleaning_booking({1})"></div>'.format(apartment_int, "'" + apartment + "'")
-			
+			#row_string += '<div class="newBookingPlaceHolder a1 s1 d61 z0 pos-{0}" onclick="new_cleaning_booking({1})"></div>'.format(apartment_int, "'" + apartment + "'")
+			for_loop_count = 1
+			while for_loop_count < 62:
+				row_string += '<div class="newBookingPlaceHolder a1 s{2} d1 z0 pos-{0}" onclick="new_cleaning_booking({1}, {2})"></div>'.format(apartment_int, "'" + apartment + "'", for_loop_count)
+				for_loop_count += 1
 			
 			#hinzufuegen buchungen pro appartment
 			bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' AND (`booking_status` = 'End-Cleaning' OR `booking_status` = 'Sub-Cleaning')""".format(apartment, calStartDate), as_list=True)

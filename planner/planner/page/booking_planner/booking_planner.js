@@ -163,7 +163,7 @@ frappe.booking_planner = {
 	}
 	frappe.new_doc("Booking");
 } */
-function new_booking(apartment) {
+function new_booking(apartment, start_value) {
 	var d = new frappe.ui.Dialog({
 		title: __('Create new Booking'),
 		fields: [
@@ -171,8 +171,8 @@ function new_booking(apartment) {
 			{fieldname: 'booking_status', fieldtype: 'Select', options: ["Reserved", "Booked", "End-Cleaning", "Sub-Cleaning", "Renovation"].join('\n'), default: "Reserved", label:__('Status')},
 			{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: 0, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
 			{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team'), depends_on: 'eval:doc.booking_status=="End-Cleaning" || doc.booking_status=="Sub-Cleaning"' },
-			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start')},
-			{fieldname: 'end_date', fieldtype: 'Date', label:__('End')},
+			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: frappe.datetime.add_days(frappe.datetime.get_today(), (start_value - 1)) },
+			{fieldname: 'end_date', fieldtype: 'Date', label:__('End'), default: frappe.datetime.add_days(frappe.datetime.get_today(), start_value)},
 			{fieldname: 'customer', fieldtype: 'Link', label:__('Customer'), options: 'Customer'},
 			{fieldname: 'remark', fieldtype: 'Small Text', label:__('Remarks')}
 		],
@@ -205,7 +205,7 @@ function new_booking(apartment) {
 	});
 	d.show();
 }
-function new_cleaning_booking(apartment) {
+function new_cleaning_booking(apartment, start_value) {
 	/* frappe.route_options = {
 		"appartment": apartment,
 		"booking_status": "End-Cleaning"
@@ -219,8 +219,8 @@ function new_cleaning_booking(apartment) {
 			{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning')].join('\n'), default: __("Sub-Cleaning"), label:__('Status')},
 			{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: 0, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
 			{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team') },
-			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start')},
-			{fieldname: 'end_date', fieldtype: 'Date', label:__('End')},
+			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: frappe.datetime.add_days(frappe.datetime.get_today(), (start_value - 1))},
+			{fieldname: 'end_date', fieldtype: 'Date', label:__('End'), default: frappe.datetime.add_days(frappe.datetime.get_today(), (start_value - 1))},
 			{fieldname: 'customer', fieldtype: 'Link', label:__('Customer'), options: 'Customer'},
 			{fieldname: 'remark', fieldtype: 'Small Text', label:__('Remarks')}
 		],

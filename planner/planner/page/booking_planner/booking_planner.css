@@ -82,6 +82,7 @@
 	border-left-width: 0px;
 	border-color: black;
 	cursor: copy;
+	width: 51px;
 }
 .apartment {
 	border: 1px dotted black;
