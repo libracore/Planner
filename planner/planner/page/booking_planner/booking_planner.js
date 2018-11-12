@@ -168,7 +168,7 @@ function new_booking(apartment, start_value) {
 		title: __('Create new Booking'),
 		fields: [
 			{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: apartment, label:__('Apartment')},
-			{fieldname: 'booking_status', fieldtype: 'Select', options: ["Reserved", "Booked", "End-Cleaning", "Sub-Cleaning", "Renovation"].join('\n'), default: "Reserved", label:__('Status')},
+			{fieldname: 'booking_status', fieldtype: 'Select', options: [__('Reserved'), __('Booked'), __('End-Cleaning'), __('Sub-Cleaning'), __('Renovation')].join('\n'), default: __('Reserved'), label:__('Status')},
 			{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: 0, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
 			{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team'), depends_on: 'eval:doc.booking_status=="End-Cleaning" || doc.booking_status=="Sub-Cleaning"' },
 			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: frappe.datetime.add_days(frappe.datetime.get_today(), (start_value - 1)) },
@@ -216,7 +216,7 @@ function new_cleaning_booking(apartment, start_value) {
 		title: __('Create new Booking'),
 		fields: [
 			{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: apartment, label:__('Apartment')},
-			{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning')].join('\n'), default: __("Sub-Cleaning"), label:__('Status')},
+			{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning')].join('\n'), default: __('Sub-Cleaning'), label:__('Status')},
 			{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: 0, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
 			{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team') },
 			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: frappe.datetime.add_days(frappe.datetime.get_today(), (start_value - 1))},
@@ -271,7 +271,7 @@ function show_booking(_booking) {
 							{fieldname: 'name', fieldtype: 'Link', label:__('Booking'), read_only: 1, default: _booking, options: 'Booking'},
 							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House'), read_only: 1},
 							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
-							{fieldname: 'booking_status', fieldtype: 'Select', options: ["Reserved", "Booked", "End-Cleaning", "Sub-Cleaning", "Renovation"].join('\n'), default: booking.booking_status, label:__('Status')},
+							{fieldname: 'booking_status', fieldtype: 'Select', options: [__('Reserved'), __('Booked'), __('End-Cleaning'), __('Sub-Cleaning'), __('Renovation')].join('\n'), default: __(booking.booking_status), label:__('Status')},
 							{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: booking.is_checked },
 							{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team'), default: booking.cleaning_team },
 							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
@@ -302,7 +302,7 @@ function show_booking(_booking) {
 								},
 								callback(r) {
 									if(r.message == "OK") {
-										frappe.msgprint("Die Buchung wurde angepasst", "Erfolg");
+										frappe.msgprint(__('The Booking were updatet'), "Erfolg");
 										document.getElementById("update-btn").click();
 									} else {
 										frappe.msgprint("Bitte wenden Sie sich an libracore", "Error");
@@ -322,7 +322,7 @@ function show_booking(_booking) {
 							callback(r) {
 								d.hide();
 								if(r.message == "OK") {
-									frappe.msgprint("Die Buchung wurde gelöscht", "Erfolg");
+									frappe.msgprint(__('The Booking were deletet'), "Erfolg");
 									document.getElementById("update-btn").click();
 								} else {
 									frappe.msgprint("Bitte wenden Sie sich an libracore", "Error");
@@ -338,7 +338,7 @@ function show_booking(_booking) {
 							{fieldname: 'name', fieldtype: 'Link', label:__('Booking'), read_only: 1, default: _booking, options: 'Booking'},
 							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House'), read_only: 1},
 							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
-							{fieldname: 'booking_status', fieldtype: 'Select', options: ["Reserved", "Booked", "End-Cleaning", "Sub-Cleaning", "Renovation"].join('\n'), default: booking.booking_status, label:__('Status')},
+							{fieldname: 'booking_status', fieldtype: 'Select', options: [__('Reserved'), __('Booked'), __('End-Cleaning'), __('Sub-Cleaning'), __('Renovation')].join('\n'), default: __(booking.booking_status), label:__('Status')},
 							{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: booking.is_checked, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
 							{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team'), default: booking.cleaning_team, depends_on: 'eval:doc.booking_status=="End-Cleaning" || doc.booking_status=="Sub-Cleaning"' },
 							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
@@ -370,7 +370,7 @@ function show_booking(_booking) {
 								},
 								callback(r) {
 									if(r.message == "OK") {
-										frappe.msgprint("Die Buchung wurde angepasst", "Erfolg");
+										frappe.msgprint(__('The Booking were updatet'), "Erfolg");
 										document.getElementById("update-btn").click();
 									} else {
 										frappe.msgprint("Bitte wenden Sie sich an libracore", "Error");
@@ -390,7 +390,7 @@ function show_booking(_booking) {
 							callback(r) {
 								d.hide();
 								if(r.message == "OK") {
-									frappe.msgprint("Die Buchung wurde gelöscht", "Erfolg");
+									frappe.msgprint(__('The Booking were deletet'), "Erfolg");
 									document.getElementById("update-btn").click();
 								} else {
 									frappe.msgprint("Bitte wenden Sie sich an libracore", "Error");
@@ -423,7 +423,7 @@ function show_cleaning_booking(_booking) {
 							{fieldname: 'name', fieldtype: 'Link', label:__('Booking'), read_only: 1, default: _booking, options: 'Booking'},
 							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House'), read_only: 1},
 							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
-							{fieldname: 'booking_status', fieldtype: 'Select', options: ["End-Cleaning", "Sub-Cleaning"].join('\n'), default: booking.booking_status, label:__('Status')},
+							{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning')].join('\n'), default: __(booking.booking_status), label:__('Status')},
 							{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: booking.is_checked },
 							{fieldname: 'cleaning_team', fieldtype: 'Data', default: booking.cleaning_team, label:__('Cleaning Team')},
 							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
@@ -454,7 +454,7 @@ function show_cleaning_booking(_booking) {
 								},
 								callback(r) {
 									if(r.message == "OK") {
-										frappe.msgprint("Die Buchung wurde angepasst", "Erfolg");
+										frappe.msgprint(__('The Booking were updatet'), "Erfolg");
 										document.getElementById("update-btn").click();
 									} else {
 										frappe.msgprint("Bitte wenden Sie sich an libracore", "Error");
@@ -474,7 +474,7 @@ function show_cleaning_booking(_booking) {
 							callback(r) {
 								d.hide();
 								if(r.message == "OK") {
-									frappe.msgprint("Die Buchung wurde gelöscht", "Erfolg");
+									frappe.msgprint(__('The Booking were deletet'), "Erfolg");
 									document.getElementById("update-btn").click();
 								} else {
 									frappe.msgprint("Bitte wenden Sie sich an libracore", "Error");
@@ -490,7 +490,7 @@ function show_cleaning_booking(_booking) {
 							{fieldname: 'name', fieldtype: 'Link', label:__('Booking'), read_only: 1, default: _booking, options: 'Booking'},
 							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House'), read_only: 1},
 							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
-							{fieldname: 'booking_status', fieldtype: 'Select', options: ["End-Cleaning", "Sub-Cleaning"].join('\n'), default: booking.booking_status, label:__('Status')},
+							{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning')].join('\n'), default: __(booking.booking_status), label:__('Status')},
 							{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: booking.is_checked, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
 							{fieldname: 'cleaning_team', fieldtype: 'Data', default: booking.cleaning_team, label:__('Cleaning Team')},
 							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
@@ -522,7 +522,7 @@ function show_cleaning_booking(_booking) {
 								},
 								callback(r) {
 									if(r.message == "OK") {
-										frappe.msgprint("Die Buchung wurde angepasst", "Erfolg");
+										frappe.msgprint(__('The Booking were updatet'), "Erfolg");
 										document.getElementById("update-btn").click();
 									} else {
 										frappe.msgprint("Bitte wenden Sie sich an libracore", "Error");
@@ -542,7 +542,7 @@ function show_cleaning_booking(_booking) {
 							callback(r) {
 								d.hide();
 								if(r.message == "OK") {
-									frappe.msgprint("Die Buchung wurde gelöscht", "Erfolg");
+									frappe.msgprint(__('The Booking were deletet'), "Erfolg");
 									document.getElementById("update-btn").click();
 								} else {
 									frappe.msgprint("Bitte wenden Sie sich an libracore", "Error");
