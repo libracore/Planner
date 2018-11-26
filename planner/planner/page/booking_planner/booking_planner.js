@@ -5,6 +5,8 @@ frappe.pages['booking-planner'].on_page_load = function(wrapper) {
 		single_column: true
 	});
     
+	frappe["old_pos"] = 0;
+	
     frappe.booking_planner.make(page);
 	frappe.booking_planner.run(page);
     
@@ -111,9 +113,12 @@ frappe.booking_planner = {
         // display the transactions as table
         var container = document.getElementById("table_placeholder");
         //console.log("Container: " + container);
+		
+		
 		// div style
 		var content = frappe.render_template('booking_div_overview', message);
-		
+
+		//console.log(scrollTopStart);
         //console.log("Content: " + content);
         container.innerHTML = content;
 		$("#allovercontainer").scroll(function(e){
@@ -131,6 +136,13 @@ frappe.booking_planner = {
 			}
 			/* console.log(horizontal); */
 		});
+		document.getElementById("allovercontainer").scrollLeft = 100;
+		
+		$(".planner-container").scroll(function(e){
+			frappe["old_pos"] = e.currentTarget.scrollTop;
+			/* console.log(e.currentTarget.scrollTop); */
+		});
+		document.getElementsByClassName("planner-container")[0].scrollTop = frappe["old_pos"];
     },
 	start_wait: function() {
         document.getElementById("waitingScreen").classList.remove("hidden");
@@ -164,6 +176,7 @@ frappe.booking_planner = {
 	frappe.new_doc("Booking");
 } */
 function new_booking(apartment, start_value) {
+	var inpStartDate = document.getElementById("start_date").value;
 	var d = new frappe.ui.Dialog({
 		title: __('Create new Booking'),
 		fields: [
@@ -171,8 +184,8 @@ function new_booking(apartment, start_value) {
 			{fieldname: 'booking_status', fieldtype: 'Select', options: [__('Reserved'), __('Booked'), __('End-Cleaning'), __('Sub-Cleaning'), __('Renovation')].join('\n'), default: __('Reserved'), label:__('Status')},
 			{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: 0, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
 			{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team'), depends_on: 'eval:doc.booking_status=="End-Cleaning" || doc.booking_status=="Sub-Cleaning"' },
-			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: frappe.datetime.add_days(frappe.datetime.get_today(), (start_value - 1)) },
-			{fieldname: 'end_date', fieldtype: 'Date', label:__('End'), default: frappe.datetime.add_days(frappe.datetime.get_today(), start_value)},
+			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: frappe.datetime.add_days(inpStartDate, (start_value - 1)) },
+			{fieldname: 'end_date', fieldtype: 'Date', label:__('End'), default: frappe.datetime.add_days(inpStartDate, start_value + 5)},
 			{fieldname: 'customer', fieldtype: 'Link', label:__('Customer'), options: 'Customer'},
 			{fieldname: 'remark', fieldtype: 'Small Text', label:__('Remarks')}
 		],
@@ -204,6 +217,12 @@ function new_booking(apartment, start_value) {
 		primary_action_label: __('Create')
 	});
 	d.show();
+}
+function open_apartment(apartment) {
+	var pathname = "/desk#Form/Appartment/" + apartment;
+	/*window.open(window.location.origin + pathname, "_self");*/
+	var scrollLeft = document.getElementById("allovercontainer").scrollLeft;
+	console.log(scrollLeft);
 }
 function new_cleaning_booking(apartment, start_value) {
 	/* frappe.route_options = {
