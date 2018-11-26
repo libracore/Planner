@@ -60,7 +60,7 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 		row_string += '<div class="house a{0}"><span>{1}</span></div>'.format(apartment_qty * 2, house)
 		
 		#hinzufuegen appartments inkl. infos
-		apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day`, `remarks` FROM `tabAppartment` WHERE `house` = '{0}'  AND `disabled` = 0 AND `price_per_month` >= {1} AND `price_per_month` <= {2} AND `apartment_size` >= '{3}' AND `apartment_size` <= '{4}' ORDER BY `name` ASC""".format(house, from_price, to_price, from_size, to_size), as_list=True)
+		apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day`, `remarks`, `special_apartment`, `special_color` FROM `tabAppartment` WHERE `house` = '{0}'  AND `disabled` = 0 AND `price_per_month` >= {1} AND `price_per_month` <= {2} AND `apartment_size` >= '{3}' AND `apartment_size` <= '{4}' ORDER BY `name` ASC""".format(house, from_price, to_price, from_size, to_size), as_list=True)
 		#apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day`, `remarks` FROM `tabAppartment` WHERE `house` = '{0}'  AND `disabled` = 0 AND `price_per_month` >= {1} AND `price_per_month` <= {2} ORDER BY `name` ASC""".format(house, from_price, to_price, from_size, to_size), as_list=True)
 		apartment_int = 1
 		for _apartment in apartments:
@@ -72,9 +72,17 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 			price_per_day = _apartment[5]
 			service_price_per_day = _apartment[6]
 			remarks = _apartment[7]
+			special_apartment = _apartment[8]
+			special_color = _apartment[9]
+			#throw(str(apartment) + " /// " + str(special_apartment) + " /// " + str(special_color))
+			if str(special_apartment) == '1':
+				apartment_color_style = ' style="background-color: {special_color} !important;"'.format(special_color=str(special_color))
+			else:
+				apartment_color_style = ''
+				
 			# sum_per_month = float(price_per_month) + float(service_price_per_month)
 			# sum_per_day = float(price_per_day) + float(service_price_per_day)
-			row_string += '<div class="apartment pos-{0}" onclick="open_apartment({2})"><span>{1}</span></div>'.format(apartment_int, apartment, "'" + apartment + "'")
+			row_string += '<div class="apartment pos-{0}"{3} onclick="open_apartment({2})"><span>{1}</span></div>'.format(apartment_int, apartment, "'" + apartment + "'", apartment_color_style)
 			row_string += '<div class="room pos-{0}"><span>{1}</span></div>'.format(apartment_int, apartment_size)
 			row_string += '<div class="position pos-{0}"><span>{1}</span></div>'.format(apartment_int, position)
 			row_string += '<div class="pricePM pos-{0}"><span>{1}</span></div>'.format(apartment_int, price_per_month)
@@ -186,7 +194,7 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 		row_string += '<div class="house a{0}"><span>{1}</span></div>'.format(apartment_qty, house)
 		
 		#hinzufuegen appartments inkl. infos
-		apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day`, `remarks`, `cleaning_day` FROM `tabAppartment` WHERE `house` = '{0}' AND `disabled` = 0 AND `price_per_month` >= {1} AND `price_per_month` <= {2} AND `apartment_size` >= '{3}' AND `apartment_size` <= '{4}' ORDER BY `name` ASC""".format(house, from_price, to_price, from_size, to_size), as_list=True)
+		apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day`, `remarks`, `cleaning_day`, `special_apartment`, `special_color` FROM `tabAppartment` WHERE `house` = '{0}' AND `disabled` = 0 AND `price_per_month` >= {1} AND `price_per_month` <= {2} AND `apartment_size` >= '{3}' AND `apartment_size` <= '{4}' ORDER BY `name` ASC""".format(house, from_price, to_price, from_size, to_size), as_list=True)
 		apartment_int = 1
 		for _apartment in apartments:
 			booking_time_ref = []
@@ -199,9 +207,17 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 			service_price_per_day = _apartment[6]
 			remarks = _apartment[7]
 			cleaning_day = _apartment[8]
+			special_apartment = _apartment[9]
+			special_color = _apartment[10]
+			
+			if str(special_apartment) == '1':
+				apartment_color_style = ' style="background-color: {special_color} !important;"'.format(special_color=str(special_color))
+			else:
+				apartment_color_style = ''
+				
 			# sum_per_month = float(price_per_month) + float(service_price_per_month)
 			# sum_per_day = float(price_per_day) + float(service_price_per_day)
-			row_string += '<div class="apartment pos-{0}" onclick="open_apartment({2})"><span>{1}</span></div>'.format(apartment_int, apartment, "'" + apartment + "'")
+			row_string += '<div class="apartment pos-{0}"{3} onclick="open_apartment({2})"><span>{1}</span></div>'.format(apartment_int, apartment, "'" + apartment + "'", apartment_color_style)
 			row_string += '<div class="room pos-{0}"><span>{1}</span></div>'.format(apartment_int, apartment_size)
 			row_string += '<div class="position pos-{0}"><span>{1}</span></div>'.format(apartment_int, position)
 			row_string += '<div class="pricePM pos-{0}"><span>{1}</span></div>'.format(apartment_int, price_per_month)
@@ -413,6 +429,67 @@ def update_booking(apartment, end_date, start_date, booking_status, name, custom
 
 @frappe.whitelist()
 def create_booking(apartment, end_date, start_date, booking_status, customer='', is_checked=0, cleaning_team='', remark=''):
+	if booking_status == "Booked":
+		year = int(end_date.split("-")[0])
+		month = int(end_date.split("-")[1])
+		day = int(end_date.split("-")[2])
+		weekday = int(datetime(year, month, day).weekday())
+		#throw(str(end))
+		if weekday == 0:
+			wd = "Mo"
+		elif weekday == 1:
+			wd = "Di"
+		elif weekday == 2:
+			wd = "Mi"
+		elif weekday == 3:
+			wd = "Do"
+		elif weekday == 4:
+			wd = "Fr"
+		elif weekday == 5:
+			wd = "Sa"
+		else:
+			wd = "So"
+			
+		default_cleaning_day = frappe.db.sql("""SELECT `cleaning_day` FROM `tabAppartment` WHERE `name` = '{0}'""".format(apartment), as_list=True)[0][0]
+		if wd == default_cleaning_day:
+			cleaning_date = end_date
+		else:
+			if default_cleaning_day == "Mo":
+				default_cleaning_day = 0
+			elif default_cleaning_day == "Di":
+				default_cleaning_day = 1
+			elif default_cleaning_day == "Mi":
+				default_cleaning_day = 2
+			elif default_cleaning_day == "Do":
+				default_cleaning_day = 3
+			elif default_cleaning_day == "Fr":
+				default_cleaning_day = 4
+			elif default_cleaning_day == "Sa":
+				default_cleaning_day = 5
+			elif default_cleaning_day == "So":
+				default_cleaning_day = 6
+				
+			default_diff = default_cleaning_day - weekday
+			if default_diff < 0:
+				cleaning_date = add_days(end_date, (7 + default_diff))
+			else:
+				cleaning_date = add_days(end_date, default_diff)
+	
+		cleaning = frappe.new_doc("Booking")
+
+		cleaning.update({
+			"appartment": apartment,
+			"end_date": cleaning_date,
+			"start_date": cleaning_date,
+			"booking_status": "End-Cleaning",
+			"customer": customer,
+			"is_checked": 0,
+			'cleaning_team': cleaning_team,
+			'remark': remark
+		})
+		cleaning.insert(ignore_permissions=True)
+		frappe.db.commit()
+	
 	booking = frappe.new_doc("Booking")
 
 	booking.update({

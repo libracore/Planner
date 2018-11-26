@@ -212,12 +212,12 @@ frappe.booking_planner = {
 			horizontal = e.currentTarget.scrollLeft;
 			if (horizontal > 300) {
 				$(".apartment").css("z-index", 1000);
-				$(".apartment").css("background-color", "#F5F5F5");
+				//$(".apartment").css("background-color", "#F5F5F5");
 				$(".apartment").css("left", horizontal);
 				$(".apartment").css("height", 72);
 			} else {
 				$(".apartment").css("z-index", "auto");
-				$(".apartment").css("background-color", "#F5F5F5");
+				//$(".apartment").css("background-color", "#F5F5F5");
 				$(".apartment").css("left", 100);
 				$(".apartment").css("height", 36);
 			}
@@ -307,9 +307,9 @@ function new_booking(apartment, start_value) {
 }
 function open_apartment(apartment) {
 	var pathname = "/desk#Form/Appartment/" + apartment;
-	/*window.open(window.location.origin + pathname, "_self");*/
-	var scrollLeft = document.getElementById("allovercontainer").scrollLeft;
-	console.log(scrollLeft);
+	window.open(window.location.origin + pathname, "_self");
+	/* var scrollLeft = document.getElementById("allovercontainer").scrollLeft;
+	console.log(scrollLeft); */
 }
 function new_cleaning_booking(apartment, start_value) {
 	/* frappe.route_options = {

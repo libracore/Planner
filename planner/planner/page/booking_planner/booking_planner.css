@@ -94,6 +94,7 @@
 	position: absolute;
 	left: 100px;
 	font-weight: bold;
+	background-color: #F5F5F5;
 }
 .apartment:hover {
 	cursor: copy;
