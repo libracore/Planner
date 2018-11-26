@@ -61,6 +61,51 @@ frappe.booking_planner = {
 				}
 			}
         });
+		this.page.main.find("#filter_house").on('change', function() {
+            // update view
+            selected_type = document.getElementById("filter_type").value;
+			if (selected_type == "booking") {
+				frappe.booking_planner.update_table_data(page);
+			} else {
+				frappe.booking_planner.update_cleaning_table_data(page);
+			}
+        });
+		this.page.main.find("#filter_size_from").on('change', function() {
+            // update view
+            selected_type = document.getElementById("filter_type").value;
+			if (selected_type == "booking") {
+				frappe.booking_planner.update_table_data(page);
+			} else {
+				frappe.booking_planner.update_cleaning_table_data(page);
+			}
+        });
+		this.page.main.find("#filter_size_to").on('change', function() {
+            // update view
+            selected_type = document.getElementById("filter_type").value;
+			if (selected_type == "booking") {
+				frappe.booking_planner.update_table_data(page);
+			} else {
+				frappe.booking_planner.update_cleaning_table_data(page);
+			}
+        });
+		this.page.main.find("#price_from").on('change', function() {
+            // update view
+            selected_type = document.getElementById("filter_type").value;
+			if (selected_type == "booking") {
+				frappe.booking_planner.update_table_data(page);
+			} else {
+				frappe.booking_planner.update_cleaning_table_data(page);
+			}
+        });
+		this.page.main.find("#price_to").on('change', function() {
+            // update view
+            selected_type = document.getElementById("filter_type").value;
+			if (selected_type == "booking") {
+				frappe.booking_planner.update_table_data(page);
+			} else {
+				frappe.booking_planner.update_cleaning_table_data(page);
+			}
+        });
     },
     run: function(page) {
 		// prepare form data
@@ -72,7 +117,28 @@ frappe.booking_planner = {
 		document.getElementById("start_date").value = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + day;
 		//console.log(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + day);
         selected_type = document.getElementById("filter_type").value;
-		console.log(selected_type);
+		//console.log(selected_type);
+		
+		frappe.call({
+		   method: "frappe.client.get_list",
+		   args: {
+				"doctype": "House",
+				"filters": {'disabled': 0}
+		   },
+		   callback: function(response) {
+				var houses = response.message;
+				if (houses) {
+					for (i=0; i < houses.length; i++) {
+						var filter_container = document.getElementById("filter_house");
+						var option = document.createElement("option");
+						option.value = houses[i]['name'];
+						option.innerHTML = houses[i]['name'];
+						filter_container.appendChild(option);
+					}
+				}
+		   }
+		});
+		
 		if (selected_type == "booking") {
 			frappe.booking_planner.update_table_data(page);
 		} else {
