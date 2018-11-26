@@ -1,16 +1,53 @@
 <div style="margin: 5px; margin-top: 0px; border-top: 1px solid white; ">
   <div class="section-body">
 	<div class="row" style="margin-top: 5px;"> 
-        <div class="col-sm-3">
+        <div class="col-sm-2">
 			<div class="form-group">
 				<label for="filter_type">{{ __("Selection") }}:</label>
 				<select class="form-control" id="filter_type">
 					<option value="booking">{{ __("Booking") }}</option>
 					<option value="cleaning">{{ __("Cleaning") }}</option>
 				</select>
+				<label for="filter_house">{{ __("House") }}:</label>
+				<select class="form-control" id="filter_house">
+					<option value="All">{{ __("All") }}</option>
+					<option value="cleaning">{{ __("House 1") }}</option>
+				</select>
 			</div>
 		</div>
-		<div class="col-sm-3">
+		<div class="col-sm-2">
+			<div class="form-group">
+				<label for="price_from">{{ __("From Price") }}:</label>
+				<input type="number" min="0" value="0" class="form-control" id="price_from">
+				<label for="price_to">{{ __("To Price") }}:</label>
+				<input type="number" min ="0" value="10000" class="form-control" id="price_to">
+			</div>
+		</div>
+		<div class="col-sm-2">
+			<label for="filter_size_from">{{ __("From Size") }}:</label>
+				<select class="form-control" id="filter_size_from">
+					<option value="1" selected="selected">1</option>
+					<option value="1.5">1.5</option>
+					<option value="2">2</option>
+					<option value="2.5">2.5</option>
+					<option value="3">3</option>
+					<option value="3.5">3.5</option>
+					<option value="4">4</option>
+					<option value="4.5">4.5</option>
+				</select>
+				<label for="filter_size_to">{{ __("To Size") }}:</label>
+				<select class="form-control" id="filter_size_to">
+					<option value="1">1</option>
+					<option value="1.5">1.5</option>
+					<option value="2">2</option>
+					<option value="2.5">2.5</option>
+					<option value="3">3</option>
+					<option value="3.5">3.5</option>
+					<option value="4">4</option>
+					<option value="4.5" selected="selected">4.5</option>
+				</select>
+		</div>
+		<div class="col-sm-2">
 			<div class="form-group">
 				<label for="start_dtae">{{ __("Start Date") }}:</label>
 				<input type="date" class="form-control" id="start_date">

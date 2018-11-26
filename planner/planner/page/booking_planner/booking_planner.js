@@ -81,10 +81,21 @@ frappe.booking_planner = {
     },
 	update_table_data: function(page) {
 		var inpStartDate = document.getElementById("start_date").value;
+		var house = document.getElementById("filter_house").value;
+		var from_price = document.getElementById("price_from").value;
+		var to_price = document.getElementById("price_to").value;
+		var from_size = document.getElementById("filter_size_from").value;
+		var to_size = document.getElementById("filter_size_to").value;
+		console.log(house);
 		frappe.call({
             method: 'planner.planner.page.booking_planner.booking_planner.get_table_data',
             args: {
-                'inpStartDate': inpStartDate
+                'inpStartDate': inpStartDate,
+				'house': house,
+				'from_price': from_price,
+				'to_price': to_price,
+				'from_size': from_size,
+				'to_size': to_size
             },
             callback: function(r) {
                 if (r.message) {
@@ -96,10 +107,20 @@ frappe.booking_planner = {
 	},
 	update_cleaning_table_data: function(page) {
 		var inpStartDate = document.getElementById("start_date").value;
+		var house = document.getElementById("filter_house").value;
+		var from_price = document.getElementById("price_from").value;
+		var to_price = document.getElementById("price_to").value;
+		var from_size = document.getElementById("filter_size_from").value;
+		var to_size = document.getElementById("filter_size_to").value;
 		frappe.call({
             method: 'planner.planner.page.booking_planner.booking_planner.get_cleaning_table_data',
             args: {
-                'inpStartDate': inpStartDate
+                'inpStartDate': inpStartDate,
+				'house': house,
+				'from_price': from_price,
+				'to_price': to_price,
+				'from_size': from_size,
+				'to_size': to_size
             },
             callback: function(r) {
                 if (r.message) {

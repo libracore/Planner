@@ -12,46 +12,56 @@ from collections import namedtuple
 import itertools
 
 @frappe.whitelist()
-def get_table_data(inpStartDate):
+def get_table_data(inpStartDate, house, from_price, to_price, from_size, to_size):
 	calStartDate = getdate(inpStartDate)
 	calcEndDate = add_to_date(calStartDate, days=60, as_string=True)
 	
 	#div style
 	master_data = {
 		'headers': createHeaders(calStartDate, add_to_date(calStartDate, months=1)),
-		'rows': get_rows_for_div(calStartDate)
+		'rows': get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_size)
 	}
 		
 	return master_data
 	
 @frappe.whitelist()
-def get_cleaning_table_data(inpStartDate):
+def get_cleaning_table_data(inpStartDate, house, from_price, to_price, from_size, to_size):
 	calStartDate = getdate(inpStartDate)
 	calcEndDate = add_to_date(calStartDate, days=60, as_string=True)
 	
 	#div style
 	master_data = {
 		'headers': createHeaders(calStartDate, add_to_date(calStartDate, months=1)),
-		'rows': get_cleaning_rows_for_div(calStartDate)
+		'rows': get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_size)
 	}
 		
 	return master_data
 	
-def get_rows_for_div(calStartDate):
+def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_size):
 	rows = []
-	
+	from_price = int(from_price)
+	to_price = int(to_price)
+	from_size = float(from_size)
+	to_size = float(to_size)
 	#houses = alle haeuser
-	houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0 ORDER BY `name` ASC""", as_list=True)
+	if house != 'All':
+		house_filter = " AND `name` = '{house}'".format(house=house)
+	else:
+		house_filter = ''
+		
+	houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0{house_filter} ORDER BY `name` ASC""".format(house_filter=house_filter), as_list=True)
 	for _house in houses:
 		house = _house[0]
 		row_string = '<div class="planner-zeile">'
 		
 		# hinzufuegen zeile: haus
-		apartment_qty = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{0}' AND `disabled` = 0 """.format(house), as_list=True)[0][0])
+		apartment_qty = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{0}' AND `disabled` = 0 AND `price_per_month` >= {1} AND `price_per_month` <= {2} AND `apartment_size` >= '{3}' AND `apartment_size` <= '{4}' ORDER BY `name` ASC""".format(house, from_price, to_price, from_size, to_size), as_list=True)[0][0])
+		#apartment_qty = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{0}' AND `disabled` = 0 AND `price_per_month` >= {1} AND `price_per_month` <= {2} ORDER BY `name` ASC""".format(house, from_price, to_price, from_size, to_size), as_list=True)[0][0])
 		row_string += '<div class="house a{0}"><span>{1}</span></div>'.format(apartment_qty * 2, house)
 		
 		#hinzufuegen appartments inkl. infos
-		apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day`, `remarks` FROM `tabAppartment` WHERE `house` = '{0}'  AND `disabled` = 0 ORDER BY `name` ASC""".format(house), as_list=True)
+		apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day`, `remarks` FROM `tabAppartment` WHERE `house` = '{0}'  AND `disabled` = 0 AND `price_per_month` >= {1} AND `price_per_month` <= {2} AND `apartment_size` >= '{3}' AND `apartment_size` <= '{4}' ORDER BY `name` ASC""".format(house, from_price, to_price, from_size, to_size), as_list=True)
+		#apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day`, `remarks` FROM `tabAppartment` WHERE `house` = '{0}'  AND `disabled` = 0 AND `price_per_month` >= {1} AND `price_per_month` <= {2} ORDER BY `name` ASC""".format(house, from_price, to_price, from_size, to_size), as_list=True)
 		apartment_int = 1
 		for _apartment in apartments:
 			apartment = _apartment[0]
@@ -154,21 +164,29 @@ def overlap_control(date_list=[], ref_date=[]):
 	overlap = max(0, delta)
 	return overlap
 	
-def get_cleaning_rows_for_div(calStartDate):
+def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_size):
 	rows = []
-	
+	from_price = int(from_price)
+	to_price = int(to_price)
+	from_size = float(from_size)
+	to_size = float(to_size)
+	if house != 'All':
+		house_filter = " AND `name` = '{house}'".format(house=house)
+	else:
+		house_filter = ''
+		
 	#houses = alle haeuser
-	houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0 ORDER BY `name` ASC""", as_list=True)
+	houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0{house_filter} ORDER BY `name` ASC""".format(house_filter=house_filter), as_list=True)
 	for _house in houses:
 		house = _house[0]
 		row_string = '<div class="planner-zeile">'
 		
 		# hinzufuegen zeile: haus
-		apartment_qty = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{0}' AND `disabled` = 0 """.format(house), as_list=True)[0][0])
+		apartment_qty = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{0}' AND `disabled` = 0 AND `price_per_month` >= {1} AND `price_per_month` <= {2} AND `apartment_size` >= '{3}' AND `apartment_size` <= '{4}' ORDER BY `name` ASC""".format(house, from_price, to_price, from_size, to_size), as_list=True)[0][0])
 		row_string += '<div class="house a{0}"><span>{1}</span></div>'.format(apartment_qty, house)
 		
 		#hinzufuegen appartments inkl. infos
-		apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day`, `remarks`, `cleaning_day` FROM `tabAppartment` WHERE `house` = '{0}' AND `disabled` = 0 ORDER BY `name` ASC""".format(house), as_list=True)
+		apartments = frappe.db.sql("""SELECT `name`, `apartment_size`, `position`, `price_per_month`, `service_price_per_month`, `price_per_day`, `service_price_per_day`, `remarks`, `cleaning_day` FROM `tabAppartment` WHERE `house` = '{0}' AND `disabled` = 0 AND `price_per_month` >= {1} AND `price_per_month` <= {2} AND `apartment_size` >= '{3}' AND `apartment_size` <= '{4}' ORDER BY `name` ASC""".format(house, from_price, to_price, from_size, to_size), as_list=True)
 		apartment_int = 1
 		for _apartment in apartments:
 			booking_time_ref = []
