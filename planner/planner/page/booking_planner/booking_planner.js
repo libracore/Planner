@@ -51,14 +51,14 @@ frappe.booking_planner = {
 			console.log(selected_type);
 			if (selected_type == "booking") {
 				frappe.booking_planner.update_table_data(page);
-				if (!document.getElementById("transform-div").classList.contains("hidden")) {
+				/*if (!document.getElementById("transform-div").classList.contains("hidden")) {
 					document.getElementById("transform-div").classList.add("hidden");
-				}
+				}*/
 			} else {
 				frappe.booking_planner.update_cleaning_table_data(page);
-				if (document.getElementById("transform-div").classList.contains("hidden")) {
+				/*if (document.getElementById("transform-div").classList.contains("hidden")) {
 					document.getElementById("transform-div").classList.remove("hidden");
-				}
+				}*/
 			}
         });
 		this.page.main.find("#filter_house").on('change', function() {

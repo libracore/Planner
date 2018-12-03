@@ -1,7 +1,15 @@
 <div style="margin: 5px; margin-top: 0px; border-top: 1px solid white; ">
   <div class="section-body">
 	<div class="row" style="margin-top: 5px;"> 
-        <div class="col-sm-2">
+		<div class="col-sm-1"></div>
+		<div class="col-sm-2">
+			<img src="/assets/planner/images/aas-small.png" alt="AAS Logo" style="height: 55px; margin-top: 0%;">
+			<div class="form-group">
+				<label for="start_dtae">{{ __("Start Date") }}:</label>
+				<input type="date" class="form-control" id="start_date">
+			</div>
+		</div>
+		<div class="col-sm-2">
 			<div class="form-group">
 				<label for="filter_type">{{ __("Selection") }}:</label>
 				<select class="form-control" id="filter_type">
@@ -46,30 +54,15 @@
 					<option value="4.5" selected="selected">4.5</option>
 				</select>
 		</div>
-		<div class="col-sm-2">
-			<div class="form-group">
-				<label for="start_dtae">{{ __("Start Date") }}:</label>
-				<input type="date" class="form-control" id="start_date">
-			</div>
-		</div>
-		<!-- {#<div class="col-sm-3">
-			<div class="form-group">
-				<label for="filter_house">{{ __("House") }}:</label>
-				<select class="form-control" id="filter_house">
-					<option value="all">{{ __("All") }}</option>
-					<option value="booking">{{ __("House 1") }}</option>
-					<option value="cleaning">{{ __("House 2") }}</option>
-				</select>
-			</div>
-		</div>#} -->
 		<div class="col-sm-1">
 			<button type="submit" class="btn btn-xs btn-primary btn-update" id="update-btn">{{ __("Update") }}</button>
             <i id="waitingScreen" class="fa fa-spinner fa-spin hidden"></i>
 		</div>
-		<div class="col-sm-1 hidden" id="transform-div">
+		<!--<div class="col-sm-1 hidden" id="transform-div">
 			<button type="submit" class="btn btn-xs btn-primary btn-update" id="transform-btn">{{ __("Transform Default to Fixed") }}</button>
             <i id="waitingScreen" class="fa fa-spinner fa-spin hidden"></i>
-		</div>
+		</div>-->
+		
     </div>
 	  
     <div class="row">
