@@ -67,8 +67,8 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 			apartment = _apartment[0]
 			apartment_size = _apartment[1]
 			position = _apartment[2]
-			price_per_month = _apartment[3]
-			service_price_per_month = _apartment[4]
+			price_per_month = int(_apartment[3])
+			service_price_per_month = int(_apartment[4])
 			price_per_day = _apartment[5]
 			service_price_per_day = _apartment[6]
 			remarks = _apartment[7]
@@ -201,8 +201,8 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 			apartment = _apartment[0]
 			apartment_size = _apartment[1]
 			position = _apartment[2]
-			price_per_month = _apartment[3]
-			service_price_per_month = _apartment[4]
+			price_per_month = int(_apartment[3])
+			service_price_per_month = int(_apartment[4])
 			price_per_day = _apartment[5]
 			service_price_per_day = _apartment[6]
 			remarks = _apartment[7]
@@ -419,7 +419,7 @@ def update_booking(apartment, end_date, start_date, booking_status, name, custom
 		"booking_status": booking_status,
 		"customer": customer,
 		"is_checked": is_checked,
-		'cleaning_team': cleaning_team,
+		#'cleaning_team': cleaning_team,
 		'remark': remark
 	})
 	booking.save()
@@ -485,7 +485,7 @@ def create_booking(apartment, end_date, start_date, booking_status, customer='',
 			"booking_status": "End-Cleaning",
 			"customer": customer,
 			"is_checked": 0,
-			'cleaning_team': cleaning_team,
+			#'cleaning_team': cleaning_team,
 			'remark': remark
 		})
 		end_cleaning.insert(ignore_permissions=True)
@@ -552,7 +552,7 @@ def create_booking(apartment, end_date, start_date, booking_status, customer='',
 				"booking_status": "Service-Cleaning",
 				"customer": customer,
 				"is_checked": 0,
-				'cleaning_team': cleaning_team,
+				#'cleaning_team': cleaning_team,
 				'remark': remark
 			})
 			
@@ -568,7 +568,7 @@ def create_booking(apartment, end_date, start_date, booking_status, customer='',
 		"booking_status": booking_status,
 		"customer": customer,
 		"is_checked": is_checked,
-		'cleaning_team': cleaning_team,
+		#'cleaning_team': cleaning_team,
 		'remark': remark
 	})
 	

@@ -11,6 +11,8 @@ app_color = "#a2c8ed"
 app_email = "info@libracore.com"
 app_license = "GPL"
 
+fixtures = ["Custom Field"]
+
 # Includes in <head>
 # ------------------
 

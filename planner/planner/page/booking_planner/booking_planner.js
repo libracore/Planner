@@ -123,7 +123,8 @@ frappe.booking_planner = {
 		   method: "frappe.client.get_list",
 		   args: {
 				"doctype": "House",
-				"filters": {'disabled': 0}
+				"filters": {'disabled': 0},
+				"order_by": "name"
 		   },
 		   callback: function(response) {
 				var houses = response.message;
@@ -243,8 +244,8 @@ frappe.booking_planner = {
 			fields: [
 				{fieldname: 'description', fieldtype: 'HTML', label:__('Description'), read_only: 1, options: '<p>{{ __("Transform all default cleanings to fixed cleanings according to the range below") }}</p>'},
 				{fieldname: 'start_date', fieldtype: 'Date', label:__('Start')},
-				{fieldname: 'end_date', fieldtype: 'Date', label:__('End')},
-				{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team')}
+				{fieldname: 'end_date', fieldtype: 'Date', label:__('End')}/*,
+				{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team')}*/
 			],
 			primary_action: function(){
 				d.hide();
@@ -268,9 +269,9 @@ function new_booking(apartment, start_value) {
 		title: __('Create new Booking'),
 		fields: [
 			{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: apartment, label:__('Apartment')},
-			{fieldname: 'booking_status', fieldtype: 'Select', options: [__('Reserved'), __('Booked'), __('End-Cleaning'), __('Sub-Cleaning'), __('Renovation')].join('\n'), default: __('Reserved'), label:__('Status')},
+			{fieldname: 'booking_status', fieldtype: 'Select', options: [__('Reserved'), __('Booked'), __('End-Cleaning'), __('Sub-Cleaning'), __('Service-Cleaning'), __('Renovation')].join('\n'), default: __('Reserved'), label:__('Status')},
 			{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: 0, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
-			{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team'), depends_on: 'eval:doc.booking_status=="End-Cleaning" || doc.booking_status=="Sub-Cleaning"' },
+			/*{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team'), depends_on: 'eval:doc.booking_status=="End-Cleaning" || doc.booking_status=="Sub-Cleaning"' },*/
 			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: frappe.datetime.add_days(inpStartDate, (start_value - 1)) },
 			{fieldname: 'end_date', fieldtype: 'Date', label:__('End'), default: frappe.datetime.add_days(inpStartDate, start_value + 5)},
 			{fieldname: 'customer', fieldtype: 'Link', label:__('Customer'), options: 'Customer'},
@@ -288,7 +289,7 @@ function new_booking(apartment, start_value) {
 					booking_status: d.get_values().booking_status,
 					customer: d.get_values().customer,
 					is_checked: d.get_values().is_checked,
-					cleaning_team: d.get_values().cleaning_team,
+					/*cleaning_team: d.get_values().cleaning_team,*/
 					remark: d.get_values().remark
 				},
 				callback(r) {
@@ -322,9 +323,9 @@ function new_cleaning_booking(apartment, start_value) {
 		title: __('Create new Booking'),
 		fields: [
 			{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: apartment, label:__('Apartment')},
-			{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning')].join('\n'), default: __('Sub-Cleaning'), label:__('Status')},
+			{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning'), __('Service-Cleaning')].join('\n'), default: __('Sub-Cleaning'), label:__('Status')},
 			{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: 0, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
-			{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team') },
+			/*{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team') },*/
 			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: frappe.datetime.add_days(frappe.datetime.get_today(), (start_value - 1))},
 			{fieldname: 'end_date', fieldtype: 'Date', label:__('End'), default: frappe.datetime.add_days(frappe.datetime.get_today(), (start_value - 1))},
 			{fieldname: 'customer', fieldtype: 'Link', label:__('Customer'), options: 'Customer'},
@@ -342,7 +343,7 @@ function new_cleaning_booking(apartment, start_value) {
 					booking_status: d.get_values().booking_status,
 					customer: d.get_values().customer,
 					is_checked: d.get_values().is_checked,
-					cleaning_team: d.get_values().cleaning_team,
+					/*cleaning_team: d.get_values().cleaning_team,*/
 					remark: d.get_values().remark
 				},
 				callback(r) {
@@ -377,9 +378,9 @@ function show_booking(_booking) {
 							{fieldname: 'name', fieldtype: 'Link', label:__('Booking'), read_only: 1, default: _booking, options: 'Booking'},
 							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House'), read_only: 1},
 							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
-							{fieldname: 'booking_status', fieldtype: 'Select', options: [__('Reserved'), __('Booked'), __('End-Cleaning'), __('Sub-Cleaning'), __('Renovation')].join('\n'), default: __(booking.booking_status), label:__('Status')},
+							{fieldname: 'booking_status', fieldtype: 'Select', options: [__('Reserved'), __('Booked'), __('End-Cleaning'), __('Sub-Cleaning'), __('Service-Cleaning'), __('Renovation')].join('\n'), default: __(booking.booking_status), label:__('Status')},
 							{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: booking.is_checked },
-							{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team'), default: booking.cleaning_team },
+							/*{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team'), default: booking.cleaning_team },*/
 							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
 							{fieldname: 'end_date', fieldtype: 'Date', default: booking.end_date, label:__('End')},
 							{fieldname: 'customer', fieldtype: 'Link', default: booking.customer, label:__('Customer'), options: 'Customer'},
@@ -403,7 +404,7 @@ function show_booking(_booking) {
 									name: d.get_values().name,
 									is_checked: d.get_values().is_checked,
 									customer: d.get_values().customer,
-									cleaning_team: d.get_values().cleaning_team,
+									/*cleaning_team: d.get_values().cleaning_team,*/
 									remark: d.get_values().remark
 								},
 								callback(r) {
@@ -444,9 +445,9 @@ function show_booking(_booking) {
 							{fieldname: 'name', fieldtype: 'Link', label:__('Booking'), read_only: 1, default: _booking, options: 'Booking'},
 							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House'), read_only: 1},
 							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
-							{fieldname: 'booking_status', fieldtype: 'Select', options: [__('Reserved'), __('Booked'), __('End-Cleaning'), __('Sub-Cleaning'), __('Renovation')].join('\n'), default: __(booking.booking_status), label:__('Status')},
+							{fieldname: 'booking_status', fieldtype: 'Select', options: [__('Reserved'), __('Booked'), __('End-Cleaning'), __('Sub-Cleaning'), __('Service-Cleaning'), __('Renovation')].join('\n'), default: __(booking.booking_status), label:__('Status')},
 							{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: booking.is_checked, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
-							{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team'), default: booking.cleaning_team, depends_on: 'eval:doc.booking_status=="End-Cleaning" || doc.booking_status=="Sub-Cleaning"' },
+							/*{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team'), default: booking.cleaning_team, depends_on: 'eval:doc.booking_status=="End-Cleaning" || doc.booking_status=="Sub-Cleaning"' },*/
 							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
 							{fieldname: 'end_date', fieldtype: 'Date', default: booking.end_date, label:__('End')},
 							{fieldname: 'customer', fieldtype: 'Link', default: booking.customer, label:__('Customer'), options: 'Customer'},
@@ -471,7 +472,7 @@ function show_booking(_booking) {
 									name: d.get_values().name,
 									is_checked: d.get_values().is_checked,
 									customer: d.get_values().customer,
-									cleaning_team: d.get_values().cleaning_team,
+									/*cleaning_team: d.get_values().cleaning_team,*/
 									remark: d.get_values().remark
 								},
 								callback(r) {
@@ -529,9 +530,9 @@ function show_cleaning_booking(_booking) {
 							{fieldname: 'name', fieldtype: 'Link', label:__('Booking'), read_only: 1, default: _booking, options: 'Booking'},
 							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House'), read_only: 1},
 							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
-							{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning')].join('\n'), default: __(booking.booking_status), label:__('Status')},
+							{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning'), __('Service-Cleaning')].join('\n'), default: __(booking.booking_status), label:__('Status')},
 							{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: booking.is_checked },
-							{fieldname: 'cleaning_team', fieldtype: 'Data', default: booking.cleaning_team, label:__('Cleaning Team')},
+							/*{fieldname: 'cleaning_team', fieldtype: 'Data', default: booking.cleaning_team, label:__('Cleaning Team')},*/
 							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
 							{fieldname: 'end_date', fieldtype: 'Date', default: booking.end_date, label:__('End')},
 							{fieldname: 'customer', fieldtype: 'Link', default: booking.customer, label:__('Customer'), options: 'Customer'},
@@ -555,7 +556,7 @@ function show_cleaning_booking(_booking) {
 									name: d.get_values().name,
 									is_checked: d.get_values().is_checked,
 									customer: d.get_values().customer,
-									cleaning_team: d.get_values().cleaning_team,
+									/*cleaning_team: d.get_values().cleaning_team,*/
 									remark: d.get_values().remark
 								},
 								callback(r) {
@@ -596,9 +597,9 @@ function show_cleaning_booking(_booking) {
 							{fieldname: 'name', fieldtype: 'Link', label:__('Booking'), read_only: 1, default: _booking, options: 'Booking'},
 							{fieldname: 'house', fieldtype: 'Link', options: 'House', default: booking.house, label:__('House'), read_only: 1},
 							{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: booking.appartment, label:__('Apartment')},
-							{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning')].join('\n'), default: __(booking.booking_status), label:__('Status')},
+							{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning'), __('Service-Cleaning')].join('\n'), default: __(booking.booking_status), label:__('Status')},
 							{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: booking.is_checked, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
-							{fieldname: 'cleaning_team', fieldtype: 'Data', default: booking.cleaning_team, label:__('Cleaning Team')},
+							/*{fieldname: 'cleaning_team', fieldtype: 'Data', default: booking.cleaning_team, label:__('Cleaning Team')},*/
 							{fieldname: 'start_date', fieldtype: 'Date', default: booking.start_date, label:__('Start')},
 							{fieldname: 'end_date', fieldtype: 'Date', default: booking.end_date, label:__('End')},
 							{fieldname: 'customer', fieldtype: 'Link', default: booking.customer, label:__('Customer'), options: 'Customer'},
@@ -623,7 +624,7 @@ function show_cleaning_booking(_booking) {
 									name: d.get_values().name,
 									is_checked: d.get_values().is_checked,
 									customer: d.get_values().customer,
-									cleaning_team: d.get_values().cleaning_team,
+									/*cleaning_team: d.get_values().cleaning_team,*/
 									remark: d.get_values().remark
 								},
 								callback(r) {
