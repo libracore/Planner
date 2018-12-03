@@ -27,11 +27,13 @@
 	min-width: 100px;
 	border-right: 1px solid black;
 	text-align: center;
+	max-width: 100px;
 }
 .header-200 {
 	min-width: 200px;
 	border-right: 1px solid black;
 	text-align: center;
+	max-width: 200px;
 }
 .header-80 {
 	min-width: 80px;
@@ -39,12 +41,14 @@
 	text-align: center;
 	padding-left: 2px;
 	padding-right: 2px;
+	max-width: 80px;
 }
 .header-t {
 	min-width: 50px;
 	margin-left: 1px;
 	border-right: 1px solid black;
 	text-align: center;
+	max-width: 50px;
 }
 .planner-container {
 	border:1px solid black;

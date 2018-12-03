@@ -123,7 +123,7 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 						color = 'b-blue'
 					elif bookingType == 'End-Cleaning':
 						#check if checked
-						bookingType = "End"
+						bookingType = "End-R"
 						if is_checked == 1:
 							color = 'b-green'
 						elif is_checked == 0:
@@ -131,7 +131,7 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 						else:
 							color = 'b-orange'
 					elif bookingType == 'Sub-Cleaning':
-						bookingType = "Sub"
+						bookingType = "Sub-R"
 						color = 'b-red'
 					elif bookingType == 'Service-Cleaning':
 						bookingType = "Service"
@@ -249,7 +249,7 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 					s_start = datediff + 1
 					dauer = date_diff(end, start) + 1
 				if bookingType == 'End-Cleaning':
-					bookingType = "End"
+					bookingType = "End-R"
 					#check if checked
 					if is_checked == 1:
 						color = 'b-green'
@@ -258,7 +258,7 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 					else:
 						color = 'b-orange'
 				elif bookingType == 'Sub-Cleaning':
-					bookingType = "Sub"
+					bookingType = "Sub-R"
 					color = 'b-red'
 				elif bookingType == 'Service-Cleaning':
 					bookingType = "Service"

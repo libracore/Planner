@@ -280,13 +280,27 @@ function new_booking(apartment, start_value) {
 		primary_action: function(){
 			d.hide();
 			console.log(d.get_values());
+			var b_status = d.get_values().booking_status;
+			if (b_status == "Reserviert") {
+				b_status = "Reserved";
+			} else if (b_status == "Gebucht") {
+				b_status = "Booked";
+			} else if (b_status == "Endreinigung") {
+				b_status = "End-Cleaning";
+			} else if (b_status == "Zwischenreinigung") {
+				b_status = "Sub-Cleaning";
+			} else if (b_status == "Servicereinigung") {
+				b_status = "Service-Cleaning";
+			} else if (b_status == "Renorvation") {
+				b_status = "Renovation";
+			}
 			frappe.call({
 				method: "planner.planner.page.booking_planner.booking_planner.create_booking",
 				args: {
 					apartment: d.get_values().apartment,
 					end_date: d.get_values().end_date,
 					start_date: d.get_values().start_date,
-					booking_status: d.get_values().booking_status,
+					booking_status: b_status,
 					customer: d.get_values().customer,
 					is_checked: d.get_values().is_checked,
 					/*cleaning_team: d.get_values().cleaning_team,*/
@@ -318,7 +332,7 @@ function new_cleaning_booking(apartment, start_value) {
 		"booking_status": "End-Cleaning"
 	}
 	frappe.new_doc("Booking"); */
-	
+	var inpStartDate = document.getElementById("start_date").value;
 	var d = new frappe.ui.Dialog({
 		title: __('Create new Booking'),
 		fields: [
@@ -326,21 +340,35 @@ function new_cleaning_booking(apartment, start_value) {
 			{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning'), __('Service-Cleaning')].join('\n'), default: __('Sub-Cleaning'), label:__('Status')},
 			{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: 0, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
 			/*{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team') },*/
-			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: frappe.datetime.add_days(frappe.datetime.get_today(), (start_value - 1))},
-			{fieldname: 'end_date', fieldtype: 'Date', label:__('End'), default: frappe.datetime.add_days(frappe.datetime.get_today(), (start_value - 1))},
+			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: frappe.datetime.add_days(inpStartDate, (start_value - 1))},
+			{fieldname: 'end_date', fieldtype: 'Date', label:__('End'), default: frappe.datetime.add_days(inpStartDate, (start_value - 1))},
 			{fieldname: 'customer', fieldtype: 'Link', label:__('Customer'), options: 'Customer'},
 			{fieldname: 'remark', fieldtype: 'Small Text', label:__('Remarks')}
 		],
 		primary_action: function(){
 			d.hide();
 			console.log(d.get_values());
+			var b_status = d.get_values().booking_status;
+			if (b_status == "Reserviert") {
+				b_status = "Reserved";
+			} else if (b_status == "Gebucht") {
+				b_status = "Booked";
+			} else if (b_status == "Endreinigung") {
+				b_status = "End-Cleaning";
+			} else if (b_status == "Zwischenreinigung") {
+				b_status = "Sub-Cleaning";
+			} else if (b_status == "Servicereinigung") {
+				b_status = "Service-Cleaning";
+			} else if (b_status == "Renorvation") {
+				b_status = "Renovation";
+			}
 			frappe.call({
 				method: "planner.planner.page.booking_planner.booking_planner.create_booking",
 				args: {
 					apartment: d.get_values().apartment,
 					end_date: d.get_values().end_date,
 					start_date: d.get_values().start_date,
-					booking_status: d.get_values().booking_status,
+					booking_status: b_status,
 					customer: d.get_values().customer,
 					is_checked: d.get_values().is_checked,
 					/*cleaning_team: d.get_values().cleaning_team,*/
@@ -394,13 +422,27 @@ function show_booking(_booking) {
 							if (d.get_values().customer) {
 								customer = d.get_values().customer;
 							}
+							var b_status = d.get_values().booking_status;
+							if (b_status == "Reserviert") {
+								b_status = "Reserved";
+							} else if (b_status == "Gebucht") {
+								b_status = "Booked";
+							} else if (b_status == "Endreinigung") {
+								b_status = "End-Cleaning";
+							} else if (b_status == "Zwischenreinigung") {
+								b_status = "Sub-Cleaning";
+							} else if (b_status == "Servicereinigung") {
+								b_status = "Service-Cleaning";
+							} else if (b_status == "Renorvation") {
+								b_status = "Renovation";
+							}
 							frappe.call({
 								method: "planner.planner.page.booking_planner.booking_planner.update_booking",
 								args: {
 									apartment: d.get_values().apartment,
 									end_date: d.get_values().end_date,
 									start_date: d.get_values().start_date,
-									booking_status: d.get_values().booking_status,
+									booking_status: b_status,
 									name: d.get_values().name,
 									is_checked: d.get_values().is_checked,
 									customer: d.get_values().customer,
@@ -462,13 +504,27 @@ function show_booking(_booking) {
 							if (d.get_values().customer) {
 								customer = d.get_values().customer;
 							}
+							var b_status = d.get_values().booking_status;
+							if (b_status == "Reserviert") {
+								b_status = "Reserved";
+							} else if (b_status == "Gebucht") {
+								b_status = "Booked";
+							} else if (b_status == "Endreinigung") {
+								b_status = "End-Cleaning";
+							} else if (b_status == "Zwischenreinigung") {
+								b_status = "Sub-Cleaning";
+							} else if (b_status == "Servicereinigung") {
+								b_status = "Service-Cleaning";
+							} else if (b_status == "Renorvation") {
+								b_status = "Renovation";
+							}
 							frappe.call({
 								method: "planner.planner.page.booking_planner.booking_planner.update_booking",
 								args: {
 									apartment: d.get_values().apartment,
 									end_date: d.get_values().end_date,
 									start_date: d.get_values().start_date,
-									booking_status: d.get_values().booking_status,
+									booking_status: b_status,
 									name: d.get_values().name,
 									is_checked: d.get_values().is_checked,
 									customer: d.get_values().customer,
@@ -546,13 +602,27 @@ function show_cleaning_booking(_booking) {
 							if (d.get_values().customer) {
 								customer = d.get_values().customer;
 							}
+							var b_status = d.get_values().booking_status;
+							if (b_status == "Reserviert") {
+								b_status = "Reserved";
+							} else if (b_status == "Gebucht") {
+								b_status = "Booked";
+							} else if (b_status == "Endreinigung") {
+								b_status = "End-Cleaning";
+							} else if (b_status == "Zwischenreinigung") {
+								b_status = "Sub-Cleaning";
+							} else if (b_status == "Servicereinigung") {
+								b_status = "Service-Cleaning";
+							} else if (b_status == "Renorvation") {
+								b_status = "Renovation";
+							}
 							frappe.call({
 								method: "planner.planner.page.booking_planner.booking_planner.update_booking",
 								args: {
 									apartment: d.get_values().apartment,
 									end_date: d.get_values().end_date,
 									start_date: d.get_values().start_date,
-									booking_status: d.get_values().booking_status,
+									booking_status: b_status,
 									name: d.get_values().name,
 									is_checked: d.get_values().is_checked,
 									customer: d.get_values().customer,
@@ -614,13 +684,27 @@ function show_cleaning_booking(_booking) {
 							if (d.get_values().customer) {
 								customer = d.get_values().customer;
 							}
+							var b_status = d.get_values().booking_status;
+							if (b_status == "Reserviert") {
+								b_status = "Reserved";
+							} else if (b_status == "Gebucht") {
+								b_status = "Booked";
+							} else if (b_status == "Endreinigung") {
+								b_status = "End-Cleaning";
+							} else if (b_status == "Zwischenreinigung") {
+								b_status = "Sub-Cleaning";
+							} else if (b_status == "Servicereinigung") {
+								b_status = "Service-Cleaning";
+							} else if (b_status == "Renorvation") {
+								b_status = "Renovation";
+							}
 							frappe.call({
 								method: "planner.planner.page.booking_planner.booking_planner.update_booking",
 								args: {
 									apartment: d.get_values().apartment,
 									end_date: d.get_values().end_date,
 									start_date: d.get_values().start_date,
-									booking_status: d.get_values().booking_status,
+									booking_status: b_status,
 									name: d.get_values().name,
 									is_checked: d.get_values().is_checked,
 									customer: d.get_values().customer,

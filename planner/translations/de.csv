@@ -12,6 +12,7 @@ Page: booking_planner,Booked,Gebucht
 Page: booking_planner,End-Cleaning,Endreinigung
 Page: booking_planner,Sub-Cleaning,Zwischenreinigung
 Page: booking_planner,Renovation,Renorvation
+Page: booking_planner,Service-Cleaning,Servicereinigung
 Page: booking_planner,Update Booking Details,Buchung aktualisieren
 Page: booking_planner,Delete this Booking,Diese Buchung löschen
 Page: booking_planner,Is Checked,Geprüft
@@ -23,3 +24,5 @@ Page: booking_planner,Transform Default to Fixed Cleanings,Fixieren von Default-
 Page: booking_planner,The Booking were createt,Die Buchung wurde erstellt
 Page: booking_planner,The Booking were updatet,Die Buchung wurde angepasst
 Page: booking_planner,The Booking were deletet,Die Buchung wurde gelöscht
+Page: booking_planner,End-R,End-R
+Page: booking_planner,Sub-R,Sub-R
