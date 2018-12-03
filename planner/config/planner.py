@@ -38,5 +38,17 @@ def get_data():
 					"description": _("Booking")
 				}
 			]
+		},
+		{
+			"label": _("Reports"),
+			"icon": "fa fa-list",
+			"items": [
+				{
+					"type": "report",
+					"is_query_report": True,
+					"name": "Reinigungsplan",
+					"doctype": "Booking"
+				}
+			]
 		}
 	]
