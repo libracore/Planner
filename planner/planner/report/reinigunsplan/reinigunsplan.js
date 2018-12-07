@@ -23,7 +23,7 @@ frappe.query_reports["Reinigunsplan"] = {
 				value = "<span style='background-color:red!important;'>" + value + "</span>";
 		}
 		if (dataContext["Name"] == "ALERT") {
-				value = "<span style='background-color:red!important;'>" + value + "</span>";
+				value = "<span style='background-color:yellow!important;'>" + value + "</span>";
 		}
 		return value;
 	}

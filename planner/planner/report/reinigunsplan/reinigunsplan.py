@@ -65,13 +65,13 @@ def execute(filters=None):
 		#data.append([key])
 		for ma in addition[key]:
 			house = frappe.get_doc("House", key)
-			data.append([key, ma, '', '', '', '', 'Wäsche: {laundry}min<br>Hauswartung: {caretaking}min<br>Fahrzeit: {driving}min<br>Diverses: {varia}min'.format(laundry=house.laundry, caretaking=house.caretaking, driving=house.driving_time, varia=house.various)])
+			data.append([key, ma, '', '', '', '', 'Wäsche: {laundry}min - Hauswartung: {caretaking}min - Fahrzeit: {driving}min - Diverses: {varia}min'.format(laundry=house.laundry, caretaking=house.caretaking, driving=house.driving_time, varia=house.various)])
 		
 	
 	bookings = frappe.db.sql("""SELECT
 		booking.`appartment`,
 		booking.`house`,
-		booking.`start_date`,
+		DATE_FORMAT(booking.`start_date`, "%d.%c.%Y"),
 		CASE booking.`booking_status`
 			WHEN 'End-Cleaning' THEN 'End-R'
 			WHEN 'Sub-Cleaning' THEN 'Sub-R'
@@ -88,7 +88,8 @@ def execute(filters=None):
 		)""".format(from_date=filters.from_date, to_date=filters.to_date), as_list=True)
 	
 	for b in bookings:
-		data.append([b[1], 'ALERT', b[0], b[2], b[3], '', 'No cleaner found!'])
+		#data.append([b[1], 'ALERT', b[0], b[2], b[3], '', 'No cleaner found!'])
+		data.insert(0, [b[1], 'ALERT', b[0], b[2], b[3], '', 'No cleaner found!'])
 	
 	# affected_houses = frappe.db.sql("""SELECT DISTINCT `house` FROM `tabBooking` WHERE `start_date` >= '{from_date}' AND `start_date` <= '{to_date}'""".format(from_date=filters.from_date, to_date=filters.to_date), as_list=True)
 	# for affected_house in affected_houses:

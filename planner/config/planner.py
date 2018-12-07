@@ -16,7 +16,7 @@ def get_data():
 			]
 		},
 		{
-			"label": _("Documents"),
+			"label": _("Rental Structur"),
 			"icon": "fa fa-bank",
 			"items": [
 				{
@@ -36,6 +36,30 @@ def get_data():
 					"name": "Booking",
 					"label": _("Booking"),
 					"description": _("Booking")
+				}
+			]
+		},
+		{
+			"label": _("Customer Structur"),
+			"icon": "fa fa-bank",
+			"items": [
+				{
+					"type": "doctype",
+					"name": "Customer",
+					"label": _("Customer"),
+					"description": _("Customer")
+				},
+				{
+					"type": "doctype",
+					"name": "Sales Order",
+					"label": _("Rental Agreement"),
+					"description": _("Rental Agreement")
+				},
+				{
+					"type": "doctype",
+					"name": "Sales Invoice",
+					"label": _("Sales Invoice"),
+					"description": _("Sales Invoice")
 				}
 			]
 		},
