@@ -308,8 +308,16 @@ function new_booking(apartment, start_value) {
 				},
 				callback(r) {
 					if(r.message) {
-						frappe.msgprint(__("The Booking were createt"), "Erfolg");
-						document.getElementById("update-btn").click();
+						if (b_status == 'Booked') {
+							var new_booking = r.message.booking;
+							var new_order = r.message.order;
+							frappe.msgprint(__("The Booking (" + new_booking + ") and Rental Agreement (<a href='/desk#Form/Sales Order/" + new_order + "'>" + new_order + "</a>) were createt"), "Erfolg");
+							document.getElementById("update-btn").click();
+						} else {
+							var new_booking = r.message;
+							frappe.msgprint(__("The Booking (" + new_booking + ") were createt"), "Erfolg");
+							document.getElementById("update-btn").click();
+						}
 					} else {
 						frappe.msgprint("Bitte wenden Sie sich an libracore", "Error");
 					}

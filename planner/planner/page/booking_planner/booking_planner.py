@@ -574,7 +574,47 @@ def create_booking(apartment, end_date, start_date, booking_status, customer='',
 	
 	booking.insert(ignore_permissions=True)
 	frappe.db.commit()
-	return booking.name
+	
+	if not booking_status == "Booked":
+		return booking.name
+	else:
+		apartment = frappe.get_doc("Appartment", apartment)
+		order = frappe.new_doc("Sales Order")
+
+		order.update({
+			"apartment": apartment.name,
+			"customer": customer,
+			"booking": booking.name,
+			"guest": "Please add Guest",
+			"delivery_date": start_date,
+			"items": [
+				{
+					"item_code": "Depot",
+					"qty": "1", 
+					"rate": "1.00"
+				},
+				{
+					"item_code": "Miete",
+					"qty": "1", 
+					"rate": apartment.price_per_month
+				},
+				{
+					"item_code": "Service",
+					"qty": "1", 
+					"rate": apartment.service_price_per_month
+				},
+				{
+					"item_code": "Endreinigung",
+					"qty": "1", 
+					"rate": apartment.price_end_cleaning
+				}
+			]
+		})
+		
+		order.insert(ignore_permissions=True)
+		frappe.db.commit()
+		
+		return {'booking': booking.name, 'order': order.name}
 	
 @frappe.whitelist()
 def delete_booking(booking):
