@@ -233,10 +233,10 @@ frappe.booking_planner = {
 		document.getElementsByClassName("planner-container")[0].scrollTop = frappe["old_pos"];
     },
 	start_wait: function() {
-        document.getElementById("waitingScreen").classList.remove("hidden");
+        document.getElementById("myNav").style.display = "block";
     },
     end_wait: function() {
-        document.getElementById("waitingScreen").classList.add("hidden");
+        document.getElementById("myNav").style.display = "none";
     },
 	transform_default_to_fixed: function() {
 		var d = new frappe.ui.Dialog({
@@ -278,6 +278,7 @@ function new_booking(apartment, start_value) {
 			{fieldname: 'remark', fieldtype: 'Small Text', label:__('Remarks')}
 		],
 		primary_action: function(){
+			frappe.booking_planner.start_wait();
 			d.hide();
 			console.log(d.get_values());
 			var b_status = d.get_values().booking_status;
@@ -307,6 +308,7 @@ function new_booking(apartment, start_value) {
 					remark: d.get_values().remark
 				},
 				callback(r) {
+					frappe.booking_planner.end_wait();
 					if(r.message) {
 						if (b_status == 'Booked') {
 							var new_booking = r.message.booking;
@@ -355,6 +357,7 @@ function new_cleaning_booking(apartment, start_value) {
 		],
 		primary_action: function(){
 			d.hide();
+			frappe.booking_planner.start_wait();
 			console.log(d.get_values());
 			var b_status = d.get_values().booking_status;
 			if (b_status == "Reserviert") {
@@ -383,6 +386,7 @@ function new_cleaning_booking(apartment, start_value) {
 					remark: d.get_values().remark
 				},
 				callback(r) {
+					frappe.booking_planner.end_wait();
 					if(r.message) {
 						frappe.msgprint(__("The Booking were createt"), "Erfolg");
 						document.getElementById("update-btn").click();
@@ -425,6 +429,7 @@ function show_booking(_booking) {
 						],
 						primary_action: function(){
 							d.hide();
+							frappe.booking_planner.start_wait();
 							//console.log(d.get_values());
 							var customer = '';
 							if (d.get_values().customer) {
@@ -458,6 +463,7 @@ function show_booking(_booking) {
 									remark: d.get_values().remark
 								},
 								callback(r) {
+									frappe.booking_planner.end_wait();
 									if(r.message == "OK") {
 										frappe.msgprint(__('The Booking were updatet'), "Erfolg");
 										document.getElementById("update-btn").click();
@@ -471,6 +477,7 @@ function show_booking(_booking) {
 					});
 					d.fields_dict.delete_btn.input.onclick = function() {
 						console.log("delete " + d.get_values().name);
+						frappe.booking_planner.start_wait();
 						frappe.call({
 							method: "planner.planner.page.booking_planner.booking_planner.delete_booking",
 							args: {
@@ -478,6 +485,7 @@ function show_booking(_booking) {
 							},
 							callback(r) {
 								d.hide();
+								frappe.booking_planner.end_wait();
 								if(r.message == "OK") {
 									frappe.msgprint(__('The Booking were deletet'), "Erfolg");
 									document.getElementById("update-btn").click();
@@ -506,6 +514,7 @@ function show_booking(_booking) {
 						],
 						primary_action: function(){
 							d.hide();
+							frappe.booking_planner.start_wait();
 							//console.log(d.get_values());
 							//console.log(d.get_values().customer);
 							var customer = '';
@@ -540,11 +549,17 @@ function show_booking(_booking) {
 									remark: d.get_values().remark
 								},
 								callback(r) {
+									frappe.booking_planner.end_wait();
 									if(r.message == "OK") {
 										frappe.msgprint(__('The Booking were updatet'), "Erfolg");
 										document.getElementById("update-btn").click();
+									} else if(r.message.booking) {
+										var new_booking = r.message.booking;
+										var new_order = r.message.order;
+										frappe.msgprint(__("The Booking (" + new_booking + ") and Rental Agreement (<a href='/desk#Form/Sales Order/" + new_order + "'>" + new_order + "</a>) were createt"), "Erfolg");
+										document.getElementById("update-btn").click();
 									} else {
-										frappe.msgprint("Bitte wenden Sie sich an libracore", "Error");
+										frappe.msgprint(r.message);
 									}
 								}
 							});
@@ -553,6 +568,7 @@ function show_booking(_booking) {
 					});
 					d.fields_dict.delete_btn.input.onclick = function() {
 						console.log("delete " + d.get_values().name);
+						frappe.booking_planner.start_wait();
 						frappe.call({
 							method: "planner.planner.page.booking_planner.booking_planner.delete_booking",
 							args: {
@@ -560,6 +576,7 @@ function show_booking(_booking) {
 							},
 							callback(r) {
 								d.hide();
+								frappe.booking_planner.end_wait();
 								if(r.message == "OK") {
 									frappe.msgprint(__('The Booking were deletet'), "Erfolg");
 									document.getElementById("update-btn").click();
@@ -605,6 +622,7 @@ function show_cleaning_booking(_booking) {
 						],
 						primary_action: function(){
 							d.hide();
+							frappe.booking_planner.start_wait();
 							//console.log(d.get_values());
 							var customer = '';
 							if (d.get_values().customer) {
@@ -638,6 +656,7 @@ function show_cleaning_booking(_booking) {
 									remark: d.get_values().remark
 								},
 								callback(r) {
+									frappe.booking_planner.end_wait();
 									if(r.message == "OK") {
 										frappe.msgprint(__('The Booking were updatet'), "Erfolg");
 										document.getElementById("update-btn").click();
@@ -651,6 +670,7 @@ function show_cleaning_booking(_booking) {
 					});
 					d.fields_dict.delete_btn.input.onclick = function() {
 						console.log("delete " + d.get_values().name);
+						frappe.booking_planner.start_wait();
 						frappe.call({
 							method: "planner.planner.page.booking_planner.booking_planner.delete_booking",
 							args: {
@@ -658,6 +678,7 @@ function show_cleaning_booking(_booking) {
 							},
 							callback(r) {
 								d.hide();
+								frappe.booking_planner.end_wait();
 								if(r.message == "OK") {
 									frappe.msgprint(__('The Booking were deletet'), "Erfolg");
 									document.getElementById("update-btn").click();
@@ -686,6 +707,7 @@ function show_cleaning_booking(_booking) {
 						],
 						primary_action: function(){
 							d.hide();
+							frappe.booking_planner.start_wait();
 							//console.log(d.get_values());
 							//console.log(d.get_values().customer);
 							var customer = '';
@@ -720,6 +742,7 @@ function show_cleaning_booking(_booking) {
 									remark: d.get_values().remark
 								},
 								callback(r) {
+									frappe.booking_planner.end_wait();
 									if(r.message == "OK") {
 										frappe.msgprint(__('The Booking were updatet'), "Erfolg");
 										document.getElementById("update-btn").click();
@@ -733,6 +756,7 @@ function show_cleaning_booking(_booking) {
 					});
 					d.fields_dict.delete_btn.input.onclick = function() {
 						console.log("delete " + d.get_values().name);
+						frappe.booking_planner.start_wait();
 						frappe.call({
 							method: "planner.planner.page.booking_planner.booking_planner.delete_booking",
 							args: {
@@ -740,6 +764,7 @@ function show_cleaning_booking(_booking) {
 							},
 							callback(r) {
 								d.hide();
+								frappe.booking_planner.end_wait();
 								if(r.message == "OK") {
 									frappe.msgprint(__('The Booking were deletet'), "Erfolg");
 									document.getElementById("update-btn").click();
@@ -756,5 +781,6 @@ function show_cleaning_booking(_booking) {
         }
     });
 }
+
 
 

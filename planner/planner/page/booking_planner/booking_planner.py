@@ -408,24 +408,204 @@ def createHeaders(firstDate, secondDate):
 				weekday = 0
 				
 	return ( {'headers': headers} )
-	
-@frappe.whitelist()
-def update_booking(apartment, end_date, start_date, booking_status, name, customer='', is_checked=0, cleaning_team='', remark=''):
-	booking = frappe.get_doc("Booking", name)
+
+def storno_so_and_sinv(so, booking):
 	booking.update({
-		"appartment": apartment,
-		"end_date": end_date,
-		"start_date": start_date,
-		"booking_status": booking_status,
-		"customer": customer,
-		"is_checked": is_checked,
-		#'cleaning_team': cleaning_team,
-		'remark': remark
+		"sales_order": ""
 	})
 	booking.save()
 	frappe.db.commit()
-	#update = frappe.db.sql("""UPDATE `tabBooking` SET `appartment` = '{0}', `end_date` = '{1}', `start_date` = '{2}', `booking_status` = '{3}', `is_checked` = {5}, `customer` = '{6}' WHERE `name` = '{4}'""".format(apartment, end_date, start_date, booking_status, name, is_checked, customer), as_list=True)
+	try:
+		so.cancel()
+	except:
+		try:
+			so.delete()
+		except:
+			booking.update({
+				"sales_order": so.name
+			})
+			booking.save()
+			frappe.db.commit()
+			return "abort"
+			
 	return "OK"
+
+@frappe.whitelist()
+def update_booking(apartment, end_date, start_date, booking_status, name, customer='', is_checked=0, cleaning_team='', remark=''):
+	if booking_status != "Booked":
+		booking = frappe.get_doc("Booking", name)
+		if booking.booking_status == "Booked":		
+			so = frappe.get_doc("Sales Order", booking.sales_order)
+			storno = storno_so_and_sinv(so, booking)
+			if storno == "abort":
+				return
+			
+		booking.update({
+			"appartment": apartment,
+			"end_date": end_date,
+			"start_date": start_date,
+			"booking_status": booking_status,
+			"customer": customer,
+			"is_checked": is_checked,
+			#'cleaning_team': cleaning_team,
+			'remark': remark
+		})
+		booking.save()
+		frappe.db.commit()
+		#update = frappe.db.sql("""UPDATE `tabBooking` SET `appartment` = '{0}', `end_date` = '{1}', `start_date` = '{2}', `booking_status` = '{3}', `is_checked` = {5}, `customer` = '{6}' WHERE `name` = '{4}'""".format(apartment, end_date, start_date, booking_status, name, is_checked, customer), as_list=True)
+		return "OK"
+	else:
+		booking = frappe.get_doc("Booking", name)
+		if booking.booking_status == "Booked":
+			return "Diese Änderung müssen Sie manuell durchführen."
+		
+		booking.update({
+			"appartment": apartment,
+			"end_date": end_date,
+			"start_date": start_date,
+			"booking_status": booking_status,
+			"customer": customer,
+			"is_checked": is_checked,
+			#'cleaning_team': cleaning_team,
+			'remark': remark
+		})
+		booking.save()
+		frappe.db.commit()
+		
+		# block for creating autom. end-cleaning
+		year = int(end_date.split("-")[0])
+		month = int(end_date.split("-")[1])
+		day = int(end_date.split("-")[2])
+		weekday = int(datetime(year, month, day).weekday())
+		#throw(str(end))
+		if weekday == 0:
+			wd = "Mo"
+		elif weekday == 1:
+			wd = "Di"
+		elif weekday == 2:
+			wd = "Mi"
+		elif weekday == 3:
+			wd = "Do"
+		elif weekday == 4:
+			wd = "Fr"
+		elif weekday == 5:
+			wd = "Sa"
+		else:
+			wd = "So"
+			
+		default_cleaning_day = frappe.db.sql("""SELECT `cleaning_day` FROM `tabAppartment` WHERE `name` = '{0}'""".format(apartment), as_list=True)[0][0]
+		if wd == default_cleaning_day:
+			cleaning_date = end_date
+		else:
+			if default_cleaning_day == "Mo":
+				default_cleaning_day = 0
+			elif default_cleaning_day == "Di":
+				default_cleaning_day = 1
+			elif default_cleaning_day == "Mi":
+				default_cleaning_day = 2
+			elif default_cleaning_day == "Do":
+				default_cleaning_day = 3
+			elif default_cleaning_day == "Fr":
+				default_cleaning_day = 4
+			elif default_cleaning_day == "Sa":
+				default_cleaning_day = 5
+			elif default_cleaning_day == "So":
+				default_cleaning_day = 6
+				
+			default_diff = default_cleaning_day - weekday
+			if default_diff < 0:
+				cleaning_date = add_days(end_date, (7 + default_diff))
+			else:
+				cleaning_date = add_days(end_date, default_diff)
+	
+		end_cleaning = frappe.new_doc("Booking")
+
+		end_cleaning.update({
+			"appartment": apartment,
+			"end_date": cleaning_date,
+			"start_date": cleaning_date,
+			"booking_status": "End-Cleaning",
+			"customer": customer,
+			"is_checked": 0,
+			#'cleaning_team': cleaning_team,
+			'remark': remark
+		})
+		end_cleaning.insert(ignore_permissions=True)
+		frappe.db.commit()
+		
+		# block for autom. service cleaning after 13 days without booking
+		past_13_date = add_days(start_date, -13)
+		past_13_qty = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `booking_status` = 'Booked' AND `end_date` >= '{past_13_date}' AND `start_date` < '{start_date}' AND `appartment` = '{apartment}'""".format(past_13_date=str(past_13_date), start_date=str(start_date), apartment=apartment), as_list=True)[0][0])
+		#throw(str(past_13_qty) +" /// "+str(past_13_date)+" /// "+str(start_date))
+		if not past_13_qty > 0:
+			# get weekday of start_date
+			year = int(start_date.split("-")[0])
+			month = int(start_date.split("-")[1])
+			day = int(start_date.split("-")[2])
+			weekday = int(datetime(year, month, day).weekday())
+			#throw(str(end))
+			if weekday == 0:
+				wd = "Mo"
+			elif weekday == 1:
+				wd = "Di"
+			elif weekday == 2:
+				wd = "Mi"
+			elif weekday == 3:
+				wd = "Do"
+			elif weekday == 4:
+				wd = "Fr"
+			elif weekday == 5:
+				wd = "Sa"
+			else:
+				wd = "So"
+				
+			default_cleaning_day = frappe.db.sql("""SELECT `cleaning_day` FROM `tabAppartment` WHERE `name` = '{0}'""".format(apartment), as_list=True)[0][0]
+			
+			if default_cleaning_day == wd:
+				cleaning_date = add_days(start_date, -7)
+			else:
+				if default_cleaning_day == "Mo":
+					default_cleaning_day = 0 
+				elif default_cleaning_day == "Di":
+					default_cleaning_day = 1
+				elif default_cleaning_day == "Mi":
+					default_cleaning_day = 2
+				elif default_cleaning_day == "Do":
+					default_cleaning_day = 3
+				elif default_cleaning_day == "Fr":
+					default_cleaning_day = 4
+				elif default_cleaning_day == "Sa":
+					default_cleaning_day = 5
+				else:
+					default_cleaning_day = 6
+					
+				if weekday < default_cleaning_day:
+					cleaning_date = add_days(start_date, -(6 - weekday))
+				else:
+					cleaning_date = add_days(start_date, - (weekday - default_cleaning_day))
+			
+			#throw(str(weekday)+" /// "+str(default_cleaning_day))
+			pre_cleaning = frappe.new_doc("Booking")
+
+			pre_cleaning.update({
+				"appartment": apartment,
+				"end_date": cleaning_date,
+				"start_date": cleaning_date,
+				"booking_status": "Service-Cleaning",
+				"customer": customer,
+				"is_checked": 0,
+				#'cleaning_team': cleaning_team,
+				'remark': remark
+			})
+			
+			pre_cleaning.insert(ignore_permissions=True)
+			frappe.db.commit()
+			
+			apartment = frappe.get_doc("Appartment", apartment)
+			order = create_sales_order(apartment, customer, booking, start_date, end_date)
+			
+			update_booking = frappe.db.sql("""UPDATE `tabBooking` SET `sales_order` = '{so}' WHERE `name` = '{booking}'""".format(so=order.name, booking=booking.name), as_list=True)
+			return {'booking': booking.name, 'order': order.name}
 
 @frappe.whitelist()
 def create_booking(apartment, end_date, start_date, booking_status, customer='', is_checked=0, cleaning_team='', remark=''):
