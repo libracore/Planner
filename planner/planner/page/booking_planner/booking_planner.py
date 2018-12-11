@@ -816,7 +816,7 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 	mietdauer = date_diff(end_date, start_date) + 1
 	
 	# reine tagesmiete
-	if mietdauer <= 20:
+	if mietdauer <= 19:
 		miet_qty = mietdauer
 		mietpreis = apartment.price_per_day
 		mietservice = apartment.service_price_per_day
@@ -829,13 +829,13 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 					"delivery_date": delivery_date
 				},
 				{
-					"item_code": "Miete",
+					"item_code": "Miete 3.7 Tag",
 					"qty": miet_qty, 
 					"rate": mietpreis,
 					"delivery_date": delivery_date
 				},
 				{
-					"item_code": "Service",
+					"item_code": "Service 3.7 Tag",
 					"qty": miet_qty, 
 					"rate": mietservice,
 					"delivery_date": delivery_date
@@ -866,78 +866,140 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 				"delivery_date": delivery_date
 			}
 		)
-		ende_erster_monat = get_last_day(start_date)
-		miet_qty = date_diff(ende_erster_monat, start_date) + 1
 		
-		# zuerst tagesmiete
-		if miet_qty <= 20:
-			mietpreis = apartment.price_per_day
-			mietservice = apartment.service_price_per_day
-			items.append(
-				{
-					"item_code": "Miete",
-					"qty": miet_qty, 
-					"rate": mietpreis,
-					"delivery_date": delivery_date
-				}
-			)
-			items.append(
-				{
-					"item_code": "Service",
-					"qty": miet_qty, 
-					"rate": mietservice,
-					"delivery_date": delivery_date
-				}
-			)
+		#definition ob dauer >= 3Monate oder < 3Monate
+		if end_date <= add_months(start_date, 3):
+			monats_miete = 'Miete 3.7 Mt'
+			monats_service = 'Service 3.7 Mt'
+			tages_miete = 'Miete 3.7 Tag'
+			tages_service = 'Service 3.7 Tag'
 		else:
-			mietpreis = apartment.price_per_month
-			mietservice = apartment.service_price_per_month
-			items.append(
-				{
-					"item_code": "Miete",
-					"qty": "1", 
-					"rate": mietpreis,
-					"delivery_date": delivery_date
-				}
-			)
-			items.append(
-				{
-					"item_code": "Service",
-					"qty": "1", 
-					"rate": mietservice,
-					"delivery_date": delivery_date
-				}
-			)
+			monats_miete = 'Miete mt'
+			monats_service = 'Service 7.7 Mt'
+			tages_miete = 'Miete Tag'
+			tages_service = 'Service 7.7 Tag'
+			
 		
-		letzter_monat = int(str(end_date).split("-")[1])
-		folgemonat = int(str(ende_erster_monat).split("-")[1]) + 1
-		delivery_date = str(get_first_day(add_months(ende_erster_monat, 1)))
-		if folgemonat > 12:
-			folgemonat = folgemonat - 12
-		#throw(str(folgemonat)+"//"+str(letzter_monat))
-		mietpreis = apartment.price_per_month
-		mietservice = apartment.service_price_per_month
-		while folgemonat <= letzter_monat:
+		
+		start_monat = start_date
+		folgemonat = add_months(start_date, 1)
+		
+		while end_date >= folgemonat:
 			items.append(
 				{
-					"item_code": "Miete",
+					"item_code": monats_miete,
 					"qty": "1", 
-					"rate": mietpreis,
-					"delivery_date": delivery_date
+					"rate": apartment.price_per_month,
+					"delivery_date": start_monat
 				}
 			)
 			items.append(
 				{
-					"item_code": "Service",
+					"item_code": monats_service,
 					"qty": "1", 
-					"rate": mietservice,
-					"delivery_date": delivery_date
+					"rate": apartment.service_price_per_month,
+					"delivery_date": start_monat
 				}
 			)
-			delivery_date = str(add_months(delivery_date, 1))
-			folgemonat += 1
-			if folgemonat > 12:
-				folgemonat = folgemonat - 12
+			start_monat = folgemonat
+			folgemonat = add_months(start_monat, 1)
+			
+		rest_tage = date_diff(end_date, start_monat)
+		items.append(
+			{
+				"item_code": tages_miete,
+				"qty": rest_tage, 
+				"rate": apartment.price_per_month,
+				"delivery_date": start_monat
+			}
+		)
+		items.append(
+			{
+				"item_code": tages_service,
+				"qty": rest_tage, 
+				"rate": apartment.service_price_per_month,
+				"delivery_date": start_monat
+			}
+		)
+		
+		
+		
+		
+		
+		
+		# ende_erster_monat = get_last_day(start_date)
+		# miet_qty = date_diff(ende_erster_monat, start_date) + 1
+		
+				
+		# # zuerst tagesmiete
+		# if miet_qty <= 20:
+			# mietpreis = apartment.price_per_day
+			# mietservice = apartment.service_price_per_day
+			# items.append(
+				# {
+					# "item_code": "Miete",
+					# "qty": miet_qty, 
+					# "rate": mietpreis,
+					# "delivery_date": delivery_date
+				# }
+			# )
+			# items.append(
+				# {
+					# "item_code": "Service",
+					# "qty": miet_qty, 
+					# "rate": mietservice,
+					# "delivery_date": delivery_date
+				# }
+			# )
+		# else:
+			# mietpreis = apartment.price_per_month
+			# mietservice = apartment.service_price_per_month
+			# items.append(
+				# {
+					# "item_code": "Miete",
+					# "qty": "1", 
+					# "rate": mietpreis,
+					# "delivery_date": delivery_date
+				# }
+			# )
+			# items.append(
+				# {
+					# "item_code": "Service",
+					# "qty": "1", 
+					# "rate": mietservice,
+					# "delivery_date": delivery_date
+				# }
+			# )
+		
+		# letzter_monat = int(str(end_date).split("-")[1])
+		# folgemonat = int(str(ende_erster_monat).split("-")[1]) + 1
+		# delivery_date = str(get_first_day(add_months(ende_erster_monat, 1)))
+		# if folgemonat > 12:
+			# folgemonat = folgemonat - 12
+		# #throw(str(folgemonat)+"//"+str(letzter_monat))
+		# mietpreis = apartment.price_per_month
+		# mietservice = apartment.service_price_per_month
+		# while folgemonat <= letzter_monat:
+			# items.append(
+				# {
+					# "item_code": "Miete",
+					# "qty": "1", 
+					# "rate": mietpreis,
+					# "delivery_date": delivery_date
+				# }
+			# )
+			# items.append(
+				# {
+					# "item_code": "Service",
+					# "qty": "1", 
+					# "rate": mietservice,
+					# "delivery_date": delivery_date
+				# }
+			# )
+			# delivery_date = str(add_months(delivery_date, 1))
+			# folgemonat += 1
+			# if folgemonat > 12:
+				# folgemonat = folgemonat - 12
 	
 		order.update({
 			"items": items
