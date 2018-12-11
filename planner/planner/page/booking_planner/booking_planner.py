@@ -817,6 +817,7 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 	
 	# reine tagesmiete
 	if mietdauer <= 19:
+		taxes = 'Kleiner Gleich 3 Monate - AAS'
 		miet_qty = mietdauer
 		mietpreis = apartment.price_per_day
 		mietservice = apartment.service_price_per_day
