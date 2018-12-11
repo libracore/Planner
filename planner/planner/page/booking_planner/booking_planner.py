@@ -873,12 +873,37 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 			monats_service = 'Service 3.7 Mt'
 			tages_miete = 'Miete 3.7 Tag'
 			tages_service = 'Service 3.7 Tag'
+			taxes = []
+			taxes.append(
+				{
+					"charge_type": _("On Net Total"),
+					"account_head": "3002 - Reinigungs- + Serviceertrag reduzierter Satz - AAS"
+				}
+			)
+			taxes.append(
+				{
+					"charge_type": _("On Net Total"),
+					"account_head": "3036 - Mietertrag möblierte Appartement reduzierter Satz - AAS"
+				}
+			)
 		else:
 			monats_miete = 'Miete mt'
 			monats_service = 'Service 7.7 Mt'
 			tages_miete = 'Miete Tag'
 			tages_service = 'Service 7.7 Tag'
-			
+			taxes = []
+			taxes.append(
+				{
+					"charge_type": _("On Net Total"),
+					"account_head": "3001 - Reinigungs- + Serviceertrag normaler Satz - AAS"
+				}
+			)
+			taxes.append(
+				{
+					"charge_type": _("On Net Total"),
+					"account_head": "3000 - Mietertrag möblierte Appartement MWST frei - AAS"
+				}
+			)
 		
 		
 		start_monat = start_date
@@ -1002,7 +1027,8 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 				# folgemonat = folgemonat - 12
 	
 		order.update({
-			"items": items
+			"items": items,
+			"taxes": taxes
 		})
 
 	
