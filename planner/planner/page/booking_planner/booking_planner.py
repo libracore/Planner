@@ -847,7 +847,8 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 					"rate": apartment.price_end_cleaning,
 					"delivery_date": delivery_date
 				}
-			]
+			],
+			"taxes_and_charges": taxes
 		})
 	else:
 		items = []
