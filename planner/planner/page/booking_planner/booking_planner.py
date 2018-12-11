@@ -847,8 +847,8 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 					"rate": apartment.price_end_cleaning,
 					"delivery_date": delivery_date
 				}
-			],
-			"taxes_and_charges": taxes
+			]
+			#"taxes_and_charges": taxes
 		})
 	else:
 		items = []
@@ -1005,12 +1005,13 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 				# folgemonat = folgemonat - 12
 	
 		order.update({
-			"items": items,
-			"taxes_and_charges": taxes
+			"items": items
+			#"taxes_and_charges": taxes
 		})
 
 	
-	
+	#order.run_method("calculate_taxes_and_totals")
 	order.insert(ignore_permissions=True)
+	
 	frappe.db.commit()
 	return order
