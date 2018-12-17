@@ -138,6 +138,10 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 						color = 'b-darkgrey'
 					elif bookingType == 'Renovation':
 						color = 'b-darkgrey'
+					elif bookingType == 'Control-Cleaning':
+						bookingType = "Control"
+						color = 'b-darkgrey'
+						
 					if dauer > 61:
 						dauer = 61
 					
@@ -237,7 +241,7 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 				for_loop_count += 1
 			
 			#hinzufuegen buchungen pro appartment
-			bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' AND (`booking_status` = 'End-Cleaning' OR `booking_status` = 'Sub-Cleaning' OR `booking_status` = 'Service-Cleaning' OR `booking_status` = 'Booked')""".format(apartment, calStartDate), as_list=True)
+			bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' AND `start_date` <= '{2}' AND (`booking_status` = 'End-Cleaning' OR `booking_status` = 'Sub-Cleaning' OR `booking_status` = 'Service-Cleaning' OR `booking_status` = 'Booked' OR `booking_status` = 'Control-Cleaning')""".format(apartment, calStartDate, add_days(calStartDate, 61)), as_list=True)
 			
 			for _booking in bookings:
 				z_index = 2
@@ -269,6 +273,9 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 					color = 'b-red'
 				elif bookingType == 'Service-Cleaning':
 					bookingType = "Service"
+					color = 'b-darkgrey'
+				elif bookingType == 'Control-Cleaning':
+					bookingType = "Control"
 					color = 'b-darkgrey'
 				elif bookingType == 'Booked':
 					color = 'b-lightblue'
@@ -598,7 +605,7 @@ def update_booking(apartment, end_date, start_date, booking_status, name, custom
 				"appartment": apartment,
 				"end_date": cleaning_date,
 				"start_date": cleaning_date,
-				"booking_status": "Service-Cleaning",
+				"booking_status": "Control-Cleaning",
 				"customer": customer,
 				"is_checked": 0,
 				#'cleaning_team': cleaning_team,
@@ -736,7 +743,7 @@ def create_booking(apartment, end_date, start_date, booking_status, customer='',
 				"appartment": apartment,
 				"end_date": cleaning_date,
 				"start_date": cleaning_date,
-				"booking_status": "Service-Cleaning",
+				"booking_status": "Control-Cleaning",
 				"customer": customer,
 				"is_checked": 0,
 				#'cleaning_team': cleaning_team,
