@@ -767,40 +767,6 @@ def create_booking(apartment, end_date, start_date, booking_status, customer='',
 	else:
 		apartment = frappe.get_doc("Appartment", apartment)
 		order = create_sales_order(apartment, customer, booking, start_date, end_date)
-		# order = frappe.new_doc("Sales Order")
-
-		# order.update({
-			# "apartment": apartment.name,
-			# "customer": customer,
-			# "booking": booking.name,
-			# "guest": "Please add Guest",
-			# "delivery_date": start_date,
-			# "items": [
-				# {
-					# "item_code": "Depot",
-					# "qty": "1", 
-					# "rate": "1.00"
-				# },
-				# {
-					# "item_code": "Miete",
-					# "qty": "1", 
-					# "rate": apartment.price_per_month
-				# },
-				# {
-					# "item_code": "Service",
-					# "qty": "1", 
-					# "rate": apartment.service_price_per_month
-				# },
-				# {
-					# "item_code": "Endreinigung",
-					# "qty": "1", 
-					# "rate": apartment.price_end_cleaning
-				# }
-			# ]
-		# })
-		
-		# order.insert(ignore_permissions=True)
-		# frappe.db.commit()
 		update_booking = frappe.db.sql("""UPDATE `tabBooking` SET `sales_order` = '{so}' WHERE `name` = '{booking}'""".format(so=order.name, booking=booking.name), as_list=True)
 		return {'booking': booking.name, 'order': order.name}
 	
@@ -932,84 +898,6 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 			}
 		)
 		
-		
-		
-		
-		
-		
-		# ende_erster_monat = get_last_day(start_date)
-		# miet_qty = date_diff(ende_erster_monat, start_date) + 1
-		
-				
-		# # zuerst tagesmiete
-		# if miet_qty <= 20:
-			# mietpreis = apartment.price_per_day
-			# mietservice = apartment.service_price_per_day
-			# items.append(
-				# {
-					# "item_code": "Miete",
-					# "qty": miet_qty, 
-					# "rate": mietpreis,
-					# "delivery_date": delivery_date
-				# }
-			# )
-			# items.append(
-				# {
-					# "item_code": "Service",
-					# "qty": miet_qty, 
-					# "rate": mietservice,
-					# "delivery_date": delivery_date
-				# }
-			# )
-		# else:
-			# mietpreis = apartment.price_per_month
-			# mietservice = apartment.service_price_per_month
-			# items.append(
-				# {
-					# "item_code": "Miete",
-					# "qty": "1", 
-					# "rate": mietpreis,
-					# "delivery_date": delivery_date
-				# }
-			# )
-			# items.append(
-				# {
-					# "item_code": "Service",
-					# "qty": "1", 
-					# "rate": mietservice,
-					# "delivery_date": delivery_date
-				# }
-			# )
-		
-		# letzter_monat = int(str(end_date).split("-")[1])
-		# folgemonat = int(str(ende_erster_monat).split("-")[1]) + 1
-		# delivery_date = str(get_first_day(add_months(ende_erster_monat, 1)))
-		# if folgemonat > 12:
-			# folgemonat = folgemonat - 12
-		# #throw(str(folgemonat)+"//"+str(letzter_monat))
-		# mietpreis = apartment.price_per_month
-		# mietservice = apartment.service_price_per_month
-		# while folgemonat <= letzter_monat:
-			# items.append(
-				# {
-					# "item_code": "Miete",
-					# "qty": "1", 
-					# "rate": mietpreis,
-					# "delivery_date": delivery_date
-				# }
-			# )
-			# items.append(
-				# {
-					# "item_code": "Service",
-					# "qty": "1", 
-					# "rate": mietservice,
-					# "delivery_date": delivery_date
-				# }
-			# )
-			# delivery_date = str(add_months(delivery_date, 1))
-			# folgemonat += 1
-			# if folgemonat > 12:
-				# folgemonat = folgemonat - 12
 	
 		order.update({
 			"items": items,
@@ -1024,3 +912,51 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 	
 	frappe.db.commit()
 	return order
+	
+	
+@frappe.whitelist()
+def create_periodic_sinvs(order):
+	order = frappe.get_doc("Sales Order", order)
+	invoices = []
+	first_invoice = []
+	rest = []
+	dates = []
+	for item in order.items:
+		if item.delivery_date not in dates:
+			dates.append(item.delivery_date)
+	
+	for _date in sorted(dates):
+	
+		sinv = frappe.new_doc("Sales Invoice")
+		sinv.update({
+			"apartment": order.apartment,
+			"customer": order.customer,
+			"booking": order.booking,
+			"due_date": _date
+		})
+
+		items_to_append = []
+	
+		for item in order.items:
+			if item.delivery_date == _date:
+				items_to_append.append(
+					{
+						'item_code': item.item_code,
+						'qty': item.qty,
+						'delivery_date': _date,
+						'sales_order': order.name,
+						'rate': item.rate
+					}
+				)
+		
+		sinv.update({
+			'items': items_to_append,
+			'taxes_and_charges': order.taxes_and_charges
+		})
+		
+		sinv.save()
+		#sinv.insert(ignore_permissions=True)
+		invoices.append(sinv.name)
+	
+	
+	return invoices
