@@ -149,7 +149,14 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 						
 						overlap_control_list.append([[start.strftime("%Y"), start.strftime("%-m"), start.strftime("%d")], [end.strftime("%Y"), end.strftime("%-m"), end.strftime("%d")]])
 					if customer:
-						row_string += '<div class="buchung pos-{0} s{1} d{2} z{4} {3}" onclick="show_booking({5})">{6}</div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'", customer)
+						customer = frappe.get_doc("Customer", customer)
+						customer_name = customer.customer_name
+						# if len(customer_name) > 6:
+							# shortet = customer_name[:6] + '...'
+							# customer_name = u'{shortet}'.format(shortet=shortet)
+						if dauer < 2:
+							customer_name = customer_name[:6] + '...'
+						row_string += '<div class="buchung pos-{0} s{1} d{2} z{4} {3}" onclick="show_booking({5})">{6}</div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'", customer_name)
 					else:
 						row_string += '<div class="buchung pos-{0} s{1} d{2} z{4} {3}" onclick="show_booking({5})">{6}</div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'", _(bookingType))
 					z_index = 1
@@ -847,8 +854,8 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 					"rate": apartment.price_end_cleaning,
 					"delivery_date": delivery_date
 				}
-			]
-			#"taxes_and_charges": taxes
+			],
+			"taxes_and_charges": taxes
 		})
 	else:
 		items = []
@@ -1005,13 +1012,15 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 				# folgemonat = folgemonat - 12
 	
 		order.update({
-			"items": items
-			#"taxes_and_charges": taxes
+			"items": items,
+			"taxes_and_charges": taxes
 		})
 
 	
-	#order.run_method("calculate_taxes_and_totals")
+	
 	order.insert(ignore_permissions=True)
+	order.run_method("calculate_taxes_and_totals")
+	order.save()
 	
 	frappe.db.commit()
 	return order
