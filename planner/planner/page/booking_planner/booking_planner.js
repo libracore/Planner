@@ -114,8 +114,12 @@ frappe.booking_planner = {
 		if (day < 10) {
 			day = "0" + day;
 		}
-		document.getElementById("start_date").value = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + day;
-		//console.log(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + day);
+		var month = now.getMonth() + 1;
+		if (month < 10) {
+			month = "0" + month;
+		}
+		document.getElementById("start_date").value = now.getFullYear() + "-" + month + "-" + day;
+		//console.log(now.getFullYear() + "-" + month + "-" + day);
         selected_type = document.getElementById("filter_type").value;
 		//console.log(selected_type);
 		
