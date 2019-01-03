@@ -865,9 +865,9 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 		
 		
 		start_monat = start_date
-		folgemonat = get_last_day(add_months(start_date, 1))
+		folgemonat = add_months(start_date, 1)
 		
-		while getdate(str(end_date)) >= folgemonat:
+		while getdate(str(end_date)) >= getdate(str(folgemonat)):
 			items.append(
 				{
 					"item_code": monats_miete,
@@ -885,11 +885,11 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 				}
 			)
 			start_monat = folgemonat
-			folgemonat = get_last_day(add_months(start_monat, 1))
+			folgemonat = add_months(start_monat, 1)
 			
 			
 		rest_tage = date_diff(end_date, start_monat)
-		if rest_tage > 0:
+		if rest_tage > 0 and rest_tage < 20:
 			items.append(
 				{
 					"item_code": tages_miete,
@@ -906,6 +906,24 @@ def create_sales_order(apartment, customer, booking, start_date, end_date):
 					"delivery_date": str(start_monat)
 				}
 			)
+		else:
+			if rest_tage > 0:
+				items.append(
+					{
+						"item_code": monats_miete,
+						"qty": "1", 
+						"rate": apartment.price_per_month,
+						"delivery_date": str(start_monat)
+					}
+				)
+				items.append(
+					{
+						"item_code": monats_service,
+						"qty": "1", 
+						"rate": apartment.service_price_per_month,
+						"delivery_date": str(start_monat)
+					}
+				)
 		
 	
 		order.update({
