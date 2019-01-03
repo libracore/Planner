@@ -278,7 +278,11 @@ function new_booking(apartment, start_value) {
 			/*{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team'), depends_on: 'eval:doc.booking_status=="End-Cleaning" || doc.booking_status=="Sub-Cleaning"' },*/
 			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: frappe.datetime.add_days(inpStartDate, (start_value - 1)) },
 			{fieldname: 'end_date', fieldtype: 'Date', label:__('End'), default: frappe.datetime.add_days(inpStartDate, start_value + 5)},
-			{fieldname: 'customer', fieldtype: 'Link', label:__('Customer'), options: 'Customer'},
+			{fieldname: 'customer', fieldtype: 'Link', label:__('Contractual Partner'), options: 'Customer'},
+			{fieldname: 'check_diff_invoice_partner', fieldtype: 'Check', label:__('Diffrent Invoice Partner')},
+			{fieldname: 'diff_invoice_partner', fieldtype: 'Link', label:__('Invoice Partner'), options: 'Customer', depends_on: 'eval:doc.check_diff_invoice_partner=="1"'},
+			{fieldname: 'check_diff_guest', fieldtype: 'Check', label:__('Diffrent Guest')},
+			{fieldname: 'diff_guest', fieldtype: 'Data', label:__('Guest'), depends_on: 'eval:doc.check_diff_guest=="1"'},
 			{fieldname: 'remark', fieldtype: 'Small Text', label:__('Remarks')}
 		],
 		primary_action: function(){
@@ -301,6 +305,16 @@ function new_booking(apartment, start_value) {
 			}else if (b_status == "Kontrollreinigung") {
 				b_status = "Control-Cleaning";
 			}
+			var diff_invoice_partner = d.get_values().diff_invoice_partner;
+			var diff_guest = d.get_values().diff_guest;
+			if (d.get_values().check_diff_invoice_partner != "1") {
+				diff_invoice_partner = "none";
+			}
+			
+			if (d.get_values().check_diff_guest != "1") {
+				diff_guest = "none";
+			}
+			
 			frappe.call({
 				method: "planner.planner.page.booking_planner.booking_planner.create_booking",
 				args: {
@@ -311,7 +325,9 @@ function new_booking(apartment, start_value) {
 					customer: d.get_values().customer,
 					is_checked: d.get_values().is_checked,
 					/*cleaning_team: d.get_values().cleaning_team,*/
-					remark: d.get_values().remark
+					remark: d.get_values().remark,
+					invoice_partner: diff_invoice_partner,
+					guest: diff_guest
 				},
 				callback(r) {
 					frappe.booking_planner.end_wait();

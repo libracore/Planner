@@ -622,7 +622,7 @@ def update_booking(apartment, end_date, start_date, booking_status, name, custom
 			return {'booking': booking.name, 'order': order.name}
 
 @frappe.whitelist()
-def create_booking(apartment, end_date, start_date, booking_status, customer='', is_checked=0, cleaning_team='', remark=''):
+def create_booking(apartment, end_date, start_date, booking_status, customer='', is_checked=0, cleaning_team='', remark='', invoice_partner='', guest=''):
 	if booking_status == "Booked":
 		# block for creating autom. end-cleaning
 		year = int(end_date.split("-")[0])
@@ -766,6 +766,18 @@ def create_booking(apartment, end_date, start_date, booking_status, customer='',
 		'remark': remark
 	})
 	
+	if invoice_partner != 'none':
+		booking.update({
+			'check_diff_invoice_partner': 1,
+			'diff_invoice_partner': invoice_partner
+		})
+		
+	if guest != 'none':
+		booking.update({
+			'check_diff_guest': 1,
+			'diff_guest': guest
+		})
+		
 	booking.insert(ignore_permissions=True)
 	frappe.db.commit()
 	
@@ -773,7 +785,7 @@ def create_booking(apartment, end_date, start_date, booking_status, customer='',
 		return booking.name
 	else:
 		apartment = frappe.get_doc("Appartment", apartment)
-		order = create_sales_order(apartment, customer, booking, start_date, end_date)
+		order = create_sales_order(apartment, customer, booking, start_date, end_date, guest, invoice_partner)
 		update_booking = frappe.db.sql("""UPDATE `tabBooking` SET `sales_order` = '{so}' WHERE `name` = '{booking}'""".format(so=order.name, booking=booking.name), as_list=True)
 		return {'booking': booking.name, 'order': order.name}
 	
@@ -783,15 +795,27 @@ def delete_booking(booking):
 	frappe.db.commit()
 	return "OK"
 	
-def create_sales_order(apartment, customer, booking, start_date, end_date):
+def create_sales_order(apartment, customer, booking, start_date, end_date, guest='', invoice_partner=''):
 	order = frappe.new_doc("Sales Order")
 	delivery_date = start_date
-	order.update({
-		"apartment": apartment.name,
-		"customer": customer,
-		"booking": booking.name,
-		"guest": "Please add Guest"
-	})
+	if guest == 'none':
+		guest = 'Please add Guest'
+		
+	if invoice_partner != 'none':
+		order.update({
+			"apartment": apartment.name,
+			"customer": invoice_partner,
+			"contractual_partner": customer,
+			"booking": booking.name,
+			"guest": guest
+		})
+	else:
+		order.update({
+			"apartment": apartment.name,
+			"customer": customer,
+			"booking": booking.name,
+			"guest": guest
+		})
 	
 	mietdauer = date_diff(end_date, start_date) + 1
 	
@@ -948,6 +972,12 @@ def create_periodic_sinvs(order):
 	first_invoice = []
 	rest = []
 	dates = []
+	# booking = frappe.get_doc("Booking", order.booking)
+	# if booking.check_diff_invoice_partner == 1:
+		# customer = booking.diff_invoice_partner
+	# else:
+		# customer = order.customer
+	
 	for item in order.items:
 		if item.delivery_date not in dates:
 			dates.append(item.delivery_date)
