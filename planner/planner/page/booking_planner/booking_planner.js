@@ -371,7 +371,7 @@ function new_cleaning_booking(apartment, start_value) {
 		title: __('Create new Booking'),
 		fields: [
 			{fieldname: 'apartment', fieldtype: 'Link', options: 'Appartment', default: apartment, label:__('Apartment')},
-			{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning'), __('Service-Cleaning'), __('Control-Cleaning')].join('\n'), default: __('Sub-Cleaning'), label:__('Status')},
+			{fieldname: 'booking_status', fieldtype: 'Select', options: [__('End-Cleaning'), __('Sub-Cleaning'), __('Service-Cleaning'), __('Control-Cleaning')].join('\n'), default: __('Service-Cleaning'), label:__('Status')},
 			{fieldname: 'is_checked', fieldtype: 'Check', label:__('Is Checked'), default: 0, depends_on: 'eval:doc.booking_status=="End-Cleaning"' },
 			/*{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team') },*/
 			{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: frappe.datetime.add_days(inpStartDate, (start_value - 1))},

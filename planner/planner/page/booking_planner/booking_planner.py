@@ -241,7 +241,7 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 			#row_string += '<div class="newBookingPlaceHolder a1 s1 d61 z0 pos-{0}" onclick="new_cleaning_booking({1})"></div>'.format(apartment_int, "'" + apartment + "'")
 			for_loop_count = 1
 			while for_loop_count < 62:
-				row_string += '<div class="newBookingPlaceHolder a1 s{2} d1 z0 pos-{0}" onclick="new_cleaning_booking({1}, {2})"></div>'.format(apartment_int, "'" + apartment + "'", for_loop_count)
+				row_string += '<div class="newBookingPlaceHolder a1 s{2} d1 pos-{0}" style="z-index: 1;" onclick="new_cleaning_booking({1}, {2})"></div>'.format(apartment_int, "'" + apartment + "'", for_loop_count)
 				for_loop_count += 1
 			
 			#hinzufuegen buchungen pro appartment
@@ -301,7 +301,7 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 				if days["weekday"] == cleaning_day:
 					for bookong_ref in booking_time_ref:
 						if s_start >= bookong_ref[0] and s_start <= bookong_ref[1]:
-							row_string += '<div class="clean-buchung pos-{0} s{1} d{2} z{4} {3}" onclick="new_cleaning_booking({5})">Default</div>'.format(apartment_int, s_start, 1, 'b-darkgrey', 0, "'" + apartment + "', '" + str(s_start) + "'")
+							row_string += '<div class="clean-buchung pos-{0} s{1} d{2} {3}" style="z-index: 2;" onclick="new_cleaning_booking({5})">Default</div>'.format(apartment_int, s_start, 1, 'b-darkgrey', 0, "'" + apartment + "', '" + str(s_start) + "'")
 				s_start += 1
 			apartment_int += 1
 			
