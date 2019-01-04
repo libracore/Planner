@@ -842,7 +842,7 @@ def create_sales_order(apartment, customer, booking, start_date, end_date, guest
 				{
 					"item_code": "Depot",
 					"qty": "1", 
-					"rate": "1.00",
+					"rate": apartment.price_per_month + apartment.service_price_per_month,
 					"delivery_date": delivery_date
 				},
 				{
@@ -872,7 +872,7 @@ def create_sales_order(apartment, customer, booking, start_date, end_date, guest
 			{
 				"item_code": "Depot",
 				"qty": "1", 
-				"rate": "1.00",
+				"rate": apartment.price_per_month + apartment.service_price_per_month,
 				"delivery_date": delivery_date
 			}
 		)
