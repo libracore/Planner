@@ -101,7 +101,7 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 			qty_bookings = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}'""".format(apartment, calStartDate), as_list=True)[0][0])
 			if qty_bookings > 0:
 				overlap_control_list = []
-				bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked`, `customer` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' AND `start_date` <= '{2}' ORDER BY (CASE `booking_status` WHEN 'Booked' THEN 1 WHEN 'Reserved' THEN 2 ELSE 10 END)""".format(apartment, calStartDate, add_days(calStartDate, 61)), as_list=True)
+				bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked`, `customer`, `mv_terminated` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' AND `start_date` <= '{2}' ORDER BY (CASE `booking_status` WHEN 'Booked' THEN 1 WHEN 'Reserved' THEN 2 ELSE 10 END)""".format(apartment, calStartDate, add_days(calStartDate, 61)), as_list=True)
 				z_index = 1
 				for _booking in bookings:
 					booking = _booking[0]
@@ -110,6 +110,7 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 					bookingType = _booking[3]
 					is_checked = _booking[4]
 					customer = _booking[5]
+					mv_terminated = _booking[6]
 					datediff = date_diff(start, calStartDate)
 					if datediff <= 0:
 						s_start = 1
@@ -120,7 +121,10 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 					if bookingType == 'Reserved':
 						color = 'b-yellow'
 					elif bookingType == 'Booked':
-						color = 'b-blue'
+						if mv_terminated == 1:
+							color = 'b-darkgrey'
+						else:
+							color = 'b-blue'
 					elif bookingType == 'End-Cleaning':
 						#check if checked
 						bookingType = "End-R"
@@ -445,7 +449,7 @@ def storno_so_and_sinv(so, booking):
 	return "OK"
 
 @frappe.whitelist()
-def update_booking(apartment, end_date, start_date, booking_status, name, customer='', is_checked=0, cleaning_team='', remark=''):
+def update_booking(apartment, end_date, start_date, booking_status, name, customer='', is_checked=0, cleaning_team='', remark='', mv_terminated=0):
 	if booking_status != "Booked":
 		booking = frappe.get_doc("Booking", name)
 		if booking.booking_status == "Booked":		
@@ -462,7 +466,8 @@ def update_booking(apartment, end_date, start_date, booking_status, name, custom
 			"customer": customer,
 			"is_checked": is_checked,
 			#'cleaning_team': cleaning_team,
-			'remark': remark
+			'remark': remark,
+			'mv_terminated': mv_terminated
 		})
 		booking.save()
 		frappe.db.commit()
@@ -471,7 +476,11 @@ def update_booking(apartment, end_date, start_date, booking_status, name, custom
 	else:
 		booking = frappe.get_doc("Booking", name)
 		if booking.booking_status == "Booked":
-			return "Diese Änderung müssen Sie manuell durchführen."
+			if booking.mv_terminated != mv_terminated:
+				update_booking = frappe.db.sql("""UPDATE `tabBooking` SET `mv_terminated` = '{mv_terminated}' WHERE `name` = '{booking}'""".format(mv_terminated=mv_terminated, booking=booking.name), as_list=True)
+				return "Die Änderung des Kündigungsstatus wurde übernommen, alle anderen Änderungen müssen Sie manuell durchführen."
+			else:
+				return "Diese Änderung müssen Sie manuell durchführen."
 		
 		booking.update({
 			"appartment": apartment,
@@ -481,7 +490,8 @@ def update_booking(apartment, end_date, start_date, booking_status, name, custom
 			"customer": customer,
 			"is_checked": is_checked,
 			#'cleaning_team': cleaning_team,
-			'remark': remark
+			'remark': remark,
+			'mv_terminated': mv_terminated
 		})
 		booking.save()
 		frappe.db.commit()
@@ -622,68 +632,69 @@ def update_booking(apartment, end_date, start_date, booking_status, name, custom
 			return {'booking': booking.name, 'order': order.name}
 
 @frappe.whitelist()
-def create_booking(apartment, end_date, start_date, booking_status, customer='', is_checked=0, cleaning_team='', remark='', invoice_partner='', guest=''):
+def create_booking(apartment, end_date, start_date, booking_status, customer='', is_checked=0, cleaning_team='', remark='', invoice_partner='', guest='', mv_terminated=0):
 	if booking_status == "Booked":
-		# block for creating autom. end-cleaning
-		year = int(end_date.split("-")[0])
-		month = int(end_date.split("-")[1])
-		day = int(end_date.split("-")[2])
-		weekday = int(datetime(year, month, day).weekday())
-		#throw(str(end))
-		if weekday == 0:
-			wd = "Mo"
-		elif weekday == 1:
-			wd = "Di"
-		elif weekday == 2:
-			wd = "Mi"
-		elif weekday == 3:
-			wd = "Do"
-		elif weekday == 4:
-			wd = "Fr"
-		elif weekday == 5:
-			wd = "Sa"
-		else:
-			wd = "So"
-			
-		default_cleaning_day = frappe.db.sql("""SELECT `cleaning_day` FROM `tabAppartment` WHERE `name` = '{0}'""".format(apartment), as_list=True)[0][0]
-		if wd == default_cleaning_day:
-			cleaning_date = end_date
-		else:
-			if default_cleaning_day == "Mo":
-				default_cleaning_day = 0
-			elif default_cleaning_day == "Di":
-				default_cleaning_day = 1
-			elif default_cleaning_day == "Mi":
-				default_cleaning_day = 2
-			elif default_cleaning_day == "Do":
-				default_cleaning_day = 3
-			elif default_cleaning_day == "Fr":
-				default_cleaning_day = 4
-			elif default_cleaning_day == "Sa":
-				default_cleaning_day = 5
-			elif default_cleaning_day == "So":
-				default_cleaning_day = 6
-				
-			default_diff = default_cleaning_day - weekday
-			if default_diff < 0:
-				cleaning_date = add_days(end_date, (7 + default_diff))
+		if str(mv_terminated) == '1':
+			# block for creating autom. end-cleaning
+			year = int(end_date.split("-")[0])
+			month = int(end_date.split("-")[1])
+			day = int(end_date.split("-")[2])
+			weekday = int(datetime(year, month, day).weekday())
+			#throw(str(end))
+			if weekday == 0:
+				wd = "Mo"
+			elif weekday == 1:
+				wd = "Di"
+			elif weekday == 2:
+				wd = "Mi"
+			elif weekday == 3:
+				wd = "Do"
+			elif weekday == 4:
+				wd = "Fr"
+			elif weekday == 5:
+				wd = "Sa"
 			else:
-				cleaning_date = add_days(end_date, default_diff)
-	
-		end_cleaning = frappe.new_doc("Booking")
+				wd = "So"
+				
+			default_cleaning_day = frappe.db.sql("""SELECT `cleaning_day` FROM `tabAppartment` WHERE `name` = '{0}'""".format(apartment), as_list=True)[0][0]
+			if wd == default_cleaning_day:
+				cleaning_date = end_date
+			else:
+				if default_cleaning_day == "Mo":
+					default_cleaning_day = 0
+				elif default_cleaning_day == "Di":
+					default_cleaning_day = 1
+				elif default_cleaning_day == "Mi":
+					default_cleaning_day = 2
+				elif default_cleaning_day == "Do":
+					default_cleaning_day = 3
+				elif default_cleaning_day == "Fr":
+					default_cleaning_day = 4
+				elif default_cleaning_day == "Sa":
+					default_cleaning_day = 5
+				elif default_cleaning_day == "So":
+					default_cleaning_day = 6
+					
+				default_diff = default_cleaning_day - weekday
+				if default_diff < 0:
+					cleaning_date = add_days(end_date, (7 + default_diff))
+				else:
+					cleaning_date = add_days(end_date, default_diff)
+		
+			end_cleaning = frappe.new_doc("Booking")
 
-		end_cleaning.update({
-			"appartment": apartment,
-			"end_date": cleaning_date,
-			"start_date": cleaning_date,
-			"booking_status": "End-Cleaning",
-			"customer": customer,
-			"is_checked": 0,
-			#'cleaning_team': cleaning_team,
-			'remark': remark
-		})
-		end_cleaning.insert(ignore_permissions=True)
-		frappe.db.commit()
+			end_cleaning.update({
+				"appartment": apartment,
+				"end_date": cleaning_date,
+				"start_date": cleaning_date,
+				"booking_status": "End-Cleaning",
+				"customer": customer,
+				"is_checked": 0,
+				#'cleaning_team': cleaning_team,
+				'remark': remark
+			})
+			end_cleaning.insert(ignore_permissions=True)
+			frappe.db.commit()
 		
 		# block for autom. service cleaning after 13 days without booking
 		past_13_date = add_days(start_date, -13)
@@ -763,7 +774,8 @@ def create_booking(apartment, end_date, start_date, booking_status, customer='',
 		"customer": customer,
 		"is_checked": is_checked,
 		#'cleaning_team': cleaning_team,
-		'remark': remark
+		'remark': remark,
+		'mv_terminated': mv_terminated
 	})
 	
 	if invoice_partner != 'none':
@@ -798,21 +810,21 @@ def delete_booking(booking):
 def create_sales_order(apartment, customer, booking, start_date, end_date, guest='', invoice_partner=''):
 	order = frappe.new_doc("Sales Order")
 	delivery_date = start_date
-	if guest == 'none':
+	if guest == 'none' or guest == '':
 		guest = 'Please add Guest'
 		
-	if invoice_partner != 'none':
+	if invoice_partner == 'none' or invoice_partner == '':
 		order.update({
 			"apartment": apartment.name,
-			"customer": invoice_partner,
-			"contractual_partner": customer,
+			"customer": customer,
 			"booking": booking.name,
 			"guest": guest
 		})
 	else:
 		order.update({
 			"apartment": apartment.name,
-			"customer": customer,
+			"customer": invoice_partner,
+			"contractual_partner": customer,
 			"booking": booking.name,
 			"guest": guest
 		})

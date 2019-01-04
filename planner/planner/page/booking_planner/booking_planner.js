@@ -283,7 +283,8 @@ function new_booking(apartment, start_value) {
 			{fieldname: 'diff_invoice_partner', fieldtype: 'Link', label:__('Invoice Partner'), options: 'Customer', depends_on: 'eval:doc.check_diff_invoice_partner=="1"'},
 			{fieldname: 'check_diff_guest', fieldtype: 'Check', label:__('Diffrent Guest')},
 			{fieldname: 'diff_guest', fieldtype: 'Data', label:__('Guest'), depends_on: 'eval:doc.check_diff_guest=="1"'},
-			{fieldname: 'remark', fieldtype: 'Small Text', label:__('Remarks')}
+			{fieldname: 'remark', fieldtype: 'Small Text', label:__('Remarks')},
+			{fieldname: 'mv_terminated', fieldtype: 'Check', label:__('MV Terminated')}
 		],
 		primary_action: function(){
 			frappe.booking_planner.start_wait();
@@ -327,7 +328,8 @@ function new_booking(apartment, start_value) {
 					/*cleaning_team: d.get_values().cleaning_team,*/
 					remark: d.get_values().remark,
 					invoice_partner: diff_invoice_partner,
-					guest: diff_guest
+					guest: diff_guest,
+					mv_terminated: d.get_values().mv_terminated
 				},
 				callback(r) {
 					frappe.booking_planner.end_wait();
@@ -536,6 +538,7 @@ function show_booking(_booking) {
 							{fieldname: 'end_date', fieldtype: 'Date', default: booking.end_date, label:__('End')},
 							{fieldname: 'customer', fieldtype: 'Link', default: booking.customer, label:__('Customer'), options: 'Customer'},
 							{fieldname: 'remark', fieldtype: 'Small Text', default: booking.remark, label:__('Remarks')},
+							{fieldname: 'mv_terminated', fieldtype: 'Check', label:__('MV Terminated')},
 							{fieldname: 'delete_btn', fieldtype: "Button", label: __("Delete this Booking"), cssClass: "btn-danger"}
 						],
 						primary_action: function(){
@@ -574,7 +577,8 @@ function show_booking(_booking) {
 									is_checked: d.get_values().is_checked,
 									customer: d.get_values().customer,
 									/*cleaning_team: d.get_values().cleaning_team,*/
-									remark: d.get_values().remark
+									remark: d.get_values().remark,
+									mv_terminated: d.get_values().mv_terminated
 								},
 								callback(r) {
 									frappe.booking_planner.end_wait();
@@ -588,6 +592,7 @@ function show_booking(_booking) {
 										document.getElementById("update-btn").click();
 									} else {
 										frappe.msgprint(r.message);
+										document.getElementById("update-btn").click();
 									}
 								}
 							});
