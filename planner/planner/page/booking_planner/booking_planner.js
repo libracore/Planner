@@ -570,7 +570,7 @@ function show_booking(_booking) {
 							{fieldname: 'end_date', fieldtype: 'Date', default: booking.end_date, label:__('End')},
 							{fieldname: 'customer', fieldtype: 'Link', default: booking.customer, label:__('Customer'), options: 'Customer'},
 							{fieldname: 'remark', fieldtype: 'Small Text', default: booking.remark, label:__('Remarks')},
-							{fieldname: 'mv_terminated', fieldtype: 'Check', label:__('MV Terminated')},
+							{fieldname: 'mv_terminated', fieldtype: 'Check', label:__('MV Terminated'), default: booking.mv_terminated},
 							{fieldname: 'delete_btn', fieldtype: "Button", label: __("Delete this Booking"), cssClass: "btn-danger"}
 						],
 						primary_action: function(){
