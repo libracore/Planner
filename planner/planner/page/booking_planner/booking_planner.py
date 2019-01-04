@@ -30,9 +30,11 @@ def get_cleaning_table_data(inpStartDate, house, from_price, to_price, from_size
 	calcEndDate = add_to_date(calStartDate, days=60, as_string=True)
 	
 	#div style
+	raw_datas = get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_size)
 	master_data = {
 		'headers': createHeaders(calStartDate, add_to_date(calStartDate, months=1)),
-		'rows': get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_size)
+		'rows': raw_datas['rows'],
+		'default_cleanings': raw_datas['default_cleanings']
 	}
 		
 	return master_data
@@ -189,6 +191,7 @@ def overlap_control(date_list=[], ref_date=[]):
 	
 def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_size):
 	rows = []
+	default_cleanings = {}
 	from_price = int(from_price)
 	to_price = int(to_price)
 	from_size = float(from_size)
@@ -245,10 +248,10 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 				for_loop_count += 1
 			
 			#hinzufuegen buchungen pro appartment
-			bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' AND `start_date` <= '{2}' AND (`booking_status` = 'End-Cleaning' OR `booking_status` = 'Sub-Cleaning' OR `booking_status` = 'Service-Cleaning' OR `booking_status` = 'Booked' OR `booking_status` = 'Control-Cleaning')""".format(apartment, calStartDate, add_days(calStartDate, 61)), as_list=True)
+			bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked`, `customer` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' AND `start_date` <= '{2}' AND (`booking_status` = 'End-Cleaning' OR `booking_status` = 'Sub-Cleaning' OR `booking_status` = 'Service-Cleaning' OR `booking_status` = 'Booked' OR `booking_status` = 'Control-Cleaning')""".format(apartment, calStartDate, add_days(calStartDate, 61)), as_list=True)
 			
 			for _booking in bookings:
-				z_index = 2
+				z_index = 3
 				booking = _booking[0]
 				start = _booking[1]
 				end = _booking[2]
@@ -284,7 +287,7 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 				elif bookingType == 'Booked':
 					color = 'b-lightblue'
 					z_index = 0
-					booking_time_ref.append([s_start, (s_start + dauer - 1)])
+					booking_time_ref.append([s_start, (s_start + dauer - 1),_booking[5]])
 					on_click_detail = ''
 					cursor_style = ' cursor: default !important;'
 				else:
@@ -302,6 +305,11 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 					for bookong_ref in booking_time_ref:
 						if s_start >= bookong_ref[0] and s_start <= bookong_ref[1]:
 							row_string += '<div class="clean-buchung pos-{0} s{1} d{2} {3}" style="z-index: 2;" onclick="new_cleaning_booking({5})">Default</div>'.format(apartment_int, s_start, 1, 'b-darkgrey', 0, "'" + apartment + "', '" + str(s_start) + "'")
+							if str(s_start) in default_cleanings:
+								default_cleanings[str(s_start)].append([apartment, bookong_ref[2]])
+							else:
+								default_cleanings[str(s_start)] = []
+								default_cleanings[str(s_start)].append([apartment, bookong_ref[2]])
 				s_start += 1
 			apartment_int += 1
 			
@@ -309,7 +317,7 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 		row_string += '</div>'
 		rows.append(row_string)
 	
-	return rows
+	return {'rows': rows, 'default_cleanings': default_cleanings}
 		
 def createHeaders(firstDate, secondDate):
 	headers = []

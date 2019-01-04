@@ -51,14 +51,14 @@ frappe.booking_planner = {
 			console.log(selected_type);
 			if (selected_type == "booking") {
 				frappe.booking_planner.update_table_data(page);
-				/*if (!document.getElementById("transform-div").classList.contains("hidden")) {
+				if (!document.getElementById("transform-div").classList.contains("hidden")) {
 					document.getElementById("transform-div").classList.add("hidden");
-				}*/
+				}
 			} else {
 				frappe.booking_planner.update_cleaning_table_data(page);
-				/*if (document.getElementById("transform-div").classList.contains("hidden")) {
+				if (document.getElementById("transform-div").classList.contains("hidden")) {
 					document.getElementById("transform-div").classList.remove("hidden");
-				}*/
+				}
 			}
         });
 		this.page.main.find("#filter_house").on('change', function() {
@@ -196,7 +196,8 @@ frappe.booking_planner = {
             callback: function(r) {
                 if (r.message) {
                     //console.log(r.message);
-                    frappe.booking_planner.show_table(page, r.message);
+                    frappe.default_cleanings = r.message['default_cleanings'];
+					frappe.booking_planner.show_table(page, r.message);
                 } 
             }
         });
@@ -247,13 +248,44 @@ frappe.booking_planner = {
 			title: __('Transform Default to Fixed Cleanings'),
 			fields: [
 				{fieldname: 'description', fieldtype: 'HTML', label:__('Description'), read_only: 1, options: '<p>{{ __("Transform all default cleanings to fixed cleanings according to the range below") }}</p>'},
-				{fieldname: 'start_date', fieldtype: 'Date', label:__('Start')},
-				{fieldname: 'end_date', fieldtype: 'Date', label:__('End')}/*,
+				{fieldname: 'start_date', fieldtype: 'Date', label:__('Start'), default: document.getElementById("start_date").value},
+				{fieldname: 'end_date', fieldtype: 'Date', label:__('End'), default: frappe.datetime.add_days(document.getElementById("start_date").value, 6)}/*,
 				{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team')}*/
 			],
 			primary_action: function(){
 				d.hide();
+				
 				//console.log(d.get_values());
+				var start = frappe.datetime.get_day_diff(d.get_values().start_date, document.getElementById("start_date").value) + 1;
+				var ende = frappe.datetime.get_day_diff(d.get_values().end_date, document.getElementById("start_date").value) + 1;
+				/* console.log("Start: " + start);
+				console.log("ende: " + ende);
+				console.log("Defaults:");*/
+				console.log(frappe['default_cleanings']);
+				for (i=1; i <= parseInt(ende); i++) {
+					if (frappe['default_cleanings'][i]) {
+						for (y=0; y < frappe['default_cleanings'][i].length; y++) {
+							
+							//console.log(frappe['default_cleanings'][i][y]);
+							//console.log(frappe.datetime.add_days(document.getElementById("start_date").value, (i - 1)));
+							frappe.call({
+								method: "planner.planner.page.booking_planner.booking_planner.create_booking",
+								args: {
+									apartment: frappe['default_cleanings'][i][y][0],
+									end_date: frappe.datetime.add_days(document.getElementById("start_date").value, (i - 1)),
+									start_date: frappe.datetime.add_days(document.getElementById("start_date").value, (i - 1)),
+									booking_status: 'Service-Cleaning',
+									customer: frappe['default_cleanings'][i][y][1]
+								},
+								callback(r) {
+									
+								}
+							});
+						}
+					}
+				}
+				//console.log("finish");
+				
 			},
 			primary_action_label: __('Transform')
 		});
