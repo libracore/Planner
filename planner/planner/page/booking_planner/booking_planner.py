@@ -194,8 +194,8 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 	default_cleanings = {}
 	from_price = int(from_price)
 	to_price = int(to_price)
-	from_size = float(from_size)
-	to_size = float(to_size)
+	from_size = from_size
+	to_size = to_size
 	if house != 'All':
 		house_filter = " AND `name` = '{house}'".format(house=house)
 	else:
