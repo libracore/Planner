@@ -43,8 +43,8 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 	rows = []
 	from_price = int(from_price)
 	to_price = int(to_price)
-	from_size = float(from_size)
-	to_size = float(to_size)
+	from_size = from_size
+	to_size = to_size
 	#houses = alle haeuser
 	if house != 'All':
 		house_filter = " AND `name` = '{house}'".format(house=house)
