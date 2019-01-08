@@ -33,6 +33,7 @@ def execute(filters=None):
 		CASE booking.`booking_status`
 			WHEN 'End-Cleaning' THEN 'End-R'
 			WHEN 'Sub-Cleaning' THEN 'Sub-R'
+			WHEN 'Control-Cleaning' THEN 'Control'
 			ELSE 'Service' END,
 		apartment.`time_for_cleaning`,
 		booking.`remark`
@@ -41,7 +42,7 @@ def execute(filters=None):
 		LEFT JOIN `tabEmployee` AS employee ON employee.`name` = housecleaning.`parent`)
 		LEFT JOIN `tabAppartment` AS apartment ON apartment.`house` = house.`name`)
 		LEFT JOIN `tabBooking` AS booking ON booking.`appartment` = apartment.`name`)
-		WHERE (booking.`booking_status` = 'End-Cleaning' OR booking.`booking_status` = 'Sub-Cleaning' OR booking.`booking_status` = 'Service-Cleaning')
+		WHERE (booking.`booking_status` = 'End-Cleaning' OR booking.`booking_status` = 'Sub-Cleaning' OR booking.`booking_status` = 'Service-Cleaning' OR booking.`booking_status` = 'Control-Cleaning')
 		AND booking.`start_date` >= '{from_date}'
 		AND booking.`start_date` <= '{to_date}'
 		AND housecleaning.`from` <= booking.`start_date`
@@ -75,9 +76,10 @@ def execute(filters=None):
 		CASE booking.`booking_status`
 			WHEN 'End-Cleaning' THEN 'End-R'
 			WHEN 'Sub-Cleaning' THEN 'Sub-R'
+			WHEN 'Control-Cleaning' THEN 'Control'
 			ELSE 'Service' END
 		FROM `tabBooking` AS booking
-		WHERE (booking.`booking_status` = 'End-Cleaning' OR booking.`booking_status` = 'Sub-Cleaning' OR booking.`booking_status` = 'Service-Cleaning')
+		WHERE (booking.`booking_status` = 'End-Cleaning' OR booking.`booking_status` = 'Sub-Cleaning' OR booking.`booking_status` = 'Service-Cleaning' OR booking.`booking_status` = 'Control-Cleaning')
 		AND booking.`start_date` >= '{from_date}'
 		AND booking.`start_date` <= '{to_date}'
 		AND NOT EXISTS (
