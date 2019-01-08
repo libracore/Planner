@@ -103,7 +103,7 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 			qty_bookings = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}'""".format(apartment, calStartDate), as_list=True)[0][0])
 			if qty_bookings > 0:
 				overlap_control_list = []
-				bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked`, `customer`, `mv_terminated` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' AND `start_date` <= '{2}' AND `booking_status` != 'Service-Cleaning' ORDER BY (CASE `booking_status` WHEN 'Booked' THEN 1 WHEN 'Reserved' THEN 2 ELSE 10 END)""".format(apartment, calStartDate, add_days(calStartDate, 61)), as_list=True)
+				bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked`, `customer`, `mv_terminated`, `diff_invoice_partner`, `diff_guest` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' AND `start_date` <= '{2}' AND `booking_status` != 'Service-Cleaning' ORDER BY (CASE `booking_status` WHEN 'Booked' THEN 1 WHEN 'Reserved' THEN 2 ELSE 10 END)""".format(apartment, calStartDate, add_days(calStartDate, 61)), as_list=True)
 				z_index = 1
 				for _booking in bookings:
 					booking = _booking[0]
@@ -113,6 +113,8 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 					is_checked = _booking[4]
 					customer = _booking[5]
 					mv_terminated = _booking[6]
+					diff_invoice_partner = _booking[7]
+					diff_guest = _booking[8]
 					datediff = date_diff(start, calStartDate)
 					if datediff <= 0:
 						s_start = 1
@@ -160,7 +162,15 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 						overlap_control_list.append([[start.strftime("%Y"), start.strftime("%-m"), start.strftime("%d")], [end.strftime("%Y"), end.strftime("%-m"), end.strftime("%d")]])
 					if customer:
 						customer = frappe.get_doc("Customer", customer)
-						customer_name = customer.customer_name
+						if diff_invoice_partner:
+							rechnungsempfaenger = ", " + frappe.get_doc("Customer", diff_invoice_partner).customer_name
+						else:
+							rechnungsempfaenger = ''
+						if diff_guest:
+							diff_guest = ', ' + diff_guest
+						else:
+							diff_guest = ''
+						customer_name = customer.customer_name + rechnungsempfaenger + diff_guest
 						# if len(customer_name) > 6:
 							# shortet = customer_name[:6] + '...'
 							# customer_name = u'{shortet}'.format(shortet=shortet)
