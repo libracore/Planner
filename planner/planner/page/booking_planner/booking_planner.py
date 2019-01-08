@@ -103,7 +103,7 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 			qty_bookings = int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}'""".format(apartment, calStartDate), as_list=True)[0][0])
 			if qty_bookings > 0:
 				overlap_control_list = []
-				bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked`, `customer`, `mv_terminated` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' AND `start_date` <= '{2}' ORDER BY (CASE `booking_status` WHEN 'Booked' THEN 1 WHEN 'Reserved' THEN 2 ELSE 10 END)""".format(apartment, calStartDate, add_days(calStartDate, 61)), as_list=True)
+				bookings = frappe.db.sql("""SELECT `name`, `start_date`, `end_date`, `booking_status`, `is_checked`, `customer`, `mv_terminated` FROM `tabBooking` WHERE `appartment` = '{0}' AND `end_date` >= '{1}' AND `start_date` <= '{2}' AND `booking_status` != 'Service-Cleaning' ORDER BY (CASE `booking_status` WHEN 'Booked' THEN 1 WHEN 'Reserved' THEN 2 ELSE 10 END)""".format(apartment, calStartDate, add_days(calStartDate, 61)), as_list=True)
 				z_index = 1
 				for _booking in bookings:
 					booking = _booking[0]
