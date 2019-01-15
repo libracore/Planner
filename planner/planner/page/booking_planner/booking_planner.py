@@ -124,6 +124,8 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 						dauer = date_diff(end, start) + 1
 					if bookingType == 'Reserved':
 						color = 'b-yellow'
+						if diff_guest:
+							bookingType = diff_guest
 					elif bookingType == 'Booked':
 						if mv_terminated == 1:
 							color = 'b-darkgrey'
