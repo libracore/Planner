@@ -1059,7 +1059,7 @@ def create_periodic_sinvs(order):
 @frappe.whitelist()
 def get_lieferadresse(customer):
 	adresse = frappe.db.sql("""SELECT `name` FROM `tabAddress` WHERE `is_shipping_address` = 1 AND `name` IN (SELECT `parent` FROM `tabDynamic Link` WHERE `parenttype` = 'Address' AND `link_name` = '{link_name}') LIMIT 1""".format(link_name=customer), as_list=True)
-		if adresse:
-			return adresse[0][0]
-		else:
-			return "nok"
+	if adresse:
+		return adresse[0][0]
+	else:
+		return "nok"
