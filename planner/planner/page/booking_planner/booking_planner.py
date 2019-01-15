@@ -841,10 +841,16 @@ def create_sales_order(apartment, customer, booking, start_date, end_date, guest
 			"guest": guest
 		})
 	else:
+		vertrags_adresse = frappe.db.sql("""SELECT `name` FROM `tabAddress` WHERE `is_shipping_address` = 1 AND `name` IN (SELECT `parent` FROM `tabDynamic Link` WHERE `parenttype` = 'Address' AND `link_name` = '{link_name}') LIMIT 1""".format(link_name=customer), as_list=True)
+		if vertrags_adresse:
+			vertrags_adresse = vertrags_adresse[0][0]
+		else:
+			vertrags_adresse = ''
 		order.update({
 			"apartment": apartment.name,
 			"customer": invoice_partner,
 			"contractual_partner": customer,
+			"contractual_partner_address": vertrags_adresse,
 			"booking": booking.name,
 			"guest": guest
 		})
