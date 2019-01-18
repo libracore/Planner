@@ -254,37 +254,61 @@ frappe.booking_planner = {
 			],
 			primary_action: function(){
 				d.hide();
-				
+				frappe.booking_planner.start_wait();
 				//console.log(d.get_values());
 				var start = frappe.datetime.get_day_diff(d.get_values().start_date, document.getElementById("start_date").value) + 1;
 				var ende = frappe.datetime.get_day_diff(d.get_values().end_date, document.getElementById("start_date").value) + 1;
 				/* console.log("Start: " + start);
 				console.log("ende: " + ende);
 				console.log("Defaults:");*/
-				console.log(frappe['default_cleanings']);
+				//console.log(frappe['default_cleanings']);
 				for (i=1; i <= parseInt(ende); i++) {
 					if (frappe['default_cleanings'][i]) {
 						for (y=0; y < frappe['default_cleanings'][i].length; y++) {
 							
 							//console.log(frappe['default_cleanings'][i][y]);
 							//console.log(frappe.datetime.add_days(document.getElementById("start_date").value, (i - 1)));
+							var _apar = frappe['default_cleanings'][i][y][0];
 							frappe.call({
-								method: "planner.planner.page.booking_planner.booking_planner.create_booking",
-								args: {
-									apartment: frappe['default_cleanings'][i][y][0],
-									end_date: frappe.datetime.add_days(document.getElementById("start_date").value, (i - 1)),
-									start_date: frappe.datetime.add_days(document.getElementById("start_date").value, (i - 1)),
-									booking_status: 'Service-Cleaning',
-									customer: frappe['default_cleanings'][i][y][1]
+								method:"frappe.client.get_list",
+								args:{
+								doctype:"Booking",
+								filters: [
+									["appartment","=",_apar],
+									["start_date","=",frappe.datetime.add_days(document.getElementById("start_date").value, (i - 1))],
+									["end_date","=",frappe.datetime.add_days(document.getElementById("start_date").value, (i - 1))],
+									["booking_status","=","Service-Cleaning"]
+								],
+									fields: ["name"]
 								},
+								async: false,
 								callback(r) {
-									
+									//console.log(r.message);
+									if (r.message) {
+										//console.log("grösser");
+									} else {
+										frappe.call({
+											method: "planner.planner.page.booking_planner.booking_planner.create_booking",
+											args: {
+												apartment: frappe['default_cleanings'][i][y][0],
+												end_date: frappe.datetime.add_days(document.getElementById("start_date").value, (i - 1)),
+												start_date: frappe.datetime.add_days(document.getElementById("start_date").value, (i - 1)),
+												booking_status: 'Service-Cleaning',
+												customer: frappe['default_cleanings'][i][y][1]
+											},
+											callback(r) {
+												
+											}
+										});
+									}
 								}
 							});
 						}
 					}
 				}
-				//console.log("finish");
+				console.log("finish");
+				frappe.booking_planner.end_wait();
+				document.getElementById("update-btn").click();
 				
 			},
 			primary_action_label: __('Transform')
