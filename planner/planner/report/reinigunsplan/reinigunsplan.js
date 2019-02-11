@@ -25,6 +25,9 @@ frappe.query_reports["Reinigunsplan"] = {
 		if (dataContext["Name"] == "ALERT") {
 				value = "<span style='background-color:yellow!important;'>" + value + "</span>";
 		}
+		if (dataContext["Remark"] == ("KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!")) {
+				value = "<span style='background-color:orange!important;'>" + value + "</span>";
+		}
 		return value;
 	}
 }

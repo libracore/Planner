@@ -8,24 +8,9 @@ from frappe.utils.data import date_diff, add_days
 import string
 
 def execute(filters=None):
-	# qty_days = date_diff(filters.to_date, filters.from_date)
-	# loop_counter = 0
-	# date_string = []
-	# while loop_counter <= qty_days:
-		# if qty_days == 0:
-			# date_string.append('{start_date}::50'.format(start_date=filters.from_date))
-			# loop_counter += 1
-		# else:
-			# calc_date = add_days(filters.from_date, loop_counter)
-			# date_string.append('{calc_date}::50'.format(calc_date=calc_date))
-			# loop_counter += 1
-		
-	columns, data = [], []
+	columns, data, _data, kontrolle = [], [], [], []
 	columns = ["House:Link/House:120", "Name::100", "Apartment:Link/Appartment:70", "Due Date::150", "Task::90", "min::50", "Remark::300"]
-	# for addition in date_string:
-		# columns.append(addition)
-		
-	data = frappe.db.sql("""SELECT
+	_data = frappe.db.sql("""SELECT
 		house.`name`,
 		employee.`employee_name`,
 		apartment.`name`,
@@ -36,7 +21,36 @@ def execute(filters=None):
 			WHEN 'Control-Cleaning' THEN 'Control'
 			ELSE 'Service' END,
 		apartment.`time_for_cleaning`,
-		booking.`remark`
+		CASE
+			WHEN WEEKDAY(booking.`start_date`) = 0 THEN
+				CASE
+					WHEN housecleaning.`monday` = 1 THEN 'KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!'
+					ELSE booking.`remark` END
+			WHEN WEEKDAY(booking.`start_date`) = 1 THEN
+				CASE
+					WHEN housecleaning.`tuesday` = 1 THEN 'KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!'
+					ELSE booking.`remark` END
+			WHEN WEEKDAY(booking.`start_date`) = 2 THEN
+				CASE
+					WHEN housecleaning.`wednesday` = 1 THEN 'KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!'
+					ELSE booking.`remark` END
+			WHEN WEEKDAY(booking.`start_date`) = 3 THEN
+				CASE
+					WHEN housecleaning.`thursday` = 1 THEN 'KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!'
+					ELSE booking.`remark` END
+			WHEN WEEKDAY(booking.`start_date`) = 4 THEN
+				CASE
+					WHEN housecleaning.`friday` = 1 THEN 'KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!'
+					ELSE booking.`remark` END
+			WHEN WEEKDAY(booking.`start_date`) = 5 THEN
+				CASE
+					WHEN housecleaning.`saturday` = 1 THEN 'KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!'
+					ELSE booking.`remark` END
+			WHEN WEEKDAY(booking.`start_date`) = 6 THEN
+				CASE
+					WHEN housecleaning.`sunday` = 1 THEN 'KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!'
+					ELSE booking.`remark` END
+			ELSE booking.`remark` END
 		FROM ((((`tabHouse` AS house
 		LEFT JOIN `tabHouse Cleaning` AS housecleaning ON house.`name` = housecleaning.`house`)
 		LEFT JOIN `tabEmployee` AS employee ON employee.`name` = housecleaning.`parent`)
@@ -49,6 +63,20 @@ def execute(filters=None):
 		AND housecleaning.`to` >= booking.`start_date`
 		ORDER BY booking.`start_date` ASC, house.`name` ASC, apartment.`name` ASC""".format(from_date=filters.from_date, to_date=filters.to_date), as_list=True)
 	
+	for eintrag in _data:
+		if eintrag[6] != 'KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!':
+			data.append(eintrag)
+		else:
+			kontrolle.append([eintrag[0], 'ALERT', eintrag[2], eintrag[3], eintrag[4], '', 'No cleaner found!'])
+	
+	for entfernt in kontrolle:
+		vorhanden = False
+		for original in data:
+			if entfernt[2] in original:
+				if entfernt[3] in original:
+					vorhanden = True
+		if not vorhanden:
+			data.insert(0, entfernt)
 	
 	addition = {}
 	for detail in data:
@@ -58,12 +86,8 @@ def execute(filters=None):
 		else:
 			if detail[1] not in addition[detail[0]]:
 				addition[detail[0]].append(detail[1])
-			
-	
-	#frappe.throw(str(addition))
-	
+
 	for key in addition:
-		#data.append([key])
 		for ma in addition[key]:
 			house = frappe.get_doc("House", key)
 			data.append([key, ma, '', '', '', '', 'Wäsche: {laundry}min - Hauswartung: {caretaking}min - Fahrzeit: {driving}min - Diverses: {varia}min'.format(laundry=house.laundry, caretaking=house.caretaking, driving=house.driving_time, varia=house.various)])
@@ -90,15 +114,6 @@ def execute(filters=None):
 		)""".format(from_date=filters.from_date, to_date=filters.to_date), as_list=True)
 	
 	for b in bookings:
-		#data.append([b[1], 'ALERT', b[0], b[2], b[3], '', 'No cleaner found!'])
 		data.insert(0, [b[1], 'ALERT', b[0], b[2], b[3], '', 'No cleaner found!'])
-	
-	# affected_houses = frappe.db.sql("""SELECT DISTINCT `house` FROM `tabBooking` WHERE `start_date` >= '{from_date}' AND `start_date` <= '{to_date}'""".format(from_date=filters.from_date, to_date=filters.to_date), as_list=True)
-	# for affected_house in affected_houses:
-		# house = affected_house[0]
-		# qty_of_keeper = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabHouse Cleaning` WHERE `house` = '{house}' AND `from` <= '{from_date}' AND `to` >= '{to_date}'""".format(house=house, from_date=filters.from_date, to_date=filters.to_date), as_list=True)
-		# if qty_of_keeper[0][0] <= 0:
-			# alert = [house, 'ALERT', '', '', '', '', 'No Keeper found!']
-			# data.append(alert)
 	
 	return columns, data
