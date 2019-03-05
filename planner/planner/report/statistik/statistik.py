@@ -100,7 +100,8 @@ def execute(filters=None):
 										`appartment`.`apartment_size`,
 										`booking`.`start_date`,
 										`booking`.`end_date`,
-										`appartment`.`price_per_month`
+										`appartment`.`price_per_month`,
+										`booking`.`name`
 									FROM (`tabBooking` AS `booking`
 									INNER JOIN `tabAppartment` AS `appartment` ON `booking`.`appartment` = `appartment`.`name`)
 									WHERE
@@ -114,7 +115,12 @@ def execute(filters=None):
 				max_days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
 				belegung = float((float((float(100) / float(max_days))) * float(days)))
 				einnahmen = (float(x.price_per_month) / 100) * belegung
-				data.append([monat['quartal'], monat['monat'], x.house, x.appartment, x.apartment_size, x.price_per_month, days, round(belegung, 2), round(einnahmen, 1), 0])
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND MONTH(`due_date`) = '{int_monat}' AND YEAR(`due_date`) = '{year}'""".format(year=filters.year, booking=x.name, int_monat=monat['int_monat']), as_list=True)[0][0]
+				if eff_verrechnet:
+					abweichung = float((float(100) / float(einnahmen)) * float(eff_verrechnet))
+				else:
+					abweichung = 0
+				data.append([monat['quartal'], monat['monat'], x.house, x.appartment, x.apartment_size, x.price_per_month, days, round(belegung, 2), round(einnahmen, 1), eff_verrechnet, round(abweichung, 2)])
 				
 			# Case 2 (Jan)
 			case_2_jan = frappe.db.sql("""SELECT
@@ -123,7 +129,8 @@ def execute(filters=None):
 										`appartment`.`apartment_size`,
 										`booking`.`start_date`,
 										`booking`.`end_date`,
-										`appartment`.`price_per_month`
+										`appartment`.`price_per_month`,
+										`booking`.`name`
 									FROM (`tabBooking` AS `booking`
 									INNER JOIN `tabAppartment` AS `appartment` ON `booking`.`appartment` = `appartment`.`name`)
 									WHERE
@@ -142,7 +149,12 @@ def execute(filters=None):
 				max_days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
 				belegung = float((float((float(100) / float(max_days))) * float(days)))
 				einnahmen = (float(x.price_per_month) / 100) * belegung
-				data.append([monat['quartal'], monat['monat'], x.house, x.appartment, x.apartment_size, x.price_per_month, days, round(belegung, 2), round(einnahmen, 1), 0])
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND MONTH(`due_date`) = '{int_monat}' AND YEAR(`due_date`) = '{year}'""".format(year=filters.year, booking=x.name, int_monat=monat['int_monat']), as_list=True)[0][0]
+				if eff_verrechnet:
+					abweichung = float((float(100) / float(einnahmen)) * float(eff_verrechnet))
+				else:
+					abweichung = 0
+				data.append([monat['quartal'], monat['monat'], x.house, x.appartment, x.apartment_size, x.price_per_month, days, round(belegung, 2), round(einnahmen, 1), eff_verrechnet, round(abweichung, 2)])
 				
 			# Case 3 (Jan)
 			case_3_jan = frappe.db.sql("""SELECT
@@ -151,7 +163,8 @@ def execute(filters=None):
 										`appartment`.`apartment_size`,
 										`booking`.`start_date`,
 										`booking`.`end_date`,
-										`appartment`.`price_per_month`
+										`appartment`.`price_per_month`,
+										`booking`.`name`
 									FROM (`tabBooking` AS `booking`
 									INNER JOIN `tabAppartment` AS `appartment` ON `booking`.`appartment` = `appartment`.`name`)
 									WHERE
@@ -170,7 +183,12 @@ def execute(filters=None):
 				max_days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
 				belegung = float((float((float(100) / float(max_days))) * float(days)))
 				einnahmen = (float(x.price_per_month) / 100) * belegung
-				data.append([monat['quartal'], monat['monat'], x.house, x.appartment, x.apartment_size, x.price_per_month, days, round(belegung, 2), round(einnahmen, 1), 0])
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND MONTH(`due_date`) = '{int_monat}' AND YEAR(`due_date`) = '{year}'""".format(year=filters.year, booking=x.name, int_monat=monat['int_monat']), as_list=True)[0][0]
+				if eff_verrechnet:
+					abweichung = float((float(100) / float(einnahmen)) * float(eff_verrechnet))
+				else:
+					abweichung = 0
+				data.append([monat['quartal'], monat['monat'], x.house, x.appartment, x.apartment_size, x.price_per_month, days, round(belegung, 2), round(einnahmen, 1), eff_verrechnet, round(abweichung, 2)])
 				
 			# Case 4 (Jan)
 			case_4_jan = frappe.db.sql("""SELECT
@@ -179,7 +197,8 @@ def execute(filters=None):
 										`appartment`.`apartment_size`,
 										`booking`.`start_date`,
 										`booking`.`end_date`,
-										`appartment`.`price_per_month`
+										`appartment`.`price_per_month`,
+										`booking`.`name`
 									FROM (`tabBooking` AS `booking`
 									INNER JOIN `tabAppartment` AS `appartment` ON `booking`.`appartment` = `appartment`.`name`)
 									WHERE
@@ -199,42 +218,53 @@ def execute(filters=None):
 											""".format(year=filters.year, int_monat=monat['int_monat']), as_dict=True)
 			for x in case_4_jan:
 				days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
-				data.append([monat['quartal'], monat['monat'], x.house, x.appartment, x.apartment_size, x.price_per_month, days, round(100, 2), x.price_per_month, 0])
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND MONTH(`due_date`) = '{int_monat}' AND YEAR(`due_date`) = '{year}'""".format(year=filters.year, booking=x.name, int_monat=monat['int_monat']), as_list=True)[0][0]
+				if eff_verrechnet:
+					abweichung = float((float(100) / float(x.price_per_month)) * float(eff_verrechnet))
+				else:
+					abweichung = 0
+				data.append([monat['quartal'], monat['monat'], x.house, x.appartment, x.apartment_size, x.price_per_month, days, round(100, 2), x.price_per_month, eff_verrechnet, round(abweichung, 2)])
 	
-		columns = ["Quartal:Data:57", "Monat:Data:52", "Haus:Link/House:97", "Wohnung:Link/Appartment:79", "Grösse:Data:54", "Miete/Mt:Currency:79", "Tage belegt:Int:81", "Belegung in %:Percentage:95", "Prozentuale Mieteinnahmen:Currency:174", "Eff. Verrechnet:Currency:106"]
+		columns = ["Quartal:Data:57", "Monat:Data:52", "Haus:Link/House:97", "Wohnung:Link/Appartment:79", "Grösse:Data:54", "Miete/Mt:Currency:79", "Tage belegt:Int:81", "Belegung in %:Percentage:95", "Prozentuale Mieteinnahmen:Currency:174", "Eff. Verrechnet:Currency:106", "Abweichung in %:Percentage:95"]
 		return columns, data
 		
 	if filters.ansicht == "Quartalsweise nach Haus":
 		houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0""", as_dict=True)
+		chart_data = [0, 0, 0, 0, 0, 0, 0, 0]
 		for house in houses:
 			anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]
 			master = {
 				'q1': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-01-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]) * 3,
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'q2': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-04-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]) * 3,
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'q3': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-09-15"), get_first_day(filters.year + "-07-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]) * 3,
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'q4': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-12-15"), get_first_day(filters.year + "-10-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]) * 3,
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				}
 			}
 			for monat in basis:
 				# Case 1 (Jan)
 				case_1_jan = frappe.db.sql("""SELECT
 											`booking`.`start_date`,
-											`booking`.`end_date`
+											`booking`.`end_date`,
+											`booking`.`name`
 										FROM `tabBooking` AS `booking`
 										WHERE
 											`booking`.`booking_status` = 'Booked'
@@ -247,12 +277,20 @@ def execute(filters=None):
 					days = date_diff(x.end_date, x.start_date) + 1
 					if monat['quartal'] == 'Q1':
 						master['q1']['tage'] = master['q1']['tage'] + days
+						if x.name not in master['q1']['buchungen']:
+							master['q1']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q2':
 						master['q2']['tage'] = master['q2']['tage'] + days
+						if x.name not in master['q2']['buchungen']:
+							master['q2']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q3':
 						master['q3']['tage'] = master['q3']['tage'] + days
+						if x.name not in master['q3']['buchungen']:
+							master['q3']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q4':
 						master['q4']['tage'] = master['q4']['tage'] + days
+						if x.name not in master['q4']['buchungen']:
+							master['q4']['buchungen'].append(x.name)
 					
 				# Case 2 (Jan)
 				case_2_jan = frappe.db.sql("""SELECT
@@ -273,12 +311,20 @@ def execute(filters=None):
 					days = date_diff(get_last_day(x.start_date), x.start_date) + 1
 					if monat['quartal'] == 'Q1':
 						master['q1']['tage'] = master['q1']['tage'] + days
+						if x.name not in master['q1']['buchungen']:
+							master['q1']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q2':
 						master['q2']['tage'] = master['q2']['tage'] + days
+						if x.name not in master['q2']['buchungen']:
+							master['q2']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q3':
 						master['q3']['tage'] = master['q3']['tage'] + days
+						if x.name not in master['q3']['buchungen']:
+							master['q3']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q4':
 						master['q4']['tage'] = master['q4']['tage'] + days
+						if x.name not in master['q4']['buchungen']:
+							master['q4']['buchungen'].append(x.name)
 					
 				# Case 3 (Jan)
 				case_3_jan = frappe.db.sql("""SELECT
@@ -299,12 +345,20 @@ def execute(filters=None):
 					days = date_diff(x.end_date, get_first_day(x.end_date)) + 1
 					if monat['quartal'] == 'Q1':
 						master['q1']['tage'] = master['q1']['tage'] + days
+						if x.name not in master['q1']['buchungen']:
+							master['q1']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q2':
 						master['q2']['tage'] = master['q2']['tage'] + days
+						if x.name not in master['q2']['buchungen']:
+							master['q2']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q3':
 						master['q3']['tage'] = master['q3']['tage'] + days
+						if x.name not in master['q3']['buchungen']:
+							master['q3']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q4':
 						master['q4']['tage'] = master['q4']['tage'] + days
+						if x.name not in master['q4']['buchungen']:
+							master['q4']['buchungen'].append(x.name)
 					
 				# Case 4 (Jan)
 				case_4_jan = frappe.db.sql("""SELECT
@@ -329,54 +383,119 @@ def execute(filters=None):
 					days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
 					if monat['quartal'] == 'Q1':
 						master['q1']['tage'] = master['q1']['tage'] + days
+						if x.name not in master['q1']['buchungen']:
+							master['q1']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q2':
 						master['q2']['tage'] = master['q2']['tage'] + days
+						if x.name not in master['q2']['buchungen']:
+							master['q2']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q3':
 						master['q3']['tage'] = master['q3']['tage'] + days
+						if x.name not in master['q3']['buchungen']:
+							master['q3']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q4':
 						master['q4']['tage'] = master['q4']['tage'] + days
+						if x.name not in master['q4']['buchungen']:
+							master['q4']['buchungen'].append(x.name)
 			
 			q1_prozent = float((float(100) / float(master['q1']['total_tage'])) * float(master['q1']['tage']))
 			q1_einnahmen = float(float(int(master['q1']['moegliche_einnahmen']) / 100) * q1_prozent)
-			data.append([house.name, "Q1", round(q1_prozent, 2), round(q1_einnahmen, 2), "0"])
+			q1_eff_verrechnet = 0.00
+			for y in master['q1']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '1' OR MONTH(`due_date`) = '2' OR MONTH(`due_date`) = '3')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					q1_eff_verrechnet = q1_eff_verrechnet + eff_verrechnet
+			if q1_einnahmen > 0:
+				q1_diff = float((float(100) / float(q1_einnahmen)) * float(q1_eff_verrechnet))
+			else:
+				q1_diff = 0.00
+			data.append([house.name, "Q1", round(q1_prozent, 2), round(q1_einnahmen, 2), q1_eff_verrechnet, round(q1_diff, 2)])
 			q2_prozent = float((float(100) / float(master['q2']['total_tage'])) * float(master['q2']['tage']))
 			q2_einnahmen = float(float(int(master['q2']['moegliche_einnahmen']) / 100) * q2_prozent)
-			data.append([house.name, "Q2", round(q2_prozent, 2), round(q2_einnahmen, 2), "0"])
+			q2_eff_verrechnet = 0.00
+			for y in master['q2']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '4' OR MONTH(`due_date`) = '5' OR MONTH(`due_date`) = '6')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					q2_eff_verrechnet = q2_eff_verrechnet + eff_verrechnet
+			if q2_einnahmen > 0:
+				q2_diff = float((float(100) / float(q2_einnahmen)) * float(q2_eff_verrechnet))
+			else:
+				q2_diff = 0.00
+			data.append([house.name, "Q2", round(q2_prozent, 2), round(q2_einnahmen, 2), q2_eff_verrechnet, round(q2_diff, 2)])
 			q3_prozent = float((float(100) / float(master['q3']['total_tage'])) * float(master['q3']['tage']))
 			q3_einnahmen = float(float(int(master['q3']['moegliche_einnahmen']) / 100) * q3_prozent)
-			data.append([house.name, "Q3", round(q3_prozent, 2), round(q3_einnahmen, 2), "0"])
+			q3_eff_verrechnet = 0.00
+			for y in master['q3']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '7' OR MONTH(`due_date`) = '8' OR MONTH(`due_date`) = '9')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					q3_eff_verrechnet = q3_eff_verrechnet + eff_verrechnet
+			if q3_einnahmen > 0:
+				q3_diff = float((float(100) / float(q3_einnahmen)) * float(q3_eff_verrechnet))
+			else:
+				q3_diff = 0.00
+			data.append([house.name, "Q3", round(q3_prozent, 2), round(q3_einnahmen, 2), q3_eff_verrechnet, round(q3_diff, 2)])
 			q4_prozent = float((float(100) / float(master['q4']['total_tage'])) * float(master['q4']['tage']))
 			q4_einnahmen = float(float(int(master['q4']['moegliche_einnahmen']) / 100) * q4_prozent)
-			data.append([house.name, "Q4", round(q4_prozent, 2), round(q4_einnahmen, 2), "0"])
+			q4_eff_verrechnet = 0.00
+			for y in master['q4']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '10' OR MONTH(`due_date`) = '11' OR MONTH(`due_date`) = '12')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					q4_eff_verrechnet = q4_eff_verrechnet + eff_verrechnet
+			if q4_einnahmen > 0:
+				q4_diff = float((float(100) / float(q4_einnahmen)) * float(q4_eff_verrechnet))
+			else:
+				q4_diff = 0.00
+			data.append([house.name, "Q4", round(q4_prozent, 2), round(q4_einnahmen, 2), q4_eff_verrechnet, round(q4_diff, 2)])
 			total_prozent = (q1_prozent / 4) + (q2_prozent / 4) + (q3_prozent / 4) + (q4_prozent / 4)
 			total_einnahmen = q1_einnahmen + q2_einnahmen + q3_einnahmen + q4_einnahmen
-			data.append([house.name, "Q1-Q4", round(total_prozent, 2), round(total_einnahmen, 2), "0"])
-		columns = ["Haus:Data:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129"]
-		return columns, data
+			total_eff_einnahmen = q1_eff_verrechnet + q2_eff_verrechnet + q3_eff_verrechnet + q4_eff_verrechnet
+			if total_einnahmen > 0:
+				total_diff = float((float(100) / float(total_einnahmen)) * float(total_eff_einnahmen))
+			else:
+				total_diff = 0.00
+			data.append([house.name, "Q1-Q4", round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
+			
+			chart_data[0] = chart_data[0] + q1_einnahmen
+			chart_data[1] = chart_data[1] + q2_einnahmen
+			chart_data[2] = chart_data[2] + q3_einnahmen
+			chart_data[3] = chart_data[3] + q4_einnahmen
+			chart_data[4] = chart_data[4] + q1_eff_verrechnet
+			chart_data[5] = chart_data[5] + q2_eff_verrechnet
+			chart_data[6] = chart_data[6] + q3_eff_verrechnet
+			chart_data[7] = chart_data[7] + q4_eff_verrechnet
+		
+		columns = ["Haus:Data:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129", "Differenz in %:Percentage:98"]
+		chart = get_quartal_chart_data(chart_data)
+		return columns, data, None, chart
 		
 	if filters.ansicht == "Quartalsweise nach Wohnung":
 		wohnungen = frappe.db.sql("""SELECT `name` FROM `tabAppartment` WHERE `disabled` = 0""", as_dict=True)
+		chart_data = [0, 0, 0, 0, 0, 0, 0, 0]
 		for wohnung in wohnungen:
 			master = {
 				'q1': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-01-15")) + 1),
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]) * 3,
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'q2': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-04-15")) + 1),
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]) * 3,
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'q3': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-09-15"), get_first_day(filters.year + "-07-15")) + 1),
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]) * 3,
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'q4': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-12-15"), get_first_day(filters.year + "-10-15")) + 1),
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]) * 3,
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				}
 			}
 			for monat in basis:
@@ -394,16 +513,22 @@ def execute(filters=None):
 											AND `booking`.`appartment` = '{appartment}'""".format(year=filters.year, int_monat=monat['int_monat'], appartment=wohnung.name), as_dict=True)
 				for x in case_1_jan:
 					days = date_diff(x.end_date, x.start_date) + 1
-					#frappe.throw(str(monat['quartal']) + " // Case 1 // " + str(monat['monat']) + "<br><br>" + str(days) + "<br><br>" + str(wohnung.name))
 					if monat['quartal'] == 'Q1':
-						#frappe.throw(days)
 						master['q1']['tage'] = master['q1']['tage'] + days
+						if x.name not in master['q1']['buchungen']:
+							master['q1']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q2':
 						master['q2']['tage'] = master['q2']['tage'] + days
+						if x.name not in master['q2']['buchungen']:
+							master['q2']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q3':
 						master['q3']['tage'] = master['q3']['tage'] + days
+						if x.name not in master['q3']['buchungen']:
+							master['q3']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q4':
 						master['q4']['tage'] = master['q4']['tage'] + days
+						if x.name not in master['q4']['buchungen']:
+							master['q4']['buchungen'].append(x.name)
 					
 				# Case 2 (Jan)
 				case_2_jan = frappe.db.sql("""SELECT
@@ -421,17 +546,23 @@ def execute(filters=None):
 												(YEAR(`booking`.`end_date`) > '{year}')
 												)""".format(year=filters.year, int_monat=monat['int_monat'], appartment=wohnung.name), as_dict=True)
 				for x in case_2_jan:
-					#frappe.throw(str(x.start_date))
 					days = date_diff(get_last_day(x.start_date), x.start_date) + 1
-					#frappe.throw(str(monat['quartal']) + " // Case 2 // " + str(monat['monat']) + "<br><br>" + str(days) + "<br><br>" + str(wohnung.name))
 					if monat['quartal'] == 'Q1':
 						master['q1']['tage'] = master['q1']['tage'] + days
+						if x.name not in master['q1']['buchungen']:
+							master['q1']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q2':
 						master['q2']['tage'] = master['q2']['tage'] + days
+						if x.name not in master['q2']['buchungen']:
+							master['q2']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q3':
 						master['q3']['tage'] = master['q3']['tage'] + days
+						if x.name not in master['q3']['buchungen']:
+							master['q3']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q4':
 						master['q4']['tage'] = master['q4']['tage'] + days
+						if x.name not in master['q4']['buchungen']:
+							master['q4']['buchungen'].append(x.name)
 					
 				# Case 3 (Jan)
 				case_3_jan = frappe.db.sql("""SELECT
@@ -450,15 +581,22 @@ def execute(filters=None):
 												)""".format(year=filters.year, int_monat=monat['int_monat'], appartment=wohnung.name), as_dict=True)
 				for x in case_3_jan:
 					days = date_diff(x.end_date, get_first_day(x.end_date)) + 1
-					#frappe.throw(str(monat['quartal']) + " // Case 3 // " + str(monat['monat']) + "<br><br>" + str(days) + "<br><br>" + str(wohnung.name))
 					if monat['quartal'] == 'Q1':
 						master['q1']['tage'] = master['q1']['tage'] + days
+						if x.name not in master['q1']['buchungen']:
+							master['q1']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q2':
 						master['q2']['tage'] = master['q2']['tage'] + days
+						if x.name not in master['q2']['buchungen']:
+							master['q2']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q3':
 						master['q3']['tage'] = master['q3']['tage'] + days
+						if x.name not in master['q3']['buchungen']:
+							master['q3']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q4':
 						master['q4']['tage'] = master['q4']['tage'] + days
+						if x.name not in master['q4']['buchungen']:
+							master['q4']['buchungen'].append(x.name)
 					
 				# Case 4 (Jan)
 				case_4_jan = frappe.db.sql("""SELECT
@@ -481,107 +619,178 @@ def execute(filters=None):
 												)""".format(year=filters.year, int_monat=monat['int_monat'], appartment=wohnung.name), as_dict=True)
 				for x in case_4_jan:
 					days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
-					#frappe.throw(str(monat['quartal']) + " // Case 4 // " + str(monat['monat']) + "<br><br>" + str(days) + "<br><br>" + str(wohnung.name))
 					if monat['quartal'] == 'Q1':
 						master['q1']['tage'] = master['q1']['tage'] + days
+						if x.name not in master['q1']['buchungen']:
+							master['q1']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q2':
 						master['q2']['tage'] = master['q2']['tage'] + days
+						if x.name not in master['q2']['buchungen']:
+							master['q2']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q3':
 						master['q3']['tage'] = master['q3']['tage'] + days
+						if x.name not in master['q3']['buchungen']:
+							master['q3']['buchungen'].append(x.name)
 					if monat['quartal'] == 'Q4':
 						master['q4']['tage'] = master['q4']['tage'] + days
+						if x.name not in master['q4']['buchungen']:
+							master['q4']['buchungen'].append(x.name)
 			
 			q1_prozent = float((float(100) / float(master['q1']['total_tage'])) * float(master['q1']['tage']))
 			q1_einnahmen = float(float(int(master['q1']['moegliche_einnahmen']) / 100) * q1_prozent)
-			data.append([wohnung.name, "Q1", round(q1_prozent, 2), round(q1_einnahmen, 2), "0"])
+			q1_eff_verrechnet = 0.00
+			for y in master['q1']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '1' OR MONTH(`due_date`) = '2' OR MONTH(`due_date`) = '3')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					q1_eff_verrechnet = q1_eff_verrechnet + eff_verrechnet
+			if q1_einnahmen > 0:
+				q1_diff = float((float(100) / float(q1_einnahmen)) * float(q1_eff_verrechnet))
+			else:
+				q1_diff = 0.00
+			data.append([wohnung.name, "Q1", round(q1_prozent, 2), round(q1_einnahmen, 2), q1_eff_verrechnet, round(q1_diff, 2)])
 			q2_prozent = float((float(100) / float(master['q2']['total_tage'])) * float(master['q2']['tage']))
 			q2_einnahmen = float(float(int(master['q2']['moegliche_einnahmen']) / 100) * q2_prozent)
-			data.append([wohnung.name, "Q2", round(q2_prozent, 2), round(q2_einnahmen, 2), "0"])
+			q2_eff_verrechnet = 0.00
+			for y in master['q2']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '4' OR MONTH(`due_date`) = '5' OR MONTH(`due_date`) = '6')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					q2_eff_verrechnet = q2_eff_verrechnet + eff_verrechnet
+			if q2_einnahmen > 0:
+				q2_diff = float((float(100) / float(q2_einnahmen)) * float(q2_eff_verrechnet))
+			else:
+				q2_diff = 0.00
+			data.append([wohnung.name, "Q2", round(q2_prozent, 2), round(q2_einnahmen, 2), q2_eff_verrechnet, round(q2_diff, 2)])
 			q3_prozent = float((float(100) / float(master['q3']['total_tage'])) * float(master['q3']['tage']))
 			q3_einnahmen = float(float(int(master['q3']['moegliche_einnahmen']) / 100) * q3_prozent)
-			data.append([wohnung.name, "Q3", round(q3_prozent, 2), round(q3_einnahmen, 2), "0"])
+			q3_eff_verrechnet = 0.00
+			for y in master['q3']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '7' OR MONTH(`due_date`) = '8' OR MONTH(`due_date`) = '9')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					q3_eff_verrechnet = q3_eff_verrechnet + eff_verrechnet
+			if q3_einnahmen > 0:
+				q3_diff = float((float(100) / float(q3_einnahmen)) * float(q3_eff_verrechnet))
+			else:
+				q3_diff = 0.00
+			data.append([wohnung.name, "Q3", round(q3_prozent, 2), round(q3_einnahmen, 2), q3_eff_verrechnet, round(q3_diff, 2)])
 			q4_prozent = float((float(100) / float(master['q4']['total_tage'])) * float(master['q4']['tage']))
 			q4_einnahmen = float(float(int(master['q4']['moegliche_einnahmen']) / 100) * q4_prozent)
-			data.append([wohnung.name, "Q4", round(q4_prozent, 2), round(q4_einnahmen, 2), "0"])
+			q4_eff_verrechnet = 0.00
+			for y in master['q4']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '10' OR MONTH(`due_date`) = '11' OR MONTH(`due_date`) = '12')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					q4_eff_verrechnet = q4_eff_verrechnet + eff_verrechnet
+			if q4_einnahmen > 0:
+				q4_diff = float((float(100) / float(q4_einnahmen)) * float(q4_eff_verrechnet))
+			else:
+				q4_diff = 0.00
+			data.append([wohnung.name, "Q4", round(q4_prozent, 2), round(q4_einnahmen, 2), q4_eff_verrechnet, round(q4_diff, 2)])
 			total_prozent = (q1_prozent / 4) + (q2_prozent / 4) + (q3_prozent / 4) + (q4_prozent / 4)
 			total_einnahmen = q1_einnahmen + q2_einnahmen + q3_einnahmen + q4_einnahmen
-			data.append([wohnung.name, "Q1-Q4", round(total_prozent, 2), round(total_einnahmen, 2), "0"])
+			total_eff_einnahmen = q1_eff_verrechnet + q2_eff_verrechnet + q3_eff_verrechnet + q4_eff_verrechnet
+			if total_einnahmen > 0:
+				total_diff = float((float(100) / float(total_einnahmen)) * float(total_eff_einnahmen))
+			else:
+				total_diff = 0.00
+			data.append([wohnung.name, "Q1-Q4", round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
 			
-			#frappe.throw(str(master))
-		columns = ["Wohnung:Link/Appartment:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129"]
-		return columns, data
+			chart_data[0] = chart_data[0] + q1_einnahmen
+			chart_data[1] = chart_data[1] + q2_einnahmen
+			chart_data[2] = chart_data[2] + q3_einnahmen
+			chart_data[3] = chart_data[3] + q4_einnahmen
+			chart_data[4] = chart_data[4] + q1_eff_verrechnet
+			chart_data[5] = chart_data[5] + q2_eff_verrechnet
+			chart_data[6] = chart_data[6] + q3_eff_verrechnet
+			chart_data[7] = chart_data[7] + q4_eff_verrechnet
+			
+		chart = get_quartal_chart_data(chart_data)
+		columns = ["Wohnung:Link/Appartment:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129", "Differenz in %:Percentage:98"]
+		return columns, data, None, chart
 		
 	if filters.ansicht == "Monatsweise nach Haus":
 		houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0""", as_dict=True)
+		chart_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		for house in houses:
 			anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]
 			master = {
 				'jan': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-01-15"), get_first_day(filters.year + "-01-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'feb': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-02-15"), get_first_day(filters.year + "-02-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'mar': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-03-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'apr': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-04-15"), get_first_day(filters.year + "-04-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'mai': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-05-15"), get_first_day(filters.year + "-05-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'jun': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-06-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'jul': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-07-15"), get_first_day(filters.year + "-07-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'aug': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-08-15"), get_first_day(filters.year + "-08-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'sept': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-09-15"), get_first_day(filters.year + "-09-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'okt': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-10-15"), get_first_day(filters.year + "-10-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'nov': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-11-15"), get_first_day(filters.year + "-11-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'dez': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-12-15"), get_first_day(filters.year + "-12-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				}
 			}
 			for monat in basis:
 				# Case 1 (Jan)
 				case_1_jan = frappe.db.sql("""SELECT
 											`booking`.`start_date`,
-											`booking`.`end_date`
+											`booking`.`end_date`,
+											`booking`.`name`
 										FROM `tabBooking` AS `booking`
 										WHERE
 											`booking`.`booking_status` = 'Booked'
@@ -594,32 +803,57 @@ def execute(filters=None):
 					days = date_diff(x.end_date, x.start_date) + 1
 					if monat['monat'] == 'Januar':
 						master['jan']['tage'] = master['jan']['tage'] + days
+						if x.name not in master['jan']['buchungen']:
+							master['jan']['buchungen'].append(x.name)
 					if monat['monat'] == 'Februar':
 						master['feb']['tage'] = master['feb']['tage'] + days
+						if x.name not in master['feb']['buchungen']:
+							master['feb']['buchungen'].append(x.name)
 					if monat['monat'] == 'März':
 						master['mar']['tage'] = master['mar']['tage'] + days
+						if x.name not in master['mar']['buchungen']:
+							master['mar']['buchungen'].append(x.name)
 					if monat['monat'] == 'April':
 						master['apr']['tage'] = master['apr']['tage'] + days
+						if x.name not in master['apr']['buchungen']:
+							master['apr']['buchungen'].append(x.name)
 					if monat['monat'] == 'Mai':
 						master['mai']['tage'] = master['mai']['tage'] + days
+						if x.name not in master['mai']['buchungen']:
+							master['mai']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juni':
 						master['jun']['tage'] = master['jun']['tage'] + days
+						if x.name not in master['jun']['buchungen']:
+							master['jun']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juli':
 						master['jul']['tage'] = master['jul']['tage'] + days
+						if x.name not in master['jul']['buchungen']:
+							master['jul']['buchungen'].append(x.name)
 					if monat['monat'] == 'August':
 						master['aug']['tage'] = master['aug']['tage'] + days
+						if x.name not in master['aug']['buchungen']:
+							master['aug']['buchungen'].append(x.name)
 					if monat['monat'] == 'September':
 						master['sept']['tage'] = master['sept']['tage'] + days
+						if x.name not in master['sept']['buchungen']:
+							master['sept']['buchungen'].append(x.name)
 					if monat['monat'] == 'Oktober':
 						master['okt']['tage'] = master['okt']['tage'] + days
+						if x.name not in master['okt']['buchungen']:
+							master['okt']['buchungen'].append(x.name)
 					if monat['monat'] == 'November':
 						master['nov']['tage'] = master['nov']['tage'] + days
+						if x.name not in master['nov']['buchungen']:
+							master['nov']['buchungen'].append(x.name)
 					if monat['monat'] == 'Dezember':
 						master['dez']['tage'] = master['dez']['tage'] + days
+						if x.name not in master['dez']['buchungen']:
+							master['dez']['buchungen'].append(x.name)
 					
 				# Case 2 (Jan)
 				case_2_jan = frappe.db.sql("""SELECT
-											`booking`.`start_date`
+											`booking`.`start_date`,
+											`booking`.`name`
 										FROM `tabBooking` AS `booking`
 										WHERE
 											`booking`.`booking_status` = 'Booked'
@@ -636,32 +870,57 @@ def execute(filters=None):
 					days = date_diff(get_last_day(x.start_date), x.start_date) + 1
 					if monat['monat'] == 'Januar':
 						master['jan']['tage'] = master['jan']['tage'] + days
+						if x.name not in master['jan']['buchungen']:
+							master['jan']['buchungen'].append(x.name)
 					if monat['monat'] == 'Februar':
 						master['feb']['tage'] = master['feb']['tage'] + days
+						if x.name not in master['feb']['buchungen']:
+							master['feb']['buchungen'].append(x.name)
 					if monat['monat'] == 'März':
 						master['mar']['tage'] = master['mar']['tage'] + days
+						if x.name not in master['mar']['buchungen']:
+							master['mar']['buchungen'].append(x.name)
 					if monat['monat'] == 'April':
 						master['apr']['tage'] = master['apr']['tage'] + days
+						if x.name not in master['apr']['buchungen']:
+							master['apr']['buchungen'].append(x.name)
 					if monat['monat'] == 'Mai':
 						master['mai']['tage'] = master['mai']['tage'] + days
+						if x.name not in master['mai']['buchungen']:
+							master['mai']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juni':
 						master['jun']['tage'] = master['jun']['tage'] + days
+						if x.name not in master['jun']['buchungen']:
+							master['jun']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juli':
 						master['jul']['tage'] = master['jul']['tage'] + days
+						if x.name not in master['jul']['buchungen']:
+							master['jul']['buchungen'].append(x.name)
 					if monat['monat'] == 'August':
 						master['aug']['tage'] = master['aug']['tage'] + days
+						if x.name not in master['aug']['buchungen']:
+							master['aug']['buchungen'].append(x.name)
 					if monat['monat'] == 'September':
 						master['sept']['tage'] = master['sept']['tage'] + days
+						if x.name not in master['sept']['buchungen']:
+							master['sept']['buchungen'].append(x.name)
 					if monat['monat'] == 'Oktober':
 						master['okt']['tage'] = master['okt']['tage'] + days
+						if x.name not in master['okt']['buchungen']:
+							master['okt']['buchungen'].append(x.name)
 					if monat['monat'] == 'November':
 						master['nov']['tage'] = master['nov']['tage'] + days
+						if x.name not in master['nov']['buchungen']:
+							master['nov']['buchungen'].append(x.name)
 					if monat['monat'] == 'Dezember':
 						master['dez']['tage'] = master['dez']['tage'] + days
+						if x.name not in master['dez']['buchungen']:
+							master['dez']['buchungen'].append(x.name)
 					
 				# Case 3 (Jan)
 				case_3_jan = frappe.db.sql("""SELECT
-											`booking`.`end_date`
+											`booking`.`end_date`,
+											`booking`.`name`
 										FROM `tabBooking` AS `booking`
 										WHERE
 											`booking`.`booking_status` = 'Booked'
@@ -678,28 +937,52 @@ def execute(filters=None):
 					days = date_diff(x.end_date, get_first_day(x.end_date)) + 1
 					if monat['monat'] == 'Januar':
 						master['jan']['tage'] = master['jan']['tage'] + days
+						if x.name not in master['jan']['buchungen']:
+							master['jan']['buchungen'].append(x.name)
 					if monat['monat'] == 'Februar':
 						master['feb']['tage'] = master['feb']['tage'] + days
+						if x.name not in master['feb']['buchungen']:
+							master['feb']['buchungen'].append(x.name)
 					if monat['monat'] == 'März':
 						master['mar']['tage'] = master['mar']['tage'] + days
+						if x.name not in master['mar']['buchungen']:
+							master['mar']['buchungen'].append(x.name)
 					if monat['monat'] == 'April':
 						master['apr']['tage'] = master['apr']['tage'] + days
+						if x.name not in master['apr']['buchungen']:
+							master['apr']['buchungen'].append(x.name)
 					if monat['monat'] == 'Mai':
 						master['mai']['tage'] = master['mai']['tage'] + days
+						if x.name not in master['mai']['buchungen']:
+							master['mai']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juni':
 						master['jun']['tage'] = master['jun']['tage'] + days
+						if x.name not in master['jun']['buchungen']:
+							master['jun']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juli':
 						master['jul']['tage'] = master['jul']['tage'] + days
+						if x.name not in master['jul']['buchungen']:
+							master['jul']['buchungen'].append(x.name)
 					if monat['monat'] == 'August':
 						master['aug']['tage'] = master['aug']['tage'] + days
+						if x.name not in master['aug']['buchungen']:
+							master['aug']['buchungen'].append(x.name)
 					if monat['monat'] == 'September':
 						master['sept']['tage'] = master['sept']['tage'] + days
+						if x.name not in master['sept']['buchungen']:
+							master['sept']['buchungen'].append(x.name)
 					if monat['monat'] == 'Oktober':
 						master['okt']['tage'] = master['okt']['tage'] + days
+						if x.name not in master['okt']['buchungen']:
+							master['okt']['buchungen'].append(x.name)
 					if monat['monat'] == 'November':
 						master['nov']['tage'] = master['nov']['tage'] + days
+						if x.name not in master['nov']['buchungen']:
+							master['nov']['buchungen'].append(x.name)
 					if monat['monat'] == 'Dezember':
 						master['dez']['tage'] = master['dez']['tage'] + days
+						if x.name not in master['dez']['buchungen']:
+							master['dez']['buchungen'].append(x.name)
 					
 				# Case 4 (Jan)
 				case_4_jan = frappe.db.sql("""SELECT
@@ -724,136 +1007,313 @@ def execute(filters=None):
 					days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
 					if monat['monat'] == 'Januar':
 						master['jan']['tage'] = master['jan']['tage'] + days
+						if x.name not in master['jan']['buchungen']:
+							master['jan']['buchungen'].append(x.name)
 					if monat['monat'] == 'Februar':
 						master['feb']['tage'] = master['feb']['tage'] + days
+						if x.name not in master['feb']['buchungen']:
+							master['feb']['buchungen'].append(x.name)
 					if monat['monat'] == 'März':
 						master['mar']['tage'] = master['mar']['tage'] + days
+						if x.name not in master['mar']['buchungen']:
+							master['mar']['buchungen'].append(x.name)
 					if monat['monat'] == 'April':
 						master['apr']['tage'] = master['apr']['tage'] + days
+						if x.name not in master['apr']['buchungen']:
+							master['apr']['buchungen'].append(x.name)
 					if monat['monat'] == 'Mai':
 						master['mai']['tage'] = master['mai']['tage'] + days
+						if x.name not in master['mai']['buchungen']:
+							master['mai']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juni':
 						master['jun']['tage'] = master['jun']['tage'] + days
+						if x.name not in master['jun']['buchungen']:
+							master['jun']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juli':
 						master['jul']['tage'] = master['jul']['tage'] + days
+						if x.name not in master['jul']['buchungen']:
+							master['jul']['buchungen'].append(x.name)
 					if monat['monat'] == 'August':
 						master['aug']['tage'] = master['aug']['tage'] + days
+						if x.name not in master['aug']['buchungen']:
+							master['aug']['buchungen'].append(x.name)
 					if monat['monat'] == 'September':
 						master['sept']['tage'] = master['sept']['tage'] + days
+						if x.name not in master['sept']['buchungen']:
+							master['sept']['buchungen'].append(x.name)
 					if monat['monat'] == 'Oktober':
 						master['okt']['tage'] = master['okt']['tage'] + days
+						if x.name not in master['okt']['buchungen']:
+							master['okt']['buchungen'].append(x.name)
 					if monat['monat'] == 'November':
 						master['nov']['tage'] = master['nov']['tage'] + days
+						if x.name not in master['nov']['buchungen']:
+							master['nov']['buchungen'].append(x.name)
 					if monat['monat'] == 'Dezember':
 						master['dez']['tage'] = master['dez']['tage'] + days
+						if x.name not in master['dez']['buchungen']:
+							master['dez']['buchungen'].append(x.name)
 			
 			jan_prozent = float((float(100) / float(master['jan']['total_tage'])) * float(master['jan']['tage']))
 			jan_einnahmen = float(float(int(master['jan']['moegliche_einnahmen']) / 100) * jan_prozent)
-			data.append([house.name, "Januar", round(jan_prozent, 2), round(jan_einnahmen, 2), "0"])
+			jan_eff_verrechnet = 0.00
+			for y in master['jan']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '1'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					jan_eff_verrechnet = jan_eff_verrechnet + eff_verrechnet
+			if jan_einnahmen > 0:
+				jan_diff = float((float(100) / float(jan_einnahmen)) * float(jan_eff_verrechnet))
+			else:
+				jan_diff = 0.00
+			data.append([house.name, "Januar", round(jan_prozent, 2), round(jan_einnahmen, 2), jan_eff_verrechnet, round(jan_diff, 2)])
 			feb_prozent = float((float(100) / float(master['feb']['total_tage'])) * float(master['feb']['tage']))
 			feb_einnahmen = float(float(int(master['feb']['moegliche_einnahmen']) / 100) * feb_prozent)
-			data.append([house.name, "Februar", round(feb_prozent, 2), round(feb_einnahmen, 2), "0"])
+			feb_eff_verrechnet = 0.00
+			for y in master['feb']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '2'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					feb_eff_verrechnet = feb_eff_verrechnet + eff_verrechnet
+			if feb_einnahmen > 0:
+				feb_diff = float((float(100) / float(feb_einnahmen)) * float(feb_eff_verrechnet))
+			else:
+				feb_diff = 0.00
+			data.append([house.name, "Februar", round(feb_prozent, 2), round(feb_einnahmen, 2), feb_eff_verrechnet, round(feb_diff, 2)])
 			mar_prozent = float((float(100) / float(master['mar']['total_tage'])) * float(master['mar']['tage']))
 			mar_einnahmen = float(float(int(master['mar']['moegliche_einnahmen']) / 100) * mar_prozent)
-			data.append([house.name, "März", round(mar_prozent, 2), round(mar_einnahmen, 2), "0"])
+			mar_eff_verrechnet = 0.00
+			for y in master['mar']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '3'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					mar_eff_verrechnet = mar_eff_verrechnet + eff_verrechnet
+			if mar_einnahmen > 0:
+				mar_diff = float((float(100) / float(mar_einnahmen)) * float(mar_eff_verrechnet))
+			else:
+				mar_diff = 0.00
+			data.append([house.name, "März", round(mar_prozent, 2), round(mar_einnahmen, 2), mar_eff_verrechnet, round(mar_diff, 2)])
 			apr_prozent = float((float(100) / float(master['apr']['total_tage'])) * float(master['apr']['tage']))
 			apr_einnahmen = float(float(int(master['apr']['moegliche_einnahmen']) / 100) * apr_prozent)
-			data.append([house.name, "April", round(apr_prozent, 2), round(apr_einnahmen, 2), "0"])
+			apr_eff_verrechnet = 0.00
+			for y in master['apr']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '4'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					apr_eff_verrechnet = apr_eff_verrechnet + eff_verrechnet
+			if apr_einnahmen > 0:
+				apr_diff = float((float(100) / float(apr_einnahmen)) * float(apr_eff_verrechnet))
+			else:
+				apr_diff = 0.00
+			data.append([house.name, "April", round(apr_prozent, 2), round(apr_einnahmen, 2), apr_eff_verrechnet, round(apr_diff, 2)])
 			mai_prozent = float((float(100) / float(master['mai']['total_tage'])) * float(master['mai']['tage']))
 			mai_einnahmen = float(float(int(master['mai']['moegliche_einnahmen']) / 100) * mai_prozent)
-			data.append([house.name, "Mai", round(mai_prozent, 2), round(mai_einnahmen, 2), "0"])
+			mai_eff_verrechnet = 0.00
+			for y in master['mai']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '5'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					mai_eff_verrechnet = mai_eff_verrechnet + eff_verrechnet
+			if mai_einnahmen > 0:
+				mai_diff = float((float(100) / float(mai_einnahmen)) * float(mai_eff_verrechnet))
+			else:
+				mai_diff = 0.00
+			data.append([house.name, "Mai", round(mai_prozent, 2), round(mai_einnahmen, 2), mai_eff_verrechnet, round(mai_diff, 2)])
 			jun_prozent = float((float(100) / float(master['jun']['total_tage'])) * float(master['jun']['tage']))
 			jun_einnahmen = float(float(int(master['jun']['moegliche_einnahmen']) / 100) * jun_prozent)
-			data.append([house.name, "Juni", round(jun_prozent, 2), round(jun_einnahmen, 2), "0"])
+			jun_eff_verrechnet = 0.00
+			for y in master['jun']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '6'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					jun_eff_verrechnet = jun_eff_verrechnet + eff_verrechnet
+			if jun_einnahmen > 0:
+				jun_diff = float((float(100) / float(jun_einnahmen)) * float(jun_eff_verrechnet))
+			else:
+				jun_diff = 0.00
+			data.append([house.name, "Juni", round(jun_prozent, 2), round(jun_einnahmen, 2), jun_eff_verrechnet, round(jun_diff, 2)])
 			jul_prozent = float((float(100) / float(master['jul']['total_tage'])) * float(master['jul']['tage']))
 			jul_einnahmen = float(float(int(master['jul']['moegliche_einnahmen']) / 100) * jul_prozent)
-			data.append([house.name, "Juli", round(jul_prozent, 2), round(jul_einnahmen, 2), "0"])
+			jul_eff_verrechnet = 0.00
+			for y in master['jul']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '7'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					jul_eff_verrechnet = jul_eff_verrechnet + eff_verrechnet
+			if jul_einnahmen > 0:
+				jul_diff = float((float(100) / float(jul_einnahmen)) * float(jul_eff_verrechnet))
+			else:
+				jul_diff = 0.00
+			data.append([house.name, "Juli", round(jul_prozent, 2), round(jul_einnahmen, 2), jul_eff_verrechnet, round(jul_diff, 2)])
 			aug_prozent = float((float(100) / float(master['aug']['total_tage'])) * float(master['aug']['tage']))
 			aug_einnahmen = float(float(int(master['aug']['moegliche_einnahmen']) / 100) * aug_prozent)
-			data.append([house.name, "August", round(aug_prozent, 2), round(aug_einnahmen, 2), "0"])
+			aug_eff_verrechnet = 0.00
+			for y in master['aug']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '8'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					aug_eff_verrechnet = aug_eff_verrechnet + eff_verrechnet
+			if aug_einnahmen > 0:
+				aug_diff = float((float(100) / float(aug_einnahmen)) * float(aug_eff_verrechnet))
+			else:
+				aug_diff = 0.00
+			data.append([house.name, "August", round(aug_prozent, 2), round(aug_einnahmen, 2), aug_eff_verrechnet, round(aug_diff, 2)])
 			sept_prozent = float((float(100) / float(master['sept']['total_tage'])) * float(master['sept']['tage']))
 			sept_einnahmen = float(float(int(master['sept']['moegliche_einnahmen']) / 100) * sept_prozent)
-			data.append([house.name, "September", round(sept_prozent, 2), round(sept_einnahmen, 2), "0"])
+			sept_eff_verrechnet = 0.00
+			for y in master['sept']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '9'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					sept_eff_verrechnet = sept_eff_verrechnet + eff_verrechnet
+			if sept_einnahmen > 0:
+				sept_diff = float((float(100) / float(sept_einnahmen)) * float(sept_eff_verrechnet))
+			else:
+				sept_diff = 0.00
+			data.append([house.name, "September", round(sept_prozent, 2), round(sept_einnahmen, 2), sept_eff_verrechnet, round(sept_diff, 2)])
 			okt_prozent = float((float(100) / float(master['okt']['total_tage'])) * float(master['okt']['tage']))
 			okt_einnahmen = float(float(int(master['okt']['moegliche_einnahmen']) / 100) * okt_prozent)
-			data.append([house.name, "Oktober", round(okt_prozent, 2), round(okt_einnahmen, 2), "0"])
+			okt_eff_verrechnet = 0.00
+			for y in master['okt']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '10'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					okt_eff_verrechnet = okt_eff_verrechnet + eff_verrechnet
+			if okt_einnahmen > 0:
+				okt_diff = float((float(100) / float(okt_einnahmen)) * float(okt_eff_verrechnet))
+			else:
+				okt_diff = 0.00
+			data.append([house.name, "Oktober", round(okt_prozent, 2), round(okt_einnahmen, 2), okt_eff_verrechnet, round(okt_diff, 2)])
 			nov_prozent = float((float(100) / float(master['nov']['total_tage'])) * float(master['nov']['tage']))
 			nov_einnahmen = float(float(int(master['nov']['moegliche_einnahmen']) / 100) * nov_prozent)
-			data.append([house.name, "November", round(nov_prozent, 2), round(nov_einnahmen, 2), "0"])
+			nov_eff_verrechnet = 0.00
+			for y in master['nov']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '11'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					nov_eff_verrechnet = nov_eff_verrechnet + eff_verrechnet
+			if nov_einnahmen > 0:
+				nov_diff = float((float(100) / float(nov_einnahmen)) * float(nov_eff_verrechnet))
+			else:
+				nov_diff = 0.00
+			data.append([house.name, "November", round(nov_prozent, 2), round(nov_einnahmen, 2), nov_eff_verrechnet, round(nov_diff, 2)])
 			dez_prozent = float((float(100) / float(master['dez']['total_tage'])) * float(master['dez']['tage']))
 			dez_einnahmen = float(float(int(master['dez']['moegliche_einnahmen']) / 100) * dez_prozent)
-			data.append([house.name, "Dezember", round(dez_prozent, 2), round(dez_einnahmen, 2), "0"])
+			dez_eff_verrechnet = 0.00
+			for y in master['dez']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '12'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					dez_eff_verrechnet = dez_eff_verrechnet + eff_verrechnet
+			if dez_einnahmen > 0:
+				dez_diff = float((float(100) / float(dez_einnahmen)) * float(dez_eff_verrechnet))
+			else:
+				dez_diff = 0.00
+			data.append([house.name, "Dezember", round(dez_prozent, 2), round(dez_einnahmen, 2), dez_eff_verrechnet, round(dez_diff, 2)])
 			
 			total_prozent = (jan_prozent / 12) + (feb_prozent / 12) + (mar_prozent / 12) + (apr_prozent / 12) + (mai_prozent / 12) + (jun_prozent / 12) + (jul_prozent / 12) + (aug_prozent / 12) + (sept_prozent / 12) + (okt_prozent / 12) + (nov_prozent / 12) + (dez_prozent / 12)
 			total_einnahmen = jan_einnahmen + feb_einnahmen + mar_einnahmen + apr_einnahmen + mai_einnahmen + jun_einnahmen + jul_einnahmen + aug_einnahmen + sept_einnahmen + okt_einnahmen + nov_einnahmen + dez_einnahmen
-			data.append([house.name, filters.year, round(total_prozent, 2), round(total_einnahmen, 2), "0"])
-		columns = ["Haus:Link/House:118", "Monat:Data:100", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129"]
-		return columns, data
+			total_eff_einnahmen = jan_eff_verrechnet + feb_eff_verrechnet + mar_eff_verrechnet + apr_eff_verrechnet + mai_eff_verrechnet + jun_eff_verrechnet + jul_eff_verrechnet + aug_eff_verrechnet + sept_eff_verrechnet + okt_eff_verrechnet + nov_eff_verrechnet + dez_eff_verrechnet
+			if total_einnahmen > 0:
+				total_diff = float((float(100) / float(total_einnahmen)) * float(total_eff_einnahmen))
+			else:
+				total_diff = 0.00
+			data.append([house.name, filters.year, round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
+			
+			chart_data[0] = chart_data[0] + jan_einnahmen
+			chart_data[1] = chart_data[1] + feb_einnahmen
+			chart_data[2] = chart_data[2] + mar_einnahmen
+			chart_data[3] = chart_data[3] + apr_einnahmen
+			chart_data[4] = chart_data[4] + mai_einnahmen
+			chart_data[5] = chart_data[5] + jun_einnahmen
+			chart_data[6] = chart_data[6] + jul_einnahmen
+			chart_data[7] = chart_data[7] + aug_einnahmen
+			chart_data[8] = chart_data[8] + sept_einnahmen
+			chart_data[9] = chart_data[9] + okt_einnahmen
+			chart_data[10] = chart_data[10] + nov_einnahmen
+			chart_data[11] = chart_data[11] + dez_einnahmen
+			chart_data[12] = chart_data[12] + jan_eff_verrechnet
+			chart_data[13] = chart_data[13] + feb_eff_verrechnet
+			chart_data[14] = chart_data[14] + mar_eff_verrechnet
+			chart_data[15] = chart_data[15] + apr_eff_verrechnet
+			chart_data[16] = chart_data[16] + mai_eff_verrechnet
+			chart_data[17] = chart_data[17] + jun_eff_verrechnet
+			chart_data[18] = chart_data[18] + jul_eff_verrechnet
+			chart_data[19] = chart_data[19] + aug_eff_verrechnet
+			chart_data[20] = chart_data[20] + sept_eff_verrechnet
+			chart_data[21] = chart_data[21] + okt_eff_verrechnet
+			chart_data[22] = chart_data[22] + nov_eff_verrechnet
+			chart_data[23] = chart_data[23] + dez_eff_verrechnet
+			
+		chart = get_month_chart_data(chart_data)
+		columns = ["Haus:Link/House:118", "Monat:Data:100", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129", "Differenz in %:Percentage:98"]
+		return columns, data, None, chart
 		
 	if filters.ansicht == "Monatsweise nach Wohnung":
 		wohnungen = frappe.db.sql("""SELECT `name` FROM `tabAppartment` WHERE `disabled` = 0""", as_dict=True)
+		chart_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		for wohnung in wohnungen:
 			anzahl_whg = 1
 			master = {
 				'jan': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-01-15"), get_first_day(filters.year + "-01-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'feb': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-02-15"), get_first_day(filters.year + "-02-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'mar': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-03-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'apr': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-04-15"), get_first_day(filters.year + "-04-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'mai': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-05-15"), get_first_day(filters.year + "-05-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'jun': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-06-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'jul': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-07-15"), get_first_day(filters.year + "-07-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'aug': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-08-15"), get_first_day(filters.year + "-08-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'sept': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-09-15"), get_first_day(filters.year + "-09-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'okt': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-10-15"), get_first_day(filters.year + "-10-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'nov': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-11-15"), get_first_day(filters.year + "-11-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				},
 				'dez': {
 					'total_tage': (date_diff(get_last_day(filters.year + "-12-15"), get_first_day(filters.year + "-12-15")) + 1) * anzahl_whg,
 					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
-					'tage': 0
+					'tage': 0,
+					'buchungen': []
 				}
 			}
 			for monat in basis:
@@ -873,28 +1333,52 @@ def execute(filters=None):
 					days = date_diff(x.end_date, x.start_date) + 1
 					if monat['monat'] == 'Januar':
 						master['jan']['tage'] = master['jan']['tage'] + days
+						if x.name not in master['jan']['buchungen']:
+							master['jan']['buchungen'].append(x.name)
 					if monat['monat'] == 'Februar':
 						master['feb']['tage'] = master['feb']['tage'] + days
+						if x.name not in master['feb']['buchungen']:
+							master['feb']['buchungen'].append(x.name)
 					if monat['monat'] == 'März':
 						master['mar']['tage'] = master['mar']['tage'] + days
+						if x.name not in master['mar']['buchungen']:
+							master['mar']['buchungen'].append(x.name)
 					if monat['monat'] == 'April':
 						master['apr']['tage'] = master['apr']['tage'] + days
+						if x.name not in master['apr']['buchungen']:
+							master['apr']['buchungen'].append(x.name)
 					if monat['monat'] == 'Mai':
 						master['mai']['tage'] = master['mai']['tage'] + days
+						if x.name not in master['mai']['buchungen']:
+							master['mai']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juni':
 						master['jun']['tage'] = master['jun']['tage'] + days
+						if x.name not in master['jun']['buchungen']:
+							master['jun']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juli':
 						master['jul']['tage'] = master['jul']['tage'] + days
+						if x.name not in master['jul']['buchungen']:
+							master['jul']['buchungen'].append(x.name)
 					if monat['monat'] == 'August':
 						master['aug']['tage'] = master['aug']['tage'] + days
+						if x.name not in master['aug']['buchungen']:
+							master['aug']['buchungen'].append(x.name)
 					if monat['monat'] == 'September':
 						master['sept']['tage'] = master['sept']['tage'] + days
+						if x.name not in master['sept']['buchungen']:
+							master['sept']['buchungen'].append(x.name)
 					if monat['monat'] == 'Oktober':
 						master['okt']['tage'] = master['okt']['tage'] + days
+						if x.name not in master['okt']['buchungen']:
+							master['okt']['buchungen'].append(x.name)
 					if monat['monat'] == 'November':
 						master['nov']['tage'] = master['nov']['tage'] + days
+						if x.name not in master['nov']['buchungen']:
+							master['nov']['buchungen'].append(x.name)
 					if monat['monat'] == 'Dezember':
 						master['dez']['tage'] = master['dez']['tage'] + days
+						if x.name not in master['dez']['buchungen']:
+							master['dez']['buchungen'].append(x.name)
 					
 				# Case 2 (Jan)
 				case_2_jan = frappe.db.sql("""SELECT
@@ -912,32 +1396,55 @@ def execute(filters=None):
 												(YEAR(`booking`.`end_date`) > '{year}')
 												)""".format(year=filters.year, int_monat=monat['int_monat'], appartment=wohnung.name), as_dict=True)
 				for x in case_2_jan:
-					#frappe.throw(str(x.start_date))
 					days = date_diff(get_last_day(x.start_date), x.start_date) + 1
 					if monat['monat'] == 'Januar':
 						master['jan']['tage'] = master['jan']['tage'] + days
+						if x.name not in master['jan']['buchungen']:
+							master['jan']['buchungen'].append(x.name)
 					if monat['monat'] == 'Februar':
 						master['feb']['tage'] = master['feb']['tage'] + days
+						if x.name not in master['feb']['buchungen']:
+							master['feb']['buchungen'].append(x.name)
 					if monat['monat'] == 'März':
 						master['mar']['tage'] = master['mar']['tage'] + days
+						if x.name not in master['mar']['buchungen']:
+							master['mar']['buchungen'].append(x.name)
 					if monat['monat'] == 'April':
 						master['apr']['tage'] = master['apr']['tage'] + days
+						if x.name not in master['apr']['buchungen']:
+							master['apr']['buchungen'].append(x.name)
 					if monat['monat'] == 'Mai':
 						master['mai']['tage'] = master['mai']['tage'] + days
+						if x.name not in master['mai']['buchungen']:
+							master['mai']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juni':
 						master['jun']['tage'] = master['jun']['tage'] + days
+						if x.name not in master['jun']['buchungen']:
+							master['jun']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juli':
 						master['jul']['tage'] = master['jul']['tage'] + days
+						if x.name not in master['jul']['buchungen']:
+							master['jul']['buchungen'].append(x.name)
 					if monat['monat'] == 'August':
 						master['aug']['tage'] = master['aug']['tage'] + days
+						if x.name not in master['aug']['buchungen']:
+							master['aug']['buchungen'].append(x.name)
 					if monat['monat'] == 'September':
 						master['sept']['tage'] = master['sept']['tage'] + days
+						if x.name not in master['sept']['buchungen']:
+							master['sept']['buchungen'].append(x.name)
 					if monat['monat'] == 'Oktober':
 						master['okt']['tage'] = master['okt']['tage'] + days
+						if x.name not in master['okt']['buchungen']:
+							master['okt']['buchungen'].append(x.name)
 					if monat['monat'] == 'November':
 						master['nov']['tage'] = master['nov']['tage'] + days
+						if x.name not in master['nov']['buchungen']:
+							master['nov']['buchungen'].append(x.name)
 					if monat['monat'] == 'Dezember':
 						master['dez']['tage'] = master['dez']['tage'] + days
+						if x.name not in master['dez']['buchungen']:
+							master['dez']['buchungen'].append(x.name)
 					
 				# Case 3 (Jan)
 				case_3_jan = frappe.db.sql("""SELECT
@@ -958,28 +1465,52 @@ def execute(filters=None):
 					days = date_diff(x.end_date, get_first_day(x.end_date)) + 1
 					if monat['monat'] == 'Januar':
 						master['jan']['tage'] = master['jan']['tage'] + days
+						if x.name not in master['jan']['buchungen']:
+							master['jan']['buchungen'].append(x.name)
 					if monat['monat'] == 'Februar':
 						master['feb']['tage'] = master['feb']['tage'] + days
+						if x.name not in master['feb']['buchungen']:
+							master['feb']['buchungen'].append(x.name)
 					if monat['monat'] == 'März':
 						master['mar']['tage'] = master['mar']['tage'] + days
+						if x.name not in master['mar']['buchungen']:
+							master['mar']['buchungen'].append(x.name)
 					if monat['monat'] == 'April':
 						master['apr']['tage'] = master['apr']['tage'] + days
+						if x.name not in master['apr']['buchungen']:
+							master['apr']['buchungen'].append(x.name)
 					if monat['monat'] == 'Mai':
 						master['mai']['tage'] = master['mai']['tage'] + days
+						if x.name not in master['mai']['buchungen']:
+							master['mai']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juni':
 						master['jun']['tage'] = master['jun']['tage'] + days
+						if x.name not in master['jun']['buchungen']:
+							master['jun']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juli':
 						master['jul']['tage'] = master['jul']['tage'] + days
+						if x.name not in master['jul']['buchungen']:
+							master['jul']['buchungen'].append(x.name)
 					if monat['monat'] == 'August':
 						master['aug']['tage'] = master['aug']['tage'] + days
+						if x.name not in master['aug']['buchungen']:
+							master['aug']['buchungen'].append(x.name)
 					if monat['monat'] == 'September':
 						master['sept']['tage'] = master['sept']['tage'] + days
+						if x.name not in master['sept']['buchungen']:
+							master['sept']['buchungen'].append(x.name)
 					if monat['monat'] == 'Oktober':
 						master['okt']['tage'] = master['okt']['tage'] + days
+						if x.name not in master['okt']['buchungen']:
+							master['okt']['buchungen'].append(x.name)
 					if monat['monat'] == 'November':
 						master['nov']['tage'] = master['nov']['tage'] + days
+						if x.name not in master['nov']['buchungen']:
+							master['nov']['buchungen'].append(x.name)
 					if monat['monat'] == 'Dezember':
 						master['dez']['tage'] = master['dez']['tage'] + days
+						if x.name not in master['dez']['buchungen']:
+							master['dez']['buchungen'].append(x.name)
 					
 				# Case 4 (Jan)
 				case_4_jan = frappe.db.sql("""SELECT
@@ -1002,71 +1533,284 @@ def execute(filters=None):
 												)""".format(year=filters.year, int_monat=monat['int_monat'], appartment=wohnung.name), as_dict=True)
 				for x in case_4_jan:
 					days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
-					#frappe.throw(str(monat['quartal']) + " // Case 4 // " + str(monat['monat']) + "<br><br>" + str(days) + "<br><br>" + str(wohnung.name))
 					if monat['monat'] == 'Januar':
 						master['jan']['tage'] = master['jan']['tage'] + days
+						if x.name not in master['jan']['buchungen']:
+							master['jan']['buchungen'].append(x.name)
 					if monat['monat'] == 'Februar':
 						master['feb']['tage'] = master['feb']['tage'] + days
+						if x.name not in master['feb']['buchungen']:
+							master['feb']['buchungen'].append(x.name)
 					if monat['monat'] == 'März':
 						master['mar']['tage'] = master['mar']['tage'] + days
+						if x.name not in master['mar']['buchungen']:
+							master['mar']['buchungen'].append(x.name)
 					if monat['monat'] == 'April':
 						master['apr']['tage'] = master['apr']['tage'] + days
+						if x.name not in master['apr']['buchungen']:
+							master['apr']['buchungen'].append(x.name)
 					if monat['monat'] == 'Mai':
 						master['mai']['tage'] = master['mai']['tage'] + days
+						if x.name not in master['mai']['buchungen']:
+							master['mai']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juni':
 						master['jun']['tage'] = master['jun']['tage'] + days
+						if x.name not in master['jun']['buchungen']:
+							master['jun']['buchungen'].append(x.name)
 					if monat['monat'] == 'Juli':
 						master['jul']['tage'] = master['jul']['tage'] + days
+						if x.name not in master['jul']['buchungen']:
+							master['jul']['buchungen'].append(x.name)
 					if monat['monat'] == 'August':
 						master['aug']['tage'] = master['aug']['tage'] + days
+						if x.name not in master['aug']['buchungen']:
+							master['aug']['buchungen'].append(x.name)
 					if monat['monat'] == 'September':
 						master['sept']['tage'] = master['sept']['tage'] + days
+						if x.name not in master['sept']['buchungen']:
+							master['sept']['buchungen'].append(x.name)
 					if monat['monat'] == 'Oktober':
 						master['okt']['tage'] = master['okt']['tage'] + days
+						if x.name not in master['okt']['buchungen']:
+							master['okt']['buchungen'].append(x.name)
 					if monat['monat'] == 'November':
 						master['nov']['tage'] = master['nov']['tage'] + days
+						if x.name not in master['nov']['buchungen']:
+							master['nov']['buchungen'].append(x.name)
 					if monat['monat'] == 'Dezember':
 						master['dez']['tage'] = master['dez']['tage'] + days
+						if x.name not in master['dez']['buchungen']:
+							master['dez']['buchungen'].append(x.name)
 			
 			jan_prozent = float((float(100) / float(master['jan']['total_tage'])) * float(master['jan']['tage']))
 			jan_einnahmen = float(float(int(master['jan']['moegliche_einnahmen']) / 100) * jan_prozent)
-			data.append([wohnung.name, "Januar", round(jan_prozent, 2), round(jan_einnahmen, 2), "0"])
+			jan_eff_verrechnet = 0.00
+			for y in master['jan']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '1'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					jan_eff_verrechnet = jan_eff_verrechnet + eff_verrechnet
+			if jan_einnahmen > 0:
+				jan_diff = float((float(100) / float(jan_einnahmen)) * float(jan_eff_verrechnet))
+			else:
+				jan_diff = 0.00
+			data.append([wohnung.name, "Januar", round(jan_prozent, 2), round(jan_einnahmen, 2), jan_eff_verrechnet, round(jan_diff, 2)])
 			feb_prozent = float((float(100) / float(master['feb']['total_tage'])) * float(master['feb']['tage']))
 			feb_einnahmen = float(float(int(master['feb']['moegliche_einnahmen']) / 100) * feb_prozent)
-			data.append([wohnung.name, "Februar", round(feb_prozent, 2), round(feb_einnahmen, 2), "0"])
+			feb_eff_verrechnet = 0.00
+			for y in master['feb']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '2'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					feb_eff_verrechnet = feb_eff_verrechnet + eff_verrechnet
+			if feb_einnahmen > 0:
+				feb_diff = float((float(100) / float(feb_einnahmen)) * float(feb_eff_verrechnet))
+			else:
+				feb_diff = 0.00
+			data.append([wohnung.name, "Februar", round(feb_prozent, 2), round(feb_einnahmen, 2), feb_eff_verrechnet, round(feb_diff, 2)])
 			mar_prozent = float((float(100) / float(master['mar']['total_tage'])) * float(master['mar']['tage']))
 			mar_einnahmen = float(float(int(master['mar']['moegliche_einnahmen']) / 100) * mar_prozent)
-			data.append([wohnung.name, "März", round(mar_prozent, 2), round(mar_einnahmen, 2), "0"])
+			mar_eff_verrechnet = 0.00
+			for y in master['mar']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '3'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					mar_eff_verrechnet = mar_eff_verrechnet + eff_verrechnet
+			if mar_einnahmen > 0:
+				mar_diff = float((float(100) / float(mar_einnahmen)) * float(mar_eff_verrechnet))
+			else:
+				mar_diff = 0.00
+			data.append([wohnung.name, "März", round(mar_prozent, 2), round(mar_einnahmen, 2), mar_eff_verrechnet, round(mar_diff, 2)])
 			apr_prozent = float((float(100) / float(master['apr']['total_tage'])) * float(master['apr']['tage']))
 			apr_einnahmen = float(float(int(master['apr']['moegliche_einnahmen']) / 100) * apr_prozent)
-			data.append([wohnung.name, "April", round(apr_prozent, 2), round(apr_einnahmen, 2), "0"])
+			apr_eff_verrechnet = 0.00
+			for y in master['apr']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '4'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					apr_eff_verrechnet = apr_eff_verrechnet + eff_verrechnet
+			if apr_einnahmen > 0:
+				apr_diff = float((float(100) / float(apr_einnahmen)) * float(apr_eff_verrechnet))
+			else:
+				apr_diff = 0.00
+			data.append([wohnung.name, "April", round(apr_prozent, 2), round(apr_einnahmen, 2), apr_eff_verrechnet, round(apr_diff, 2)])
 			mai_prozent = float((float(100) / float(master['mai']['total_tage'])) * float(master['mai']['tage']))
 			mai_einnahmen = float(float(int(master['mai']['moegliche_einnahmen']) / 100) * mai_prozent)
-			data.append([wohnung.name, "Mai", round(mai_prozent, 2), round(mai_einnahmen, 2), "0"])
+			mai_eff_verrechnet = 0.00
+			for y in master['mai']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '5'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					mai_eff_verrechnet = mai_eff_verrechnet + eff_verrechnet
+			if mai_einnahmen > 0:
+				mai_diff = float((float(100) / float(mai_einnahmen)) * float(mai_eff_verrechnet))
+			else:
+				mai_diff = 0.00
+			data.append([wohnung.name, "Mai", round(mai_prozent, 2), round(mai_einnahmen, 2), mai_eff_verrechnet, round(mai_diff, 2)])
 			jun_prozent = float((float(100) / float(master['jun']['total_tage'])) * float(master['jun']['tage']))
 			jun_einnahmen = float(float(int(master['jun']['moegliche_einnahmen']) / 100) * jun_prozent)
-			data.append([wohnung.name, "Juni", round(jun_prozent, 2), round(jun_einnahmen, 2), "0"])
+			jun_eff_verrechnet = 0.00
+			for y in master['jun']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '6'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					jun_eff_verrechnet = jun_eff_verrechnet + eff_verrechnet
+			if jun_einnahmen > 0:
+				jun_diff = float((float(100) / float(jun_einnahmen)) * float(jun_eff_verrechnet))
+			else:
+				jun_diff = 0.00
+			data.append([wohnung.name, "Juni", round(jun_prozent, 2), round(jun_einnahmen, 2), jun_eff_verrechnet, round(jun_diff, 2)])
 			jul_prozent = float((float(100) / float(master['jul']['total_tage'])) * float(master['jul']['tage']))
 			jul_einnahmen = float(float(int(master['jul']['moegliche_einnahmen']) / 100) * jul_prozent)
-			data.append([wohnung.name, "Juli", round(jul_prozent, 2), round(jul_einnahmen, 2), "0"])
+			jul_eff_verrechnet = 0.00
+			for y in master['jul']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '7'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					jul_eff_verrechnet = jul_eff_verrechnet + eff_verrechnet
+			if jul_einnahmen > 0:
+				jul_diff = float((float(100) / float(jul_einnahmen)) * float(jul_eff_verrechnet))
+			else:
+				jul_diff = 0.00
+			data.append([wohnung.name, "Juli", round(jul_prozent, 2), round(jul_einnahmen, 2), jul_eff_verrechnet, round(jul_diff, 2)])
 			aug_prozent = float((float(100) / float(master['aug']['total_tage'])) * float(master['aug']['tage']))
 			aug_einnahmen = float(float(int(master['aug']['moegliche_einnahmen']) / 100) * aug_prozent)
-			data.append([wohnung.name, "August", round(aug_prozent, 2), round(aug_einnahmen, 2), "0"])
+			aug_eff_verrechnet = 0.00
+			for y in master['aug']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '8'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					aug_eff_verrechnet = aug_eff_verrechnet + eff_verrechnet
+			if aug_einnahmen > 0:
+				aug_diff = float((float(100) / float(aug_einnahmen)) * float(aug_eff_verrechnet))
+			else:
+				aug_diff = 0.00
+			data.append([wohnung.name, "August", round(aug_prozent, 2), round(aug_einnahmen, 2), aug_eff_verrechnet, round(aug_diff, 2)])
 			sept_prozent = float((float(100) / float(master['sept']['total_tage'])) * float(master['sept']['tage']))
 			sept_einnahmen = float(float(int(master['sept']['moegliche_einnahmen']) / 100) * sept_prozent)
-			data.append([wohnung.name, "September", round(sept_prozent, 2), round(sept_einnahmen, 2), "0"])
+			sept_eff_verrechnet = 0.00
+			for y in master['sept']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '9'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					sept_eff_verrechnet = sept_eff_verrechnet + eff_verrechnet
+			if sept_einnahmen > 0:
+				sept_diff = float((float(100) / float(sept_einnahmen)) * float(sept_eff_verrechnet))
+			else:
+				sept_diff = 0.00
+			data.append([wohnung.name, "September", round(sept_prozent, 2), round(sept_einnahmen, 2), sept_eff_verrechnet, round(sept_diff, 2)])
 			okt_prozent = float((float(100) / float(master['okt']['total_tage'])) * float(master['okt']['tage']))
 			okt_einnahmen = float(float(int(master['okt']['moegliche_einnahmen']) / 100) * okt_prozent)
-			data.append([wohnung.name, "Oktober", round(okt_prozent, 2), round(okt_einnahmen, 2), "0"])
+			okt_eff_verrechnet = 0.00
+			for y in master['okt']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '10'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					okt_eff_verrechnet = okt_eff_verrechnet + eff_verrechnet
+			if okt_einnahmen > 0:
+				okt_diff = float((float(100) / float(okt_einnahmen)) * float(okt_eff_verrechnet))
+			else:
+				okt_diff = 0.00
+			data.append([wohnung.name, "Oktober", round(okt_prozent, 2), round(okt_einnahmen, 2), okt_eff_verrechnet, round(okt_diff, 2)])
 			nov_prozent = float((float(100) / float(master['nov']['total_tage'])) * float(master['nov']['tage']))
 			nov_einnahmen = float(float(int(master['nov']['moegliche_einnahmen']) / 100) * nov_prozent)
-			data.append([wohnung.name, "November", round(nov_prozent, 2), round(nov_einnahmen, 2), "0"])
+			nov_eff_verrechnet = 0.00
+			for y in master['nov']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '11'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					nov_eff_verrechnet = nov_eff_verrechnet + eff_verrechnet
+			if nov_einnahmen > 0:
+				nov_diff = float((float(100) / float(nov_einnahmen)) * float(nov_eff_verrechnet))
+			else:
+				nov_diff = 0.00
+			data.append([wohnung.name, "November", round(nov_prozent, 2), round(nov_einnahmen, 2), nov_eff_verrechnet, round(nov_diff, 2)])
 			dez_prozent = float((float(100) / float(master['dez']['total_tage'])) * float(master['dez']['tage']))
 			dez_einnahmen = float(float(int(master['dez']['moegliche_einnahmen']) / 100) * dez_prozent)
-			data.append([wohnung.name, "Dezember", round(dez_prozent, 2), round(dez_einnahmen, 2), "0"])
+			dez_eff_verrechnet = 0.00
+			for y in master['dez']['buchungen']:
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '12'""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				if eff_verrechnet > 0:
+					dez_eff_verrechnet = dez_eff_verrechnet + eff_verrechnet
+			if dez_einnahmen > 0:
+				dez_diff = float((float(100) / float(dez_einnahmen)) * float(dez_eff_verrechnet))
+			else:
+				dez_diff = 0.00
+			data.append([wohnung.name, "Dezember", round(dez_prozent, 2), round(dez_einnahmen, 2), dez_eff_verrechnet, round(dez_diff, 2)])
 			
 			total_prozent = (jan_prozent / 12) + (feb_prozent / 12) + (mar_prozent / 12) + (apr_prozent / 12) + (mai_prozent / 12) + (jun_prozent / 12) + (jul_prozent / 12) + (aug_prozent / 12) + (sept_prozent / 12) + (okt_prozent / 12) + (nov_prozent / 12) + (dez_prozent / 12)
 			total_einnahmen = jan_einnahmen + feb_einnahmen + mar_einnahmen + apr_einnahmen + mai_einnahmen + jun_einnahmen + jul_einnahmen + aug_einnahmen + sept_einnahmen + okt_einnahmen + nov_einnahmen + dez_einnahmen
-			data.append([wohnung.name, filters.year, round(total_prozent, 2), round(total_einnahmen, 2), "0"])
-		columns = ["Wohnung:Link/Appartment:118", "Monat:Data:100", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129"]
-		return columns, data
+			total_eff_einnahmen = jan_eff_verrechnet + feb_eff_verrechnet + mar_eff_verrechnet + apr_eff_verrechnet + mai_eff_verrechnet + jun_eff_verrechnet + jul_eff_verrechnet + aug_eff_verrechnet + sept_eff_verrechnet + okt_eff_verrechnet + nov_eff_verrechnet + dez_eff_verrechnet
+			if total_einnahmen > 0:
+				total_diff = float((float(100) / float(total_einnahmen)) * float(total_eff_einnahmen))
+			else:
+				total_diff = 0.00
+			data.append([wohnung.name, filters.year, round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
+			
+			chart_data[0] = chart_data[0] + jan_einnahmen
+			chart_data[1] = chart_data[1] + feb_einnahmen
+			chart_data[2] = chart_data[2] + mar_einnahmen
+			chart_data[3] = chart_data[3] + apr_einnahmen
+			chart_data[4] = chart_data[4] + mai_einnahmen
+			chart_data[5] = chart_data[5] + jun_einnahmen
+			chart_data[6] = chart_data[6] + jul_einnahmen
+			chart_data[7] = chart_data[7] + aug_einnahmen
+			chart_data[8] = chart_data[8] + sept_einnahmen
+			chart_data[9] = chart_data[9] + okt_einnahmen
+			chart_data[10] = chart_data[10] + nov_einnahmen
+			chart_data[11] = chart_data[11] + dez_einnahmen
+			chart_data[12] = chart_data[12] + jan_eff_verrechnet
+			chart_data[13] = chart_data[13] + feb_eff_verrechnet
+			chart_data[14] = chart_data[14] + mar_eff_verrechnet
+			chart_data[15] = chart_data[15] + apr_eff_verrechnet
+			chart_data[16] = chart_data[16] + mai_eff_verrechnet
+			chart_data[17] = chart_data[17] + jun_eff_verrechnet
+			chart_data[18] = chart_data[18] + jul_eff_verrechnet
+			chart_data[19] = chart_data[19] + aug_eff_verrechnet
+			chart_data[20] = chart_data[20] + sept_eff_verrechnet
+			chart_data[21] = chart_data[21] + okt_eff_verrechnet
+			chart_data[22] = chart_data[22] + nov_eff_verrechnet
+			chart_data[23] = chart_data[23] + dez_eff_verrechnet
+			
+		chart = get_month_chart_data(chart_data)
+			
+		columns = ["Wohnung:Link/Appartment:118", "Monat:Data:100", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129", "Differenz in %:Percentage:98"]
+		return columns, data, None, chart
+
+		
+		
+		
+def get_quartal_chart_data(chart_data):
+	labels = ["Q1", "Q2", "Q3", "Q4"]
+	datasets = []
+	datasets.append({
+		'name': 'Belegung',
+		'values': [round(chart_data[0], 2), round(chart_data[1], 2), round(chart_data[2], 2), round(chart_data[3], 2)],
+		'chartType': 'line'
+	})
+	datasets.append({
+		'name': 'Verrechnung',
+		'values': [round(chart_data[4], 2), round(chart_data[5], 2), round(chart_data[6], 2), round(chart_data[7], 2)],
+		'chartType': 'line'
+	})
+	chart = {
+		"data": {
+			'labels': labels,
+			'datasets': datasets
+		}
+	}
+	chart["type"] = "axis-mixed"
+	chart["colors"] = ["#7cd6fd", "#5e64ff"]
+	chart["title"] = "Übersicht in Fr."
+	return chart
+	
+def get_month_chart_data(chart_data):
+	labels = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sept", "Okt", "Nov", "Dez"]
+	datasets = []
+	datasets.append({
+		'name': 'Belegung in Fr.',
+		'values': [round(chart_data[0], 2), round(chart_data[1], 2), round(chart_data[2], 2), round(chart_data[3], 2), round(chart_data[4], 2), round(chart_data[5], 2), round(chart_data[6], 2), round(chart_data[7], 2), round(chart_data[8], 2), round(chart_data[9], 2), round(chart_data[10], 2), round(chart_data[11], 2)]
+	})
+	datasets.append({
+		'name': 'Verrechnung in Fr.',
+		'values': [round(chart_data[12], 2), round(chart_data[13], 2), round(chart_data[14], 2), round(chart_data[15], 2), round(chart_data[16], 2), round(chart_data[17], 2), round(chart_data[18], 2), round(chart_data[19], 2), round(chart_data[20], 2), round(chart_data[21], 2), round(chart_data[22], 2), round(chart_data[23], 2)]
+	})
+	chart = {
+		"data": {
+			'labels': labels,
+			'datasets': datasets
+		}
+	}
+	chart["type"] = "line"
+	chart["colors"] = ["#7cd6fd", "#5e64ff"]
+	chart["title"] = "Übersicht in Fr."
+	return chart
