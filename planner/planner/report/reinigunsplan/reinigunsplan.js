@@ -22,6 +22,9 @@ frappe.query_reports["Reinigunsplan"] = {
 		if (columnDef.id == __("Task") && (dataContext["Task"] == "End-R" || dataContext["Task"] == "Sub-R")) {
 				value = "<span style='background-color:red!important;'>" + value + "</span>";
 		}
+		if (columnDef.id == __("Task") && dataContext["Task"] == "Control") {
+				value = "<span style='background-color:gray!important;'>" + value + "</span>";
+		}
 		if (dataContext["Name"] == "ALERT") {
 				value = "<span style='background-color:yellow!important;'>" + value + "</span>";
 		}
