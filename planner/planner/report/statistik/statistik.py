@@ -462,7 +462,7 @@ def execute(filters=None):
 			chart_data[3] = chart_data[3] + q4_prozent
 			divident += 1
 		
-		columns = ["Haus:Data:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129", "Differenz in %:Percentage:98"]
+		columns = ["Haus:Data:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in CHF:Currency:124", "Eff. verrechnet in CHF:Currency:129", "Differenz in %:Percentage:98"]
 		chart_data[0] = chart_data[0] / divident
 		chart_data[1] = chart_data[1] / divident
 		chart_data[2] = chart_data[2] / divident
@@ -707,7 +707,7 @@ def execute(filters=None):
 		chart_data[2] = chart_data[2] / divident
 		chart_data[3] = chart_data[3] / divident
 		chart = get_quartal_chart_data(chart_data)
-		columns = ["Wohnung:Link/Appartment:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129", "Differenz in %:Percentage:98"]
+		columns = ["Wohnung:Link/Appartment:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in CHF:Currency:124", "Eff. verrechnet in CHF:Currency:129", "Differenz in %:Percentage:98"]
 		return columns, data, None, chart
 		
 	if filters.ansicht == "Monatsweise nach Haus":
@@ -1240,7 +1240,7 @@ def execute(filters=None):
 		chart_data[10] = chart_data[10] / divident
 		chart_data[11] = chart_data[11] / divident
 		chart = get_month_chart_data(chart_data)
-		columns = ["Haus:Link/House:118", "Monat:Data:100", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129", "Differenz in %:Percentage:98"]
+		columns = ["Haus:Link/House:118", "Monat:Data:100", "Belegung in %:Percentage:98", "Belegungsrate in CHF:Currency:124", "Eff. verrechnet in CHF:Currency:129", "Differenz in %:Percentage:98"]
 		return columns, data, None, chart
 		
 	if filters.ansicht == "Monatsweise nach Wohnung":
@@ -1772,7 +1772,7 @@ def execute(filters=None):
 			
 		chart = get_month_chart_data(chart_data)
 			
-		columns = ["Wohnung:Link/Appartment:118", "Monat:Data:100", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129", "Differenz in %:Percentage:98"]
+		columns = ["Wohnung:Link/Appartment:118", "Monat:Data:100", "Belegung in %:Percentage:98", "Belegungsrate in CHF:Currency:124", "Eff. verrechnet in CHF:Currency:129", "Differenz in %:Percentage:98"]
 		return columns, data, None, chart
 
 		
