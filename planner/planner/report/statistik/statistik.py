@@ -230,7 +230,8 @@ def execute(filters=None):
 		
 	if filters.ansicht == "Quartalsweise nach Haus":
 		houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0""", as_dict=True)
-		chart_data = [0, 0, 0, 0, 0, 0, 0, 0]
+		chart_data = [0, 0, 0, 0]
+		divident = 0
 		for house in houses:
 			anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]
 			master = {
@@ -455,22 +456,24 @@ def execute(filters=None):
 				total_diff = 0.00
 			data.append([house.name, "Q1-Q4", round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
 			
-			chart_data[0] = chart_data[0] + q1_einnahmen
-			chart_data[1] = chart_data[1] + q2_einnahmen
-			chart_data[2] = chart_data[2] + q3_einnahmen
-			chart_data[3] = chart_data[3] + q4_einnahmen
-			chart_data[4] = chart_data[4] + q1_eff_verrechnet
-			chart_data[5] = chart_data[5] + q2_eff_verrechnet
-			chart_data[6] = chart_data[6] + q3_eff_verrechnet
-			chart_data[7] = chart_data[7] + q4_eff_verrechnet
+			chart_data[0] = chart_data[0] + q1_prozent
+			chart_data[1] = chart_data[1] + q2_prozent
+			chart_data[2] = chart_data[2] + q3_prozent
+			chart_data[3] = chart_data[3] + q4_prozent
+			divident += 1
 		
 		columns = ["Haus:Data:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129", "Differenz in %:Percentage:98"]
+		chart_data[0] = chart_data[0] / divident
+		chart_data[1] = chart_data[1] / divident
+		chart_data[2] = chart_data[2] / divident
+		chart_data[3] = chart_data[3] / divident
 		chart = get_quartal_chart_data(chart_data)
 		return columns, data, None, chart
 		
 	if filters.ansicht == "Quartalsweise nach Wohnung":
 		wohnungen = frappe.db.sql("""SELECT `name` FROM `tabAppartment` WHERE `disabled` = 0""", as_dict=True)
-		chart_data = [0, 0, 0, 0, 0, 0, 0, 0]
+		chart_data = [0, 0, 0, 0]
+		divident = 0
 		for wohnung in wohnungen:
 			master = {
 				'q1': {
@@ -693,22 +696,24 @@ def execute(filters=None):
 				total_diff = 0.00
 			data.append([wohnung.name, "Q1-Q4", round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
 			
-			chart_data[0] = chart_data[0] + q1_einnahmen
-			chart_data[1] = chart_data[1] + q2_einnahmen
-			chart_data[2] = chart_data[2] + q3_einnahmen
-			chart_data[3] = chart_data[3] + q4_einnahmen
-			chart_data[4] = chart_data[4] + q1_eff_verrechnet
-			chart_data[5] = chart_data[5] + q2_eff_verrechnet
-			chart_data[6] = chart_data[6] + q3_eff_verrechnet
-			chart_data[7] = chart_data[7] + q4_eff_verrechnet
+			chart_data[0] = chart_data[0] + q1_prozent
+			chart_data[1] = chart_data[1] + q2_prozent
+			chart_data[2] = chart_data[2] + q3_prozent
+			chart_data[3] = chart_data[3] + q4_prozent
+			divident += 1
 			
+		chart_data[0] = chart_data[0] / divident
+		chart_data[1] = chart_data[1] / divident
+		chart_data[2] = chart_data[2] / divident
+		chart_data[3] = chart_data[3] / divident
 		chart = get_quartal_chart_data(chart_data)
 		columns = ["Wohnung:Link/Appartment:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129", "Differenz in %:Percentage:98"]
 		return columns, data, None, chart
 		
 	if filters.ansicht == "Monatsweise nach Haus":
 		houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0""", as_dict=True)
-		chart_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+		chart_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+		divident = 0
 		for house in houses:
 			anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]
 			master = {
@@ -1208,38 +1213,40 @@ def execute(filters=None):
 				total_diff = 0.00
 			data.append([house.name, filters.year, round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
 			
-			chart_data[0] = chart_data[0] + jan_einnahmen
-			chart_data[1] = chart_data[1] + feb_einnahmen
-			chart_data[2] = chart_data[2] + mar_einnahmen
-			chart_data[3] = chart_data[3] + apr_einnahmen
-			chart_data[4] = chart_data[4] + mai_einnahmen
-			chart_data[5] = chart_data[5] + jun_einnahmen
-			chart_data[6] = chart_data[6] + jul_einnahmen
-			chart_data[7] = chart_data[7] + aug_einnahmen
-			chart_data[8] = chart_data[8] + sept_einnahmen
-			chart_data[9] = chart_data[9] + okt_einnahmen
-			chart_data[10] = chart_data[10] + nov_einnahmen
-			chart_data[11] = chart_data[11] + dez_einnahmen
-			chart_data[12] = chart_data[12] + jan_eff_verrechnet
-			chart_data[13] = chart_data[13] + feb_eff_verrechnet
-			chart_data[14] = chart_data[14] + mar_eff_verrechnet
-			chart_data[15] = chart_data[15] + apr_eff_verrechnet
-			chart_data[16] = chart_data[16] + mai_eff_verrechnet
-			chart_data[17] = chart_data[17] + jun_eff_verrechnet
-			chart_data[18] = chart_data[18] + jul_eff_verrechnet
-			chart_data[19] = chart_data[19] + aug_eff_verrechnet
-			chart_data[20] = chart_data[20] + sept_eff_verrechnet
-			chart_data[21] = chart_data[21] + okt_eff_verrechnet
-			chart_data[22] = chart_data[22] + nov_eff_verrechnet
-			chart_data[23] = chart_data[23] + dez_eff_verrechnet
-			
+			chart_data[0] = chart_data[0] + jan_prozent
+			chart_data[1] = chart_data[1] + feb_prozent
+			chart_data[2] = chart_data[2] + mar_prozent
+			chart_data[3] = chart_data[3] + apr_prozent
+			chart_data[4] = chart_data[4] + mai_prozent
+			chart_data[5] = chart_data[5] + jun_prozent
+			chart_data[6] = chart_data[6] + jul_prozent
+			chart_data[7] = chart_data[7] + aug_prozent
+			chart_data[8] = chart_data[8] + sept_prozent
+			chart_data[9] = chart_data[9] + okt_prozent
+			chart_data[10] = chart_data[10] + nov_prozent
+			chart_data[11] = chart_data[11] + dez_prozent
+			divident += 1
+		
+		chart_data[0] = chart_data[0] / divident
+		chart_data[1] = chart_data[1] / divident
+		chart_data[2] = chart_data[2] / divident
+		chart_data[3] = chart_data[3] / divident
+		chart_data[4] = chart_data[4] / divident
+		chart_data[5] = chart_data[5] / divident
+		chart_data[6] = chart_data[6] / divident
+		chart_data[7] = chart_data[7] / divident
+		chart_data[8] = chart_data[8] / divident
+		chart_data[9] = chart_data[9] / divident
+		chart_data[10] = chart_data[10] / divident
+		chart_data[11] = chart_data[11] / divident
 		chart = get_month_chart_data(chart_data)
 		columns = ["Haus:Link/House:118", "Monat:Data:100", "Belegung in %:Percentage:98", "Belegungsrate in Fr.:Currency:124", "Eff. verrechnet in Fr.:Currency:129", "Differenz in %:Percentage:98"]
 		return columns, data, None, chart
 		
 	if filters.ansicht == "Monatsweise nach Wohnung":
 		wohnungen = frappe.db.sql("""SELECT `name` FROM `tabAppartment` WHERE `disabled` = 0""", as_dict=True)
-		chart_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+		chart_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+		divident = 0
 		for wohnung in wohnungen:
 			anzahl_whg = 1
 			master = {
@@ -1736,30 +1743,32 @@ def execute(filters=None):
 				total_diff = 0.00
 			data.append([wohnung.name, filters.year, round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
 			
-			chart_data[0] = chart_data[0] + jan_einnahmen
-			chart_data[1] = chart_data[1] + feb_einnahmen
-			chart_data[2] = chart_data[2] + mar_einnahmen
-			chart_data[3] = chart_data[3] + apr_einnahmen
-			chart_data[4] = chart_data[4] + mai_einnahmen
-			chart_data[5] = chart_data[5] + jun_einnahmen
-			chart_data[6] = chart_data[6] + jul_einnahmen
-			chart_data[7] = chart_data[7] + aug_einnahmen
-			chart_data[8] = chart_data[8] + sept_einnahmen
-			chart_data[9] = chart_data[9] + okt_einnahmen
-			chart_data[10] = chart_data[10] + nov_einnahmen
-			chart_data[11] = chart_data[11] + dez_einnahmen
-			chart_data[12] = chart_data[12] + jan_eff_verrechnet
-			chart_data[13] = chart_data[13] + feb_eff_verrechnet
-			chart_data[14] = chart_data[14] + mar_eff_verrechnet
-			chart_data[15] = chart_data[15] + apr_eff_verrechnet
-			chart_data[16] = chart_data[16] + mai_eff_verrechnet
-			chart_data[17] = chart_data[17] + jun_eff_verrechnet
-			chart_data[18] = chart_data[18] + jul_eff_verrechnet
-			chart_data[19] = chart_data[19] + aug_eff_verrechnet
-			chart_data[20] = chart_data[20] + sept_eff_verrechnet
-			chart_data[21] = chart_data[21] + okt_eff_verrechnet
-			chart_data[22] = chart_data[22] + nov_eff_verrechnet
-			chart_data[23] = chart_data[23] + dez_eff_verrechnet
+			chart_data[0] = chart_data[0] + jan_prozent
+			chart_data[1] = chart_data[1] + feb_prozent
+			chart_data[2] = chart_data[2] + mar_prozent
+			chart_data[3] = chart_data[3] + apr_prozent
+			chart_data[4] = chart_data[4] + mai_prozent
+			chart_data[5] = chart_data[5] + jun_prozent
+			chart_data[6] = chart_data[6] + jul_prozent
+			chart_data[7] = chart_data[7] + aug_prozent
+			chart_data[8] = chart_data[8] + sept_prozent
+			chart_data[9] = chart_data[9] + okt_prozent
+			chart_data[10] = chart_data[10] + nov_prozent
+			chart_data[11] = chart_data[11] + dez_prozent
+			divident += 1
+		
+		chart_data[0] = chart_data[0] / divident
+		chart_data[1] = chart_data[1] / divident
+		chart_data[2] = chart_data[2] / divident
+		chart_data[3] = chart_data[3] / divident
+		chart_data[4] = chart_data[4] / divident
+		chart_data[5] = chart_data[5] / divident
+		chart_data[6] = chart_data[6] / divident
+		chart_data[7] = chart_data[7] / divident
+		chart_data[8] = chart_data[8] / divident
+		chart_data[9] = chart_data[9] / divident
+		chart_data[10] = chart_data[10] / divident
+		chart_data[11] = chart_data[11] / divident
 			
 		chart = get_month_chart_data(chart_data)
 			
@@ -1775,12 +1784,7 @@ def get_quartal_chart_data(chart_data):
 	datasets.append({
 		'name': 'Belegung',
 		'values': [round(chart_data[0], 2), round(chart_data[1], 2), round(chart_data[2], 2), round(chart_data[3], 2)],
-		'chartType': 'line'
-	})
-	datasets.append({
-		'name': 'Verrechnung',
-		'values': [round(chart_data[4], 2), round(chart_data[5], 2), round(chart_data[6], 2), round(chart_data[7], 2)],
-		'chartType': 'line'
+		'chartType': 'bar'
 	})
 	chart = {
 		"data": {
@@ -1789,20 +1793,16 @@ def get_quartal_chart_data(chart_data):
 		}
 	}
 	chart["type"] = "axis-mixed"
-	chart["colors"] = ["#7cd6fd", "#5e64ff"]
-	chart["title"] = "Übersicht in Fr."
+	chart["colors"] = ["#7cd6fd"]
+	chart["title"] = "Belegungs Übersicht in %"
 	return chart
 	
 def get_month_chart_data(chart_data):
 	labels = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun", "Jul", "Aug", "Sept", "Okt", "Nov", "Dez"]
 	datasets = []
 	datasets.append({
-		'name': 'Belegung in Fr.',
+		'name': 'Belegung in %',
 		'values': [round(chart_data[0], 2), round(chart_data[1], 2), round(chart_data[2], 2), round(chart_data[3], 2), round(chart_data[4], 2), round(chart_data[5], 2), round(chart_data[6], 2), round(chart_data[7], 2), round(chart_data[8], 2), round(chart_data[9], 2), round(chart_data[10], 2), round(chart_data[11], 2)]
-	})
-	datasets.append({
-		'name': 'Verrechnung in Fr.',
-		'values': [round(chart_data[12], 2), round(chart_data[13], 2), round(chart_data[14], 2), round(chart_data[15], 2), round(chart_data[16], 2), round(chart_data[17], 2), round(chart_data[18], 2), round(chart_data[19], 2), round(chart_data[20], 2), round(chart_data[21], 2), round(chart_data[22], 2), round(chart_data[23], 2)]
 	})
 	chart = {
 		"data": {
@@ -1810,7 +1810,7 @@ def get_month_chart_data(chart_data):
 			'datasets': datasets
 		}
 	}
-	chart["type"] = "line"
-	chart["colors"] = ["#7cd6fd", "#5e64ff"]
-	chart["title"] = "Übersicht in Fr."
+	chart["type"] = "bar"
+	chart["colors"] = ["#7cd6fd"]
+	chart["title"] = "Belegungs Übersicht in %"
 	return chart
