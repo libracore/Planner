@@ -1795,6 +1795,7 @@ def get_quartal_chart_data(chart_data):
 	chart["type"] = "axis-mixed"
 	chart["colors"] = ["#7cd6fd"]
 	chart["title"] = "Belegungs Übersicht in %"
+	chart["valuesOverPoints"] = 1
 	return chart
 	
 def get_month_chart_data(chart_data):
@@ -1813,4 +1814,5 @@ def get_month_chart_data(chart_data):
 	chart["type"] = "bar"
 	chart["colors"] = ["#7cd6fd"]
 	chart["title"] = "Belegungs Übersicht in %"
+	chart["valuesOverPoints"] = 1
 	return chart
