@@ -109,7 +109,8 @@ def execute(filters=None):
 										AND MONTH(`booking`.`start_date`) = '{int_monat}'
 										AND YEAR(`booking`.`start_date`) = '{year}'
 										AND MONTH(`booking`.`end_date`) = '{int_monat}'
-										AND YEAR(`booking`.`end_date`) = '{int_monat}'""".format(year=filters.year, int_monat=monat['int_monat']), as_dict=True)
+										AND YEAR(`booking`.`end_date`) = '{year}'
+										AND `appartment`.`parking` = 0""".format(year=filters.year, int_monat=monat['int_monat']), as_dict=True)
 			for x in case_1_jan:
 				days = date_diff(x.end_date, x.start_date) + 1
 				max_days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
@@ -135,6 +136,7 @@ def execute(filters=None):
 									INNER JOIN `tabAppartment` AS `appartment` ON `booking`.`appartment` = `appartment`.`name`)
 									WHERE
 										`booking`.`booking_status` = 'Booked'
+										AND `appartment`.`parking` = 0
 										AND MONTH(`booking`.`start_date`) = '{int_monat}'
 										AND YEAR(`booking`.`start_date`) = '{year}'
 										AND (
@@ -169,6 +171,7 @@ def execute(filters=None):
 									INNER JOIN `tabAppartment` AS `appartment` ON `booking`.`appartment` = `appartment`.`name`)
 									WHERE
 										`booking`.`booking_status` = 'Booked'
+										AND `appartment`.`parking` = 0
 										AND (
 											(MONTH(`booking`.`start_date`) < '{int_monat}'
 											AND YEAR(`booking`.`start_date`) = '{year}')
@@ -203,6 +206,7 @@ def execute(filters=None):
 									INNER JOIN `tabAppartment` AS `appartment` ON `booking`.`appartment` = `appartment`.`name`)
 									WHERE
 										`booking`.`booking_status` = 'Booked'
+										AND `appartment`.`parking` = 0
 										AND (
 											(MONTH(`booking`.`start_date`) < '{int_monat}'
 											AND YEAR(`booking`.`start_date`) = '{year}')
@@ -229,33 +233,43 @@ def execute(filters=None):
 		return columns, data
 		
 	if filters.ansicht == "Quartalsweise nach Haus":
-		houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0""", as_dict=True)
+		houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0 AND `parking` = 0""", as_dict=True)
+		total_anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `disabled` = 0 AND `parking` = 0""", as_list=True)[0][0]
 		chart_data = [0, 0, 0, 0]
 		divident = 0
+		q1_days = (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-01-15")) + 1)
+		q2_days = (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-04-15")) + 1)
+		q3_days = (date_diff(get_last_day(filters.year + "-09-15"), get_first_day(filters.year + "-07-15")) + 1)
+		q4_days = (date_diff(get_last_day(filters.year + "-12-15"), get_first_day(filters.year + "-10-15")) + 1)
+		q1_max_days = q1_days * total_anzahl_whg
+		q2_max_days = q2_days * total_anzahl_whg
+		q3_max_days = q3_days * total_anzahl_whg
+		q4_max_days = q4_days * total_anzahl_whg
+		max_days = q1_max_days + q2_max_days + q3_max_days + q4_max_days
 		for house in houses:
-			anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]
+			anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]
 			master = {
 				'q1': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-01-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]) * 3,
+					'total_tage': q1_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]) * 3,
 					'tage': 0,
 					'buchungen': []
 				},
 				'q2': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-04-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]) * 3,
+					'total_tage': q2_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]) * 3,
 					'tage': 0,
 					'buchungen': []
 				},
 				'q3': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-09-15"), get_first_day(filters.year + "-07-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]) * 3,
+					'total_tage': q3_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]) * 3,
 					'tage': 0,
 					'buchungen': []
 				},
 				'q4': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-12-15"), get_first_day(filters.year + "-10-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]) * 3,
+					'total_tage': q4_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]) * 3,
 					'tage': 0,
 					'buchungen': []
 				}
@@ -272,7 +286,7 @@ def execute(filters=None):
 											AND MONTH(`booking`.`start_date`) = '{int_monat}'
 											AND YEAR(`booking`.`start_date`) = '{year}'
 											AND MONTH(`booking`.`end_date`) = '{int_monat}'
-											AND YEAR(`booking`.`end_date`) = '{int_monat}'
+											AND YEAR(`booking`.`end_date`) = '{year}'
 											AND `booking`.`house` = '{house}'""".format(year=filters.year, int_monat=monat['int_monat'], house=house.name), as_dict=True)
 				for x in case_1_jan:
 					days = date_diff(x.end_date, x.start_date) + 1
@@ -456,47 +470,56 @@ def execute(filters=None):
 				total_diff = 0.00
 			data.append([house.name, "Q1-Q4", round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
 			
-			chart_data[0] = chart_data[0] + q1_prozent
-			chart_data[1] = chart_data[1] + q2_prozent
-			chart_data[2] = chart_data[2] + q3_prozent
-			chart_data[3] = chart_data[3] + q4_prozent
+			chart_data[0] = chart_data[0] + float(master['q1']['tage'])
+			chart_data[1] = chart_data[1] + float(master['q2']['tage'])
+			chart_data[2] = chart_data[2] + float(master['q3']['tage'])
+			chart_data[3] = chart_data[3] + float(master['q4']['tage'])
 			divident += 1
-		
+			
+		chart_data[0] = float((float(100) / float(q1_max_days)) * float(chart_data[0]))
+		chart_data[1] = float((float(100) / float(q2_max_days)) * float(chart_data[1]))
+		chart_data[2] = float((float(100) / float(q3_max_days)) * float(chart_data[2]))
+		chart_data[3] = float((float(100) / float(q4_max_days)) * float(chart_data[3]))
 		columns = ["Haus:Data:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in CHF:Currency:124", "Eff. verrechnet in CHF:Currency:129", "Differenz in %:Percentage:98"]
-		chart_data[0] = chart_data[0] / divident
-		chart_data[1] = chart_data[1] / divident
-		chart_data[2] = chart_data[2] / divident
-		chart_data[3] = chart_data[3] / divident
 		chart = get_quartal_chart_data(chart_data)
 		return columns, data, None, chart
 		
 	if filters.ansicht == "Quartalsweise nach Wohnung":
-		wohnungen = frappe.db.sql("""SELECT `name` FROM `tabAppartment` WHERE `disabled` = 0""", as_dict=True)
+		wohnungen = frappe.db.sql("""SELECT `name` FROM `tabAppartment` WHERE `disabled` = 0 AND `parking` = 0""", as_dict=True)
 		chart_data = [0, 0, 0, 0]
 		divident = 0
+		q1_days = (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-01-15")) + 1)
+		q2_days = (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-04-15")) + 1)
+		q3_days = (date_diff(get_last_day(filters.year + "-09-15"), get_first_day(filters.year + "-07-15")) + 1)
+		q4_days = (date_diff(get_last_day(filters.year + "-12-15"), get_first_day(filters.year + "-10-15")) + 1)
+		q1_max_days = q1_days * len(wohnungen)
+		q2_max_days = q2_days * len(wohnungen)
+		q3_max_days = q3_days * len(wohnungen)
+		q4_max_days = q4_days * len(wohnungen)
+		max_days = q1_max_days + q2_max_days + q3_max_days + q4_max_days
 		for wohnung in wohnungen:
 			master = {
 				'q1': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-01-15")) + 1),
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]) * 3,
+					'total_tage': q1_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]) * 3,
 					'tage': 0,
 					'buchungen': []
 				},
 				'q2': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-04-15")) + 1),
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]) * 3,
+					'total_tage': q2_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]) * 3,
 					'tage': 0,
 					'buchungen': []
 				},
 				'q3': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-09-15"), get_first_day(filters.year + "-07-15")) + 1),
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]) * 3,
+					'total_tage': q3_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]) * 3,
 					'tage': 0,
 					'buchungen': []
 				},
 				'q4': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-12-15"), get_first_day(filters.year + "-10-15")) + 1),
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]) * 3,
+					'total_tage': q4_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]) * 3,
 					'tage': 0,
 					'buchungen': []
 				}
@@ -512,7 +535,7 @@ def execute(filters=None):
 											AND MONTH(`booking`.`start_date`) = '{int_monat}'
 											AND YEAR(`booking`.`start_date`) = '{year}'
 											AND MONTH(`booking`.`end_date`) = '{int_monat}'
-											AND YEAR(`booking`.`end_date`) = '{int_monat}'
+											AND YEAR(`booking`.`end_date`) = '{year}'
 											AND `booking`.`appartment` = '{appartment}'""".format(year=filters.year, int_monat=monat['int_monat'], appartment=wohnung.name), as_dict=True)
 				for x in case_1_jan:
 					days = date_diff(x.end_date, x.start_date) + 1
@@ -696,96 +719,121 @@ def execute(filters=None):
 				total_diff = 0.00
 			data.append([wohnung.name, "Q1-Q4", round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
 			
-			chart_data[0] = chart_data[0] + q1_prozent
-			chart_data[1] = chart_data[1] + q2_prozent
-			chart_data[2] = chart_data[2] + q3_prozent
-			chart_data[3] = chart_data[3] + q4_prozent
+			chart_data[0] = chart_data[0] + float(master['q1']['tage'])
+			chart_data[1] = chart_data[1] + float(master['q2']['tage'])
+			chart_data[2] = chart_data[2] + float(master['q3']['tage'])
+			chart_data[3] = chart_data[3] + float(master['q4']['tage'])
 			divident += 1
 			
-		chart_data[0] = chart_data[0] / divident
-		chart_data[1] = chart_data[1] / divident
-		chart_data[2] = chart_data[2] / divident
-		chart_data[3] = chart_data[3] / divident
+		chart_data[0] = float((float(100) / float(q1_max_days)) * float(chart_data[0]))
+		chart_data[1] = float((float(100) / float(q2_max_days)) * float(chart_data[1]))
+		chart_data[2] = float((float(100) / float(q3_max_days)) * float(chart_data[2]))
+		chart_data[3] = float((float(100) / float(q4_max_days)) * float(chart_data[3]))
 		chart = get_quartal_chart_data(chart_data)
 		columns = ["Wohnung:Link/Appartment:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in CHF:Currency:124", "Eff. verrechnet in CHF:Currency:129", "Differenz in %:Percentage:98"]
 		return columns, data, None, chart
 		
 	if filters.ansicht == "Monatsweise nach Haus":
-		houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0""", as_dict=True)
+		houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0 AND `parking` = 0""", as_dict=True)
+		total_anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `disabled` = 0 AND `parking` = 0""", as_list=True)[0][0]
 		chart_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		divident = 0
+		jan_days = (date_diff(get_last_day(filters.year + "-01-15"), get_first_day(filters.year + "-01-15")) + 1)
+		jan_max_days = jan_days * total_anzahl_whg
+		feb_days = (date_diff(get_last_day(filters.year + "-02-15"), get_first_day(filters.year + "-02-15")) + 1)
+		feb_max_days = feb_days * total_anzahl_whg
+		mar_days = (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-03-15")) + 1)
+		mar_max_days = mar_days * total_anzahl_whg
+		apr_days = (date_diff(get_last_day(filters.year + "-04-15"), get_first_day(filters.year + "-04-15")) + 1)
+		apr_max_days = apr_days * total_anzahl_whg
+		mai_days = (date_diff(get_last_day(filters.year + "-05-15"), get_first_day(filters.year + "-05-15")) + 1)
+		mai_max_days = mai_days * total_anzahl_whg
+		jun_days = (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-06-15")) + 1)
+		jun_max_days = jun_days * total_anzahl_whg
+		jul_days = (date_diff(get_last_day(filters.year + "-07-15"), get_first_day(filters.year + "-07-15")) + 1)
+		jul_max_days = jul_days * total_anzahl_whg
+		aug_days = (date_diff(get_last_day(filters.year + "-08-15"), get_first_day(filters.year + "-08-15")) + 1)
+		aug_max_days = aug_days * total_anzahl_whg
+		sept_days = (date_diff(get_last_day(filters.year + "-09-15"), get_first_day(filters.year + "-09-15")) + 1)
+		sept_max_days = sept_days * total_anzahl_whg
+		okt_days = (date_diff(get_last_day(filters.year + "-10-15"), get_first_day(filters.year + "-10-15")) + 1)
+		okt_max_days = okt_days * total_anzahl_whg
+		nov_days = (date_diff(get_last_day(filters.year + "-11-15"), get_first_day(filters.year + "-11-15")) + 1)
+		nov_max_days = nov_days * total_anzahl_whg
+		dez_days = (date_diff(get_last_day(filters.year + "-12-15"), get_first_day(filters.year + "-12-15")) + 1)
+		dez_max_days = dez_days * total_anzahl_whg
 		for house in houses:
-			anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]
+			anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]
 			master = {
 				'jan': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-01-15"), get_first_day(filters.year + "-01-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
+					'total_tage': jan_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'feb': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-02-15"), get_first_day(filters.year + "-02-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
+					'total_tage': feb_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'mar': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-03-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
+					'total_tage': mar_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'apr': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-04-15"), get_first_day(filters.year + "-04-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
+					'total_tage': apr_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'mai': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-05-15"), get_first_day(filters.year + "-05-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
+					'total_tage': mai_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'jun': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-06-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
+					'total_tage': jun_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'jul': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-07-15"), get_first_day(filters.year + "-07-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
+					'total_tage': jul_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'aug': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-08-15"), get_first_day(filters.year + "-08-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
+					'total_tage': aug_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'sept': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-09-15"), get_first_day(filters.year + "-09-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
+					'total_tage': sept_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'okt': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-10-15"), get_first_day(filters.year + "-10-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
+					'total_tage': okt_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'nov': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-11-15"), get_first_day(filters.year + "-11-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
+					'total_tage': nov_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'dez': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-12-15"), get_first_day(filters.year + "-12-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0""".format(house=house.name), as_list=True)[0][0]),
+					'total_tage': dez_days * anzahl_whg,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT SUM(`price_per_month`) FROM `tabAppartment` WHERE `house` = '{house}' AND `disabled` = 0 AND `parking` = 0""".format(house=house.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				}
@@ -802,7 +850,7 @@ def execute(filters=None):
 											AND MONTH(`booking`.`start_date`) = '{int_monat}'
 											AND YEAR(`booking`.`start_date`) = '{year}'
 											AND MONTH(`booking`.`end_date`) = '{int_monat}'
-											AND YEAR(`booking`.`end_date`) = '{int_monat}'
+											AND YEAR(`booking`.`end_date`) = '{year}'
 											AND `booking`.`house` = '{house}'""".format(year=filters.year, int_monat=monat['int_monat'], house=house.name), as_dict=True)
 				for x in case_1_jan:
 					days = date_diff(x.end_date, x.start_date) + 1
@@ -1213,112 +1261,136 @@ def execute(filters=None):
 				total_diff = 0.00
 			data.append([house.name, filters.year, round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
 			
-			chart_data[0] = chart_data[0] + jan_prozent
-			chart_data[1] = chart_data[1] + feb_prozent
-			chart_data[2] = chart_data[2] + mar_prozent
-			chart_data[3] = chart_data[3] + apr_prozent
-			chart_data[4] = chart_data[4] + mai_prozent
-			chart_data[5] = chart_data[5] + jun_prozent
-			chart_data[6] = chart_data[6] + jul_prozent
-			chart_data[7] = chart_data[7] + aug_prozent
-			chart_data[8] = chart_data[8] + sept_prozent
-			chart_data[9] = chart_data[9] + okt_prozent
-			chart_data[10] = chart_data[10] + nov_prozent
-			chart_data[11] = chart_data[11] + dez_prozent
-			divident += 1
+			chart_data[0] = chart_data[0] + master['jan']['tage']
+			chart_data[1] = chart_data[1] + master['feb']['tage']
+			chart_data[2] = chart_data[2] + master['mar']['tage']
+			chart_data[3] = chart_data[3] + master['apr']['tage']
+			chart_data[4] = chart_data[4] + master['mai']['tage']
+			chart_data[5] = chart_data[5] + master['jun']['tage']
+			chart_data[6] = chart_data[6] + master['jul']['tage']
+			chart_data[7] = chart_data[7] + master['aug']['tage']
+			chart_data[8] = chart_data[8] + master['sept']['tage']
+			chart_data[9] = chart_data[9] + master['okt']['tage']
+			chart_data[10] = chart_data[10] + master['nov']['tage']
+			chart_data[11] = chart_data[11] + master['dez']['tage']
 		
-		chart_data[0] = chart_data[0] / divident
-		chart_data[1] = chart_data[1] / divident
-		chart_data[2] = chart_data[2] / divident
-		chart_data[3] = chart_data[3] / divident
-		chart_data[4] = chart_data[4] / divident
-		chart_data[5] = chart_data[5] / divident
-		chart_data[6] = chart_data[6] / divident
-		chart_data[7] = chart_data[7] / divident
-		chart_data[8] = chart_data[8] / divident
-		chart_data[9] = chart_data[9] / divident
-		chart_data[10] = chart_data[10] / divident
-		chart_data[11] = chart_data[11] / divident
+		chart_data[0] = float((float(100) / float(jan_max_days)) * float(chart_data[0]))
+		chart_data[1] = float((float(100) / float(feb_max_days)) * float(chart_data[1]))
+		chart_data[2] = float((float(100) / float(mar_max_days)) * float(chart_data[2]))
+		chart_data[3] = float((float(100) / float(apr_max_days)) * float(chart_data[3]))
+		chart_data[4] = float((float(100) / float(mai_max_days)) * float(chart_data[4]))
+		chart_data[5] = float((float(100) / float(jun_max_days)) * float(chart_data[5]))
+		chart_data[6] = float((float(100) / float(jul_max_days)) * float(chart_data[6]))
+		chart_data[7] = float((float(100) / float(aug_max_days)) * float(chart_data[7]))
+		chart_data[8] = float((float(100) / float(sept_max_days)) * float(chart_data[8]))
+		chart_data[9] = float((float(100) / float(okt_max_days)) * float(chart_data[9]))
+		chart_data[10] = float((float(100) / float(nov_max_days)) * float(chart_data[10]))
+		chart_data[11] = float((float(100) / float(dez_max_days)) * float(chart_data[11]))
 		chart = get_month_chart_data(chart_data)
 		columns = ["Haus:Link/House:118", "Monat:Data:100", "Belegung in %:Percentage:98", "Belegungsrate in CHF:Currency:124", "Eff. verrechnet in CHF:Currency:129", "Differenz in %:Percentage:98"]
 		return columns, data, None, chart
 		
 	if filters.ansicht == "Monatsweise nach Wohnung":
-		wohnungen = frappe.db.sql("""SELECT `name` FROM `tabAppartment` WHERE `disabled` = 0""", as_dict=True)
+		wohnungen = frappe.db.sql("""SELECT `name` FROM `tabAppartment` WHERE `disabled` = 0 AND `parking` = 0""", as_dict=True)
+		total_anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `disabled` = 0 AND `parking` = 0""", as_list=True)[0][0]
 		chart_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		divident = 0
+		jan_days = (date_diff(get_last_day(filters.year + "-01-15"), get_first_day(filters.year + "-01-15")) + 1)
+		jan_max_days = jan_days * total_anzahl_whg
+		feb_days = (date_diff(get_last_day(filters.year + "-02-15"), get_first_day(filters.year + "-02-15")) + 1)
+		feb_max_days = feb_days * total_anzahl_whg
+		mar_days = (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-03-15")) + 1)
+		mar_max_days = mar_days * total_anzahl_whg
+		apr_days = (date_diff(get_last_day(filters.year + "-04-15"), get_first_day(filters.year + "-04-15")) + 1)
+		apr_max_days = apr_days * total_anzahl_whg
+		mai_days = (date_diff(get_last_day(filters.year + "-05-15"), get_first_day(filters.year + "-05-15")) + 1)
+		mai_max_days = mai_days * total_anzahl_whg
+		jun_days = (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-06-15")) + 1)
+		jun_max_days = jun_days * total_anzahl_whg
+		jul_days = (date_diff(get_last_day(filters.year + "-07-15"), get_first_day(filters.year + "-07-15")) + 1)
+		jul_max_days = jul_days * total_anzahl_whg
+		aug_days = (date_diff(get_last_day(filters.year + "-08-15"), get_first_day(filters.year + "-08-15")) + 1)
+		aug_max_days = aug_days * total_anzahl_whg
+		sept_days = (date_diff(get_last_day(filters.year + "-09-15"), get_first_day(filters.year + "-09-15")) + 1)
+		sept_max_days = sept_days * total_anzahl_whg
+		okt_days = (date_diff(get_last_day(filters.year + "-10-15"), get_first_day(filters.year + "-10-15")) + 1)
+		okt_max_days = okt_days * total_anzahl_whg
+		nov_days = (date_diff(get_last_day(filters.year + "-11-15"), get_first_day(filters.year + "-11-15")) + 1)
+		nov_max_days = nov_days * total_anzahl_whg
+		dez_days = (date_diff(get_last_day(filters.year + "-12-15"), get_first_day(filters.year + "-12-15")) + 1)
+		dez_max_days = dez_days * total_anzahl_whg
 		for wohnung in wohnungen:
 			anzahl_whg = 1
 			master = {
 				'jan': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-01-15"), get_first_day(filters.year + "-01-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
+					'total_tage': jan_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'feb': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-02-15"), get_first_day(filters.year + "-02-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
+					'total_tage': feb_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'mar': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-03-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
+					'total_tage': mar_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'apr': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-04-15"), get_first_day(filters.year + "-04-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
+					'total_tage': apr_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'mai': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-05-15"), get_first_day(filters.year + "-05-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
+					'total_tage': mai_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'jun': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-06-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
+					'total_tage': jun_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'jul': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-07-15"), get_first_day(filters.year + "-07-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
+					'total_tage': jul_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'aug': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-08-15"), get_first_day(filters.year + "-08-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
+					'total_tage': aug_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'sept': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-09-15"), get_first_day(filters.year + "-09-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
+					'total_tage': sept_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'okt': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-10-15"), get_first_day(filters.year + "-10-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
+					'total_tage': okt_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'nov': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-11-15"), get_first_day(filters.year + "-11-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
+					'total_tage': nov_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				},
 				'dez': {
-					'total_tage': (date_diff(get_last_day(filters.year + "-12-15"), get_first_day(filters.year + "-12-15")) + 1) * anzahl_whg,
-					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
+					'total_tage': dez_days,
+					'moegliche_einnahmen': (frappe.db.sql("""SELECT `price_per_month` FROM `tabAppartment` WHERE `name` = '{wohnung}' AND `disabled` = 0 AND `parking` = 0""".format(wohnung=wohnung.name), as_list=True)[0][0]),
 					'tage': 0,
 					'buchungen': []
 				}
@@ -1334,7 +1406,7 @@ def execute(filters=None):
 											AND MONTH(`booking`.`start_date`) = '{int_monat}'
 											AND YEAR(`booking`.`start_date`) = '{year}'
 											AND MONTH(`booking`.`end_date`) = '{int_monat}'
-											AND YEAR(`booking`.`end_date`) = '{int_monat}'
+											AND YEAR(`booking`.`end_date`) = '{year}'
 											AND `booking`.`appartment` = '{appartment}'""".format(year=filters.year, int_monat=monat['int_monat'], appartment=wohnung.name), as_dict=True)
 				for x in case_1_jan:
 					days = date_diff(x.end_date, x.start_date) + 1
@@ -1743,32 +1815,31 @@ def execute(filters=None):
 				total_diff = 0.00
 			data.append([wohnung.name, filters.year, round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
 			
-			chart_data[0] = chart_data[0] + jan_prozent
-			chart_data[1] = chart_data[1] + feb_prozent
-			chart_data[2] = chart_data[2] + mar_prozent
-			chart_data[3] = chart_data[3] + apr_prozent
-			chart_data[4] = chart_data[4] + mai_prozent
-			chart_data[5] = chart_data[5] + jun_prozent
-			chart_data[6] = chart_data[6] + jul_prozent
-			chart_data[7] = chart_data[7] + aug_prozent
-			chart_data[8] = chart_data[8] + sept_prozent
-			chart_data[9] = chart_data[9] + okt_prozent
-			chart_data[10] = chart_data[10] + nov_prozent
-			chart_data[11] = chart_data[11] + dez_prozent
-			divident += 1
+			chart_data[0] = chart_data[0] + master['jan']['tage']
+			chart_data[1] = chart_data[1] + master['feb']['tage']
+			chart_data[2] = chart_data[2] + master['mar']['tage']
+			chart_data[3] = chart_data[3] + master['apr']['tage']
+			chart_data[4] = chart_data[4] + master['mai']['tage']
+			chart_data[5] = chart_data[5] + master['jun']['tage']
+			chart_data[6] = chart_data[6] + master['jul']['tage']
+			chart_data[7] = chart_data[7] + master['aug']['tage']
+			chart_data[8] = chart_data[8] + master['sept']['tage']
+			chart_data[9] = chart_data[9] + master['okt']['tage']
+			chart_data[10] = chart_data[10] + master['nov']['tage']
+			chart_data[11] = chart_data[11] + master['dez']['tage']
 		
-		chart_data[0] = chart_data[0] / divident
-		chart_data[1] = chart_data[1] / divident
-		chart_data[2] = chart_data[2] / divident
-		chart_data[3] = chart_data[3] / divident
-		chart_data[4] = chart_data[4] / divident
-		chart_data[5] = chart_data[5] / divident
-		chart_data[6] = chart_data[6] / divident
-		chart_data[7] = chart_data[7] / divident
-		chart_data[8] = chart_data[8] / divident
-		chart_data[9] = chart_data[9] / divident
-		chart_data[10] = chart_data[10] / divident
-		chart_data[11] = chart_data[11] / divident
+		chart_data[0] = float((float(100) / float(jan_max_days)) * float(chart_data[0]))
+		chart_data[1] = float((float(100) / float(feb_max_days)) * float(chart_data[1]))
+		chart_data[2] = float((float(100) / float(mar_max_days)) * float(chart_data[2]))
+		chart_data[3] = float((float(100) / float(apr_max_days)) * float(chart_data[3]))
+		chart_data[4] = float((float(100) / float(mai_max_days)) * float(chart_data[4]))
+		chart_data[5] = float((float(100) / float(jun_max_days)) * float(chart_data[5]))
+		chart_data[6] = float((float(100) / float(jul_max_days)) * float(chart_data[6]))
+		chart_data[7] = float((float(100) / float(aug_max_days)) * float(chart_data[7]))
+		chart_data[8] = float((float(100) / float(sept_max_days)) * float(chart_data[8]))
+		chart_data[9] = float((float(100) / float(okt_max_days)) * float(chart_data[9]))
+		chart_data[10] = float((float(100) / float(nov_max_days)) * float(chart_data[10]))
+		chart_data[11] = float((float(100) / float(dez_max_days)) * float(chart_data[11]))
 			
 		chart = get_month_chart_data(chart_data)
 			
