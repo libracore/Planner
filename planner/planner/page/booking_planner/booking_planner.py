@@ -339,6 +339,7 @@ def createHeaders(firstDate, secondDate):
 	# prepare time filter
 	year = firstDate.year
 	month = firstDate.month
+	month_string = firstDate.strftime("%B")[0:3]
 
 
 	# prepare month columns
@@ -365,7 +366,7 @@ def createHeaders(firstDate, secondDate):
 			wd = "Sa"
 		else:
 			wd = "So"            
-		headers.append({ 'day': i + 1, 'weekday': wd})
+		headers.append({ 'day': i + 1, 'weekday': month_string + '<br>' + wd})
 		weekday += 1
 		total_qty += 1
 		if weekday > 6:
@@ -375,7 +376,7 @@ def createHeaders(firstDate, secondDate):
 	# prepare time filter
 	year = secondDate.year
 	month = secondDate.month
-
+	month_string = secondDate.strftime("%B")[0:3]
 
 	# prepare month columns
 	days_per_month = calendar.monthrange(year,month)[1]
@@ -401,7 +402,7 @@ def createHeaders(firstDate, secondDate):
 			wd = "Sa"
 		else:
 			wd = "So"            
-		headers.append({ 'day': i + 1, 'weekday': wd})
+		headers.append({ 'day': i + 1, 'weekday': month_string + '<br>' + wd})
 		weekday += 1
 		total_qty += 1
 		if weekday > 6:
@@ -414,6 +415,7 @@ def createHeaders(firstDate, secondDate):
 		# prepare time filter
 		year = thirdDate.year
 		month = thirdDate.month
+		month_string = thirdDate.strftime("%B")[0:3]
 
 
 		# prepare month columns
@@ -440,7 +442,7 @@ def createHeaders(firstDate, secondDate):
 				wd = "Sa"
 			else:
 				wd = "So"            
-			headers.append({ 'day': i + 1, 'weekday': wd})
+			headers.append({ 'day': i + 1, 'weekday': month_string + '<br>' + wd})
 			weekday += 1
 			if weekday > 6:
 				weekday = 0
