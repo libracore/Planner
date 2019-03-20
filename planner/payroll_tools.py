@@ -47,14 +47,23 @@ def get_sal_slip_list(start_date, end_date, ss_status=0, as_dict=True):
 	
 @frappe.whitelist()
 def increment_salary(start_date, end_date, salary_structure, posting_date, ss_status=0, as_dict=True):
-	emp_list = frappe.db.sql("""SELECT
-									t1.employee
-								FROM `tabSalary Slip` AS t1
-								WHERE t1.docstatus = 0
-								AND t1.start_date >= '{start_date}'
-								AND t1.end_date <= '{end_date}'
-								AND (t1.journal_entry is null OR t1.journal_entry = '')
-								AND t1.salary_structure = '{salary_structure}'""".format(ss_status=ss_status, start_date=start_date, end_date=end_date, salary_structure=salary_structure), as_dict=as_dict)
+	if salary_structure != "Alle":
+		emp_list = frappe.db.sql("""SELECT
+										t1.employee
+									FROM `tabSalary Slip` AS t1
+									WHERE t1.docstatus = 0
+									AND t1.start_date >= '{start_date}'
+									AND t1.end_date <= '{end_date}'
+									AND (t1.journal_entry is null OR t1.journal_entry = '')
+									AND t1.salary_structure = '{salary_structure}'""".format(ss_status=ss_status, start_date=start_date, end_date=end_date, salary_structure=salary_structure), as_dict=as_dict)
+	else:
+		emp_list = frappe.db.sql("""SELECT
+										t1.employee
+									FROM `tabSalary Slip` AS t1
+									WHERE t1.docstatus = 0
+									AND t1.start_date >= '{start_date}'
+									AND t1.end_date <= '{end_date}'
+									AND (t1.journal_entry is null OR t1.journal_entry = '')""".format(ss_status=ss_status, start_date=start_date, end_date=end_date), as_dict=as_dict)
 	
 	for _emp in emp_list:
 		emp = frappe.get_doc('Employee', _emp.employee)
