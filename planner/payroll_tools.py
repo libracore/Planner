@@ -47,7 +47,7 @@ def get_sal_slip_list(start_date, end_date, ss_status=0, as_dict=True):
 	
 @frappe.whitelist()
 def increment_salary(start_date, end_date, salary_structure, posting_date, ss_status=0, as_dict=True):
-	if salary_structure != "Alle":
+	if salary_structure == 'Timesheet':
 		emp_list = frappe.db.sql("""SELECT
 										t1.employee
 									FROM `tabSalary Slip` AS t1
@@ -56,21 +56,41 @@ def increment_salary(start_date, end_date, salary_structure, posting_date, ss_st
 									AND t1.end_date <= '{end_date}'
 									AND (t1.journal_entry is null OR t1.journal_entry = '')
 									AND t1.salary_structure = '{salary_structure}'""".format(ss_status=ss_status, start_date=start_date, end_date=end_date, salary_structure=salary_structure), as_dict=as_dict)
+		for _emp in emp_list:
+			emp = frappe.get_doc('Employee', _emp.employee)
+			stdl = emp.stundenlohn
+			zstdl = emp.zusatz_monatslohn
+			ferien_lohn = emp.saldo_ferien_lohn
+			
+			n_zstdl = (((stdl / 116.666) * 100) * 1.08333) + zstdl
+			n_ferien_lohn = (((stdl / 116.666) * 100) * 1.08333) + ferien_lohn
+			
+			update = frappe.db.sql("""UPDATE `tabEmployee` SET `zusatz_monatslohn` = '{n_zstdl}', `saldo_ferien_lohn` = '{n_ferien_lohn}' WHERE `name` = '{name}'""".format(n_zstdl=n_zstdl, n_ferien_lohn=n_ferien_lohn, name=emp.name), as_list=True)
 	else:
-		emp_list = frappe.db.sql("""SELECT
-										t1.employee
-									FROM `tabSalary Slip` AS t1
-									WHERE t1.docstatus = 0
-									AND t1.start_date >= '{start_date}'
-									AND t1.end_date <= '{end_date}'
-									AND (t1.journal_entry is null OR t1.journal_entry = '')""".format(ss_status=ss_status, start_date=start_date, end_date=end_date), as_dict=as_dict)
-	
-	for _emp in emp_list:
-		emp = frappe.get_doc('Employee', _emp.employee)
-		ml = emp.monatslohn
-		zml = emp.zusatz_monatslohn
+		if salary_structure != "Alle":
+			emp_list = frappe.db.sql("""SELECT
+											t1.employee
+										FROM `tabSalary Slip` AS t1
+										WHERE t1.docstatus = 0
+										AND t1.start_date >= '{start_date}'
+										AND t1.end_date <= '{end_date}'
+										AND (t1.journal_entry is null OR t1.journal_entry = '')
+										AND t1.salary_structure = '{salary_structure}'""".format(ss_status=ss_status, start_date=start_date, end_date=end_date, salary_structure=salary_structure), as_dict=as_dict)
+		else:
+			emp_list = frappe.db.sql("""SELECT
+											t1.employee
+										FROM `tabSalary Slip` AS t1
+										WHERE t1.docstatus = 0
+										AND t1.start_date >= '{start_date}'
+										AND t1.end_date <= '{end_date}'
+										AND (t1.journal_entry is null OR t1.journal_entry = '')""".format(ss_status=ss_status, start_date=start_date, end_date=end_date), as_dict=as_dict)
 		
-		update = frappe.db.sql("""UPDATE `tabEmployee` SET `zusatz_monatslohn` = '{new_zml}' WHERE `name` = '{name}'""".format(new_zml=(zml + (ml / 12)), name=emp.name), as_list=True)
+		for _emp in emp_list:
+			emp = frappe.get_doc('Employee', _emp.employee)
+			ml = emp.monatslohn
+			zml = emp.zusatz_monatslohn
+			
+			update = frappe.db.sql("""UPDATE `tabEmployee` SET `zusatz_monatslohn` = '{new_zml}' WHERE `name` = '{name}'""".format(new_zml=(zml + (ml / 12)), name=emp.name), as_list=True)
 	
 	return 'ok'
 	
