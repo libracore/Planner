@@ -47,7 +47,7 @@ def get_sal_slip_list(start_date, end_date, ss_status=0, as_dict=True):
 	
 @frappe.whitelist()
 def increment_salary(start_date, end_date, salary_structure, posting_date, ss_status=0, as_dict=True):
-	if salary_structure == 'Timesheet':
+	if salary_structure == 'Timesheets':
 		emp_list = frappe.db.sql("""SELECT
 										t1.employee
 									FROM `tabSalary Slip` AS t1
