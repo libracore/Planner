@@ -310,7 +310,7 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 				row_string += '<div class="clean-buchung pos-{0} s{1} d{2} z{4} {3}" style="height: 36px !important; margin-top: 0px !important;{8}"{7}>{6}</div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'", _(bookingType), on_click_detail, cursor_style)
 			
 			
-			all_days = createHeaders(calStartDate, add_to_date(calStartDate, months=1))
+			all_days = createCleaningHeaders(calStartDate, add_to_date(calStartDate, months=1))
 			s_start = 1
 			for days in all_days["headers"]:
 				if days["weekday"] == cleaning_day:
@@ -330,6 +330,125 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 		rows.append(row_string)
 	
 	return {'rows': rows, 'default_cleanings': default_cleanings}
+		
+
+def createCleaningHeaders(firstDate, secondDate):
+	headers = []
+	total_qty = 0
+
+	#first month
+	# prepare time filter
+	year = firstDate.year
+	month = firstDate.month
+	#month_string = firstDate.strftime("%B")[0:3]
+
+
+	# prepare month columns
+	days_per_month = calendar.monthrange(year,month)[1]
+	# find first weekday (0: Monday, ... 6: Sunday)
+	first_weekday = calendar.monthrange(year,month)[0]
+
+	# collect headers
+
+	#weekday = first_weekday
+	weekday = firstDate.weekday()
+	for i in range(firstDate.day - 1, days_per_month):
+		if weekday == 0:
+			wd = "Mo"
+		elif weekday == 1:
+			wd = "Di"
+		elif weekday == 2:
+			wd = "Mi"
+		elif weekday == 3:
+			wd = "Do"
+		elif weekday == 4:
+			wd = "Fr"
+		elif weekday == 5:
+			wd = "Sa"
+		else:
+			wd = "So"            
+		headers.append({ 'day': i + 1, 'weekday': wd})
+		weekday += 1
+		total_qty += 1
+		if weekday > 6:
+			weekday = 0
+
+	#second month
+	# prepare time filter
+	year = secondDate.year
+	month = secondDate.month
+	#month_string = secondDate.strftime("%B")[0:3]
+
+	# prepare month columns
+	days_per_month = calendar.monthrange(year,month)[1]
+	# find first weekday (0: Monday, ... 6: Sunday)
+	first_weekday = calendar.monthrange(year,month)[0]
+
+	# collect headers
+
+	weekday = first_weekday
+	#weekday = 0
+	for i in range(0, days_per_month):
+		if weekday == 0:
+			wd = "Mo"
+		elif weekday == 1:
+			wd = "Di"
+		elif weekday == 2:
+			wd = "Mi"
+		elif weekday == 3:
+			wd = "Do"
+		elif weekday == 4:
+			wd = "Fr"
+		elif weekday == 5:
+			wd = "Sa"
+		else:
+			wd = "So"            
+		headers.append({ 'day': i + 1, 'weekday': wd})
+		weekday += 1
+		total_qty += 1
+		if weekday > 6:
+			weekday = 0
+	
+	#optionaly third month
+	if total_qty < 60:
+		thirdDate = add_months(secondDate, 1)
+		total_diff = 60 - total_qty + 1
+		# prepare time filter
+		year = thirdDate.year
+		month = thirdDate.month
+		#month_string = thirdDate.strftime("%B")[0:3]
+
+
+		# prepare month columns
+		days_per_month = calendar.monthrange(year,month)[1]
+		# find first weekday (0: Monday, ... 6: Sunday)
+		first_weekday = calendar.monthrange(year,month)[0]
+
+		# collect headers
+
+		weekday = first_weekday
+		#weekday = 0
+		for i in range(0, total_diff):
+			if weekday == 0:
+				wd = "Mo"
+			elif weekday == 1:
+				wd = "Di"
+			elif weekday == 2:
+				wd = "Mi"
+			elif weekday == 3:
+				wd = "Do"
+			elif weekday == 4:
+				wd = "Fr"
+			elif weekday == 5:
+				wd = "Sa"
+			else:
+				wd = "So"            
+			headers.append({ 'day': i + 1, 'weekday': wd})
+			weekday += 1
+			if weekday > 6:
+				weekday = 0
+				
+	return ( {'headers': headers} )
 		
 def createHeaders(firstDate, secondDate):
 	headers = []
