@@ -95,11 +95,11 @@ def increment_salary(start_date, end_date, salary_structure, posting_date, ss_st
 	return 'ok'
 	
 @frappe.whitelist()
-def update_leave_balance(employees, posting_date):
+def update_leave_balance(employees, date):
 	if isinstance(employees, basestring):
 		employees = json.loads(employees)
 	for emp in employees:
-		leave_balance = get_leave_balance_on(employee=emp, date=posting_date, leave_type='Bevorzugter Urlaub', consider_all_leaves_in_the_allocation_period=True)
+		leave_balance = get_leave_balance_on(employee=emp, date=date, leave_type='Bevorzugter Urlaub', consider_all_leaves_in_the_allocation_period=False)
 		update = frappe.db.sql("""UPDATE `tabEmployee` SET `leave_balance` = '{leave_balance}' WHERE `name` = '{name}'""".format(name=emp, leave_balance=leave_balance), as_list=True)
 		
 	return True
