@@ -104,3 +104,14 @@ def update_leave_balance(employees, date):
 		
 	return True
 	
+@frappe.whitelist()
+def correct_fgz_ggz(type, employee, value):
+	if type == 'fgz':
+		type = 'saldo_ferien_lohn'
+	elif type == 'ggz':
+		type = 'zusatz_monatslohn'
+	else:
+		frappe.throw("Fehler, bitte libracore kontaktieren!")
+		
+	update = frappe.db.sql("""UPDATE `tabEmployee` SET `{type}` = '{value}' WHERE `name` = '{employee}'""".format(type=type, value=value, employee=employee), as_dict=True)
+	return 'ok'
