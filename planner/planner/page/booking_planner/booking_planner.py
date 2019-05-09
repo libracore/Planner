@@ -1203,7 +1203,8 @@ def create_periodic_sinvs(order):
 						'qty': item.qty,
 						'delivery_date': _date,
 						'sales_order': order.name,
-						'rate': item.rate
+						'rate': item.rate,
+						'so_detail': item.name
 					}
 				)
 		
