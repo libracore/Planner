@@ -228,6 +228,7 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 		apartment_int = 1
 		for _apartment in apartments:
 			booking_time_ref = []
+			er_ref = []
 			apartment = _apartment[0]
 			apartment_size = _apartment[1]
 			position = _apartment[2]
@@ -280,6 +281,7 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 					dauer = date_diff(end, start) + 1
 				if bookingType == 'End-Cleaning':
 					bookingType = "End-R"
+					er_ref.append(s_start)
 					#check if checked
 					if is_checked == 1:
 						color = 'b-green'
@@ -317,11 +319,12 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 					for bookong_ref in booking_time_ref:
 						if s_start >= bookong_ref[0] and s_start <= bookong_ref[1]:
 							row_string += '<div class="clean-buchung pos-{0} s{1} d{2} {3}" style="z-index: 2;" onclick="new_cleaning_booking({5})">Default</div>'.format(apartment_int, s_start, 1, 'b-darkgrey', 0, "'" + apartment + "', '" + str(s_start) + "'")
-							if str(s_start) in default_cleanings:
-								default_cleanings[str(s_start)].append([apartment, bookong_ref[2]])
-							else:
-								default_cleanings[str(s_start)] = []
-								default_cleanings[str(s_start)].append([apartment, bookong_ref[2]])
+							if s_start not in er_ref:
+								if str(s_start) in default_cleanings:
+									default_cleanings[str(s_start)].append([apartment, bookong_ref[2]])
+								else:
+									default_cleanings[str(s_start)] = []
+									default_cleanings[str(s_start)].append([apartment, bookong_ref[2]])
 				s_start += 1
 			apartment_int += 1
 			
