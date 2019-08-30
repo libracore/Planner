@@ -45,26 +45,40 @@ class KundenKontoauszug(Document):
 									
 		control = []
 		mwst_control = []
+		total = 0
 		
 		for detail in detail_daten:
-			if detail.status == 'Paid':
-				if not detail.nr in control:
-					control.append(detail.nr)
-					payments = frappe.db.sql("""SELECT `parent`, `allocated_amount`, `modified` FROM `tabPayment Entry Reference` WHERE `reference_name` = '{nr}'""".format(nr=detail.nr), as_dict=True)
-					for pay in payments:
-						row = self.append("details", {})
-						row.kunde = detail.kunde
-						row.gast = detail.gast
-						row.status = 'Zahlung'
-						row.apartment = detail.apartment
-						row.datum = pay.modified
-						row.nr = pay.parent
-						row.chf = pay.allocated_amount * -1
-						row.beschreibung = 'Zahlung für ' + detail.nr
-						
-			if not detail.nr in mwst_control:
-				mwst_control.append(detail.nr)
-				sinv = frappe.get_doc("Sales Invoice", detail.nr)
+			if str(self.gast).lower() in str(detail.gast).lower():
+				if detail.status == 'Paid':
+					if not detail.nr in control:
+						control.append(detail.nr)
+						payments = frappe.db.sql("""SELECT `parent`, `allocated_amount`, `modified` FROM `tabPayment Entry Reference` WHERE `reference_name` = '{nr}'""".format(nr=detail.nr), as_dict=True)
+						for pay in payments:
+							row = self.append("details", {})
+							row.kunde = detail.kunde
+							row.gast = detail.gast
+							row.status = 'Zahlung'
+							row.apartment = detail.apartment
+							row.datum = pay.modified
+							row.nr = pay.parent
+							row.chf = pay.allocated_amount * -1
+							row.beschreibung = 'Zahlung für ' + detail.nr
+							total += pay.allocated_amount * -1
+							
+				if not detail.nr in mwst_control:
+					mwst_control.append(detail.nr)
+					sinv = frappe.get_doc("Sales Invoice", detail.nr)
+					row = self.append("details", {})
+					row.kunde = detail.kunde
+					row.gast = detail.gast
+					row.status = detail.status
+					row.apartment = detail.apartment
+					row.datum = detail.datum
+					row.nr = detail.nr
+					row.beschreibung = 'MwSt'
+					row.chf = sinv.total_taxes_and_charges
+					total += sinv.total_taxes_and_charges
+				
 				row = self.append("details", {})
 				row.kunde = detail.kunde
 				row.gast = detail.gast
@@ -72,18 +86,11 @@ class KundenKontoauszug(Document):
 				row.apartment = detail.apartment
 				row.datum = detail.datum
 				row.nr = detail.nr
-				row.beschreibung = 'MwSt'
-				row.chf = sinv.total_taxes_and_charges
+				row.beschreibung = detail.description
+				row.chf = detail.item_betrag
+				total += detail.item_betrag
 			
-			row = self.append("details", {})
-			row.kunde = detail.kunde
-			row.gast = detail.gast
-			row.status = detail.status
-			row.apartment = detail.apartment
-			row.datum = detail.datum
-			row.nr = detail.nr
-			row.beschreibung = detail.description
-			row.chf = detail.item_betrag
+		self.total = total
 			
 	def details(self):
 		throw("changed")
