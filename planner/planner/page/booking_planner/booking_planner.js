@@ -109,16 +109,18 @@ frappe.booking_planner = {
     },
     run: function(page) {
 		// prepare form data
-        var now = new Date();
-		var day = now.getDate();
-		if (day < 10) {
-			day = "0" + day;
+        var now = new Date(2019, 8, 1);
+		if (now.getDay() != 1) {
+			if (now.getDay() != 0) {
+				now = frappe.datetime.add_days(now, -(now.getDay() - 1));
+			} else {
+				now = frappe.datetime.add_days(now, -6);
+			}
 		}
-		var month = now.getMonth() + 1;
-		if (month < 10) {
-			month = "0" + month;
-		}
-		document.getElementById("start_date").value = now.getFullYear() + "-" + month + "-" + day;
+		
+		document.getElementById("start_date").value = now;
+		
+		
 		//console.log(now.getFullYear() + "-" + month + "-" + day);
         selected_type = document.getElementById("filter_type").value;
 		//console.log(selected_type);

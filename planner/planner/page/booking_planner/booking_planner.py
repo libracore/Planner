@@ -84,7 +84,10 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 				
 			# sum_per_month = float(price_per_month) + float(service_price_per_month)
 			# sum_per_day = float(price_per_day) + float(service_price_per_day)
-			row_string += '<div class="apartment pos-{0}"{3} onclick="open_apartment({2})"><span>{1}</span></div>'.format(apartment_int, apartment, "'" + apartment + "'", apartment_color_style)
+			buchung_weit_in_zukunft = ''
+			if int(frappe.db.sql("""SELECT COUNT(`name`) FROM `tabBooking` WHERE `appartment` = '{0}' AND `start_date` >= '{1}'""".format(apartment, add_days(calStartDate, 60)), as_list=True)[0][0]) >= 1:
+				buchung_weit_in_zukunft = ' <i class="fa fa-exclamation-circle"></i>'
+			row_string += '<div class="apartment pos-{0}"{3} onclick="open_apartment({2})"><span>{1}{4}</span></div>'.format(apartment_int, apartment, "'" + apartment + "'", apartment_color_style, buchung_weit_in_zukunft)
 			row_string += '<div class="room pos-{0}"><span>{1}</span></div>'.format(apartment_int, apartment_size)
 			row_string += '<div class="position pos-{0}"><span>{1}</span></div>'.format(apartment_int, position)
 			row_string += '<div class="pricePM pos-{0}"><span>{1}</span></div>'.format(apartment_int, price_per_month)
@@ -622,6 +625,66 @@ def update_booking(apartment, end_date, start_date, booking_status, name, custom
 		if booking.booking_status == "Booked":
 			if booking.mv_terminated != mv_terminated:
 				update_booking = frappe.db.sql("""UPDATE `tabBooking` SET `mv_terminated` = '{mv_terminated}' WHERE `name` = '{booking}'""".format(mv_terminated=mv_terminated, booking=booking.name), as_list=True)
+				# block for creating autom. end-cleaning
+				year = int(end_date.split("-")[0])
+				month = int(end_date.split("-")[1])
+				day = int(end_date.split("-")[2])
+				weekday = int(datetime(year, month, day).weekday())
+				#throw(str(end))
+				if weekday == 0:
+					wd = "Mo"
+				elif weekday == 1:
+					wd = "Di"
+				elif weekday == 2:
+					wd = "Mi"
+				elif weekday == 3:
+					wd = "Do"
+				elif weekday == 4:
+					wd = "Fr"
+				elif weekday == 5:
+					wd = "Sa"
+				else:
+					wd = "So"
+					
+				default_cleaning_day = frappe.db.sql("""SELECT `cleaning_day` FROM `tabAppartment` WHERE `name` = '{0}'""".format(apartment), as_list=True)[0][0]
+				if wd == default_cleaning_day:
+					cleaning_date = end_date
+				else:
+					if default_cleaning_day == "Mo":
+						default_cleaning_day = 0
+					elif default_cleaning_day == "Di":
+						default_cleaning_day = 1
+					elif default_cleaning_day == "Mi":
+						default_cleaning_day = 2
+					elif default_cleaning_day == "Do":
+						default_cleaning_day = 3
+					elif default_cleaning_day == "Fr":
+						default_cleaning_day = 4
+					elif default_cleaning_day == "Sa":
+						default_cleaning_day = 5
+					elif default_cleaning_day == "So":
+						default_cleaning_day = 6
+						
+					default_diff = default_cleaning_day - weekday
+					if default_diff < 0:
+						cleaning_date = add_days(end_date, (7 + default_diff))
+					else:
+						cleaning_date = add_days(end_date, default_diff)
+			
+				end_cleaning = frappe.new_doc("Booking")
+
+				end_cleaning.update({
+					"appartment": apartment,
+					"end_date": cleaning_date,
+					"start_date": cleaning_date,
+					"booking_status": "End-Cleaning",
+					"customer": customer,
+					"is_checked": 0,
+					#'cleaning_team': cleaning_team,
+					'remark': remark
+				})
+				end_cleaning.insert(ignore_permissions=True)
+				frappe.db.commit()
 				return "Die Änderung des Kündigungsstatus wurde übernommen, alle anderen Änderungen müssen Sie manuell durchführen."
 			else:
 				return "Diese Änderung müssen Sie manuell durchführen."
