@@ -109,7 +109,7 @@ frappe.booking_planner = {
     },
     run: function(page) {
 		// prepare form data
-        var now = new Date(2019, 8, 1);
+        var now = new Date();
 		if (now.getDay() != 1) {
 			if (now.getDay() != 0) {
 				now = frappe.datetime.add_days(now, -(now.getDay() - 1));
@@ -117,8 +117,7 @@ frappe.booking_planner = {
 				now = frappe.datetime.add_days(now, -6);
 			}
 		}
-		
-		document.getElementById("start_date").value = now;
+		document.getElementById("start_date").value = frappe.datetime.add_days(now, 0);
 		
 		
 		//console.log(now.getFullYear() + "-" + month + "-" + day);
