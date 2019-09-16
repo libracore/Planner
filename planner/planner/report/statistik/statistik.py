@@ -251,7 +251,7 @@ def execute(filters=None):
 	if filters.ansicht == "Quartalsweise nach Haus":
 		houses = frappe.db.sql("""SELECT `name` FROM `tabHouse` WHERE `disabled` = 0 AND `parking` = 0 AND `disable_statistic` = 0""", as_dict=True)
 		total_anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `disabled` = 0 AND `parking` = 0 AND `disable_statistic` = 0""", as_list=True)[0][0]
-		chart_data = [0, 0, 0, 0]
+		chart_data = [0, 0, 0, 0, 0]
 		divident = 0
 		q1_days = (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-01-15")) + 1)
 		q2_days = (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-04-15")) + 1)
@@ -521,23 +521,34 @@ def execute(filters=None):
 					total_diff = 0.00
 			data.append([house.name, "Q1-Q4", round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
 			
-			chart_data[0] = chart_data[0] + float(master['q1']['tage'])
-			chart_data[1] = chart_data[1] + float(master['q2']['tage'])
-			chart_data[2] = chart_data[2] + float(master['q3']['tage'])
-			chart_data[3] = chart_data[3] + float(master['q4']['tage'])
+			# obsolete due commit ISS-00054
+			# chart_data[0] = chart_data[0] + float(master['q1']['tage'])
+			# chart_data[1] = chart_data[1] + float(master['q2']['tage'])
+			# chart_data[2] = chart_data[2] + float(master['q3']['tage'])
+			# chart_data[3] = chart_data[3] + float(master['q4']['tage'])
 			divident += 1
 			
-		chart_data[0] = float((float(100) / float(q1_max_days)) * float(chart_data[0]))
-		chart_data[1] = float((float(100) / float(q2_max_days)) * float(chart_data[1]))
-		chart_data[2] = float((float(100) / float(q3_max_days)) * float(chart_data[2]))
-		chart_data[3] = float((float(100) / float(q4_max_days)) * float(chart_data[3]))
+		# obsolete due commit ISS-00054
+		# chart_data[0] = float((float(100) / float(q1_max_days)) * float(chart_data[0]))
+		# chart_data[1] = float((float(100) / float(q2_max_days)) * float(chart_data[1]))
+		# chart_data[2] = float((float(100) / float(q3_max_days)) * float(chart_data[2]))
+		# chart_data[3] = float((float(100) / float(q4_max_days)) * float(chart_data[3]))
+		
+		# new calculation due commit ISS-00054
+		chart_q1, chart_q2, chart_q3, chart_q4 = get_percentage(year=False, quartal=True, curr_year=filters.year)
+		chart_data[0] = chart_q1
+		chart_data[1] = chart_q2
+		chart_data[2] = chart_q3
+		chart_data[3] = chart_q4
+		chart_data[4] = get_percentage(year=True, quartal=False, curr_year=filters.year)
+		
 		columns = ["Haus:Data:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in CHF:Currency:124", "Eff. verrechnet in CHF:Currency:129", "Differenz in %:Percentage:98"]
-		chart = get_quartal_chart_data(chart_data)
+		chart = get_quartal_chart_data(chart_data, filters.year)
 		return columns, data, None, chart
 		
 	if filters.ansicht == "Quartalsweise nach Wohnung":
 		wohnungen = frappe.db.sql("""SELECT `name` FROM `tabAppartment` WHERE `disabled` = 0 AND `parking` = 0 AND `disable_statistic` = 0""", as_dict=True)
-		chart_data = [0, 0, 0, 0]
+		chart_data = [0, 0, 0, 0, 0]
 		divident = 0
 		q1_days = (date_diff(get_last_day(filters.year + "-03-15"), get_first_day(filters.year + "-01-15")) + 1)
 		q2_days = (date_diff(get_last_day(filters.year + "-06-15"), get_first_day(filters.year + "-04-15")) + 1)
@@ -805,17 +816,27 @@ def execute(filters=None):
 					total_diff = 0.00
 			data.append([wohnung.name, "Q1-Q4", round(total_prozent, 2), round(total_einnahmen, 2), total_eff_einnahmen, round(total_diff, 2)])
 			
-			chart_data[0] = chart_data[0] + float(master['q1']['tage'])
-			chart_data[1] = chart_data[1] + float(master['q2']['tage'])
-			chart_data[2] = chart_data[2] + float(master['q3']['tage'])
-			chart_data[3] = chart_data[3] + float(master['q4']['tage'])
+			# obsolete due commit ISS-00054
+			# chart_data[0] = chart_data[0] + float(master['q1']['tage'])
+			# chart_data[1] = chart_data[1] + float(master['q2']['tage'])
+			# chart_data[2] = chart_data[2] + float(master['q3']['tage'])
+			# chart_data[3] = chart_data[3] + float(master['q4']['tage'])
 			divident += 1
 			
-		chart_data[0] = float((float(100) / float(q1_max_days)) * float(chart_data[0]))
-		chart_data[1] = float((float(100) / float(q2_max_days)) * float(chart_data[1]))
-		chart_data[2] = float((float(100) / float(q3_max_days)) * float(chart_data[2]))
-		chart_data[3] = float((float(100) / float(q4_max_days)) * float(chart_data[3]))
-		chart = get_quartal_chart_data(chart_data)
+		# obsolete due commit ISS-00054
+		# chart_data[0] = float((float(100) / float(q1_max_days)) * float(chart_data[0]))
+		# chart_data[1] = float((float(100) / float(q2_max_days)) * float(chart_data[1]))
+		# chart_data[2] = float((float(100) / float(q3_max_days)) * float(chart_data[2]))
+		# chart_data[3] = float((float(100) / float(q4_max_days)) * float(chart_data[3]))
+		
+		# new calculation due commit ISS-00054
+		chart_q1, chart_q2, chart_q3, chart_q4 = get_percentage(year=False, quartal=True, curr_year=filters.year)
+		chart_data[0] = chart_q1
+		chart_data[1] = chart_q2
+		chart_data[2] = chart_q3
+		chart_data[3] = chart_q4
+		chart_data[4] = get_percentage(year=True, quartal=False, curr_year=filters.year)
+		chart = get_quartal_chart_data(chart_data, filters.year)
 		columns = ["Wohnung:Link/Appartment:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in CHF:Currency:124", "Eff. verrechnet in CHF:Currency:129", "Differenz in %:Percentage:98"]
 		return columns, data, None, chart
 		
@@ -2118,12 +2139,12 @@ def execute(filters=None):
 		
 		
 		
-def get_quartal_chart_data(chart_data):
-	labels = ["Q1", "Q2", "Q3", "Q4"]
+def get_quartal_chart_data(chart_data, year):
+	labels = ["Q1", "Q2", "Q3", "Q4", "Total {year}".format(year=year)]
 	datasets = []
 	datasets.append({
 		'name': 'Belegung',
-		'values': [round(chart_data[0], 2), round(chart_data[1], 2), round(chart_data[2], 2), round(chart_data[3], 2)],
+		'values': [round(chart_data[0], 2), round(chart_data[1], 2), round(chart_data[2], 2), round(chart_data[3], 2), round(chart_data[4], 2)],
 		'chartType': 'bar'
 	})
 	chart = {
@@ -2132,7 +2153,7 @@ def get_quartal_chart_data(chart_data):
 			'datasets': datasets
 		}
 	}
-	chart["type"] = "axis-mixed"
+	chart["type"] = "bar"
 	chart["colors"] = ["#7cd6fd"]
 	chart["title"] = "Belegungs Übersicht in %"
 	chart["valuesOverPoints"] = 1
@@ -2156,3 +2177,228 @@ def get_month_chart_data(chart_data):
 	chart["title"] = "Belegungs Übersicht in %"
 	chart["valuesOverPoints"] = 1
 	return chart
+	
+def get_max_belegungstage(year=True, quartal=False, curr_year='2019'):
+	appartment_qty = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `disabled` = '0' AND `parking` = '0' AND `disable_statistic` = '0'""", as_list=True)[0][0] or 1
+	if year:
+		first_day = getdate(curr_year + "-01-01")
+		last_day = getdate(curr_year + "-12-31")
+		mbt_of_year = date_diff(last_day, first_day) + 1
+		mbt = mbt_of_year * appartment_qty
+		
+		return mbt
+		
+	if quartal:
+		q1_first_day = getdate(curr_year + "-01-01")
+		q1_last_day = get_last_day(getdate(curr_year + "-03-01"))
+		q1_mbt_of_year = date_diff(q1_last_day, q1_first_day) + 3
+		q1_mbt = q1_mbt_of_year * appartment_qty
+		
+		q2_first_day = getdate(curr_year + "-04-01")
+		q2_last_day = get_last_day(getdate(curr_year + "-06-01"))
+		q2_mbt_of_year = date_diff(q2_last_day, q2_first_day) + 1
+		q2_mbt = q2_mbt_of_year * appartment_qty
+		
+		q3_first_day = getdate(curr_year + "-07-01")
+		q3_last_day = get_last_day(getdate(curr_year + "-09-01"))
+		q3_mbt_of_year = date_diff(q3_last_day, q3_first_day) + 1
+		q3_mbt = q3_mbt_of_year * appartment_qty
+		
+		q4_first_day = getdate(curr_year + "-10-01")
+		q4_last_day = get_last_day(getdate(curr_year + "-12-01"))
+		q4_mbt_of_year = date_diff(q4_last_day, q4_first_day) + 1
+		q4_mbt = q4_mbt_of_year * appartment_qty
+		
+		return q1_mbt, q2_mbt, q3_mbt, q4_mbt
+		
+def get_effectiv_belegung(year=True, quartal=False, curr_year='2019'):
+	if year:
+		# case 1: start & end between 01.01.xx and 31.12.xx
+		# case 2: start between 01.01.xx and 31.12.xx & end > 31.12.xx
+		# case 3: start < 01.01.xx & end between 01.01.xx and 31.12.xx
+		# case 4: start < 01.01.xx & end > 31.12.xx
+		first_day = getdate(curr_year + "-01-01")
+		last_day = getdate(curr_year + "-12-31")
+		case_1_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` >= '{first_day}' AND `start_date` <= '{last_day}' AND `end_date` <= '{last_day}' AND `booking_status` = 'Booked'""".format(first_day=first_day, last_day=last_day), as_dict=True)
+		case_2_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` >= '{first_day}' AND `start_date` <= '{last_day}' AND `end_date` > '{last_day}' AND `booking_status` = 'Booked'""".format(first_day=first_day, last_day=last_day), as_dict=True)
+		case_3_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` < '{first_day}' AND `end_date` <= '{last_day}' AND `end_date` >= '{first_day}' AND `booking_status` = 'Booked'""".format(first_day=first_day, last_day=last_day), as_dict=True)
+		case_4_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` < '{first_day}' AND `end_date` > '{last_day}' AND `booking_status` = 'Booked'""".format(first_day=first_day, last_day=last_day), as_dict=True)
+		
+		days_case_1 = 0
+		days_case_2 = 0
+		days_case_3 = 0
+		days_case_4 = 0
+		
+		for booking in case_1_eff_belegung:
+			days_case_1 += date_diff(booking.end_date, booking.start_date) + 1
+		for booking in case_2_eff_belegung:
+			days_case_2 += date_diff(last_day, booking.start_date) + 1
+		for booking in case_3_eff_belegung:
+			days_case_3 += date_diff(booking.end_date, first_day) + 1
+		for booking in case_4_eff_belegung:
+			days_case_4 += date_diff(last_day, first_day) + 1
+		
+		return days_case_1 + days_case_2 + days_case_3 + days_case_4
+		
+	if quartal:
+		# Q1:
+		# case 1: start & end between 01.01.xx and 31.03.xx
+		# case 2: start between 01.01.xx and 31.03.xx & end > 31.03.xx
+		# case 3: start < 01.01.xx & end between 01.01.xx and 31.03.xx
+		# case 4: start < 01.01.xx & end > 31.03.xx
+		q1_first_day = getdate(curr_year + "-01-01")
+		q1_last_day = getdate(curr_year + "-03-31")
+		q1_case_1_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` >= '{q1_first_day}' AND `start_date` <= '{q1_last_day}' AND `end_date` <= '{q1_last_day}' AND `booking_status` = 'Booked'""".format(q1_first_day=q1_first_day, q1_last_day=q1_last_day), as_dict=True)
+		q1_case_2_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` >= '{q1_first_day}' AND `start_date` <= '{q1_last_day}' AND `end_date` > '{q1_last_day}' AND `booking_status` = 'Booked'""".format(q1_first_day=q1_first_day, q1_last_day=q1_last_day), as_dict=True)
+		q1_case_3_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` < '{q1_first_day}' AND `end_date` <= '{q1_last_day}' AND `end_date` >= '{q1_first_day}' AND `booking_status` = 'Booked'""".format(q1_first_day=q1_first_day, q1_last_day=q1_last_day), as_dict=True)
+		q1_case_4_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` < '{q1_first_day}' AND `end_date` > '{q1_last_day}' AND `booking_status` = 'Booked'""".format(q1_first_day=q1_first_day, q1_last_day=q1_last_day), as_dict=True)
+		
+		q1_days_case_1 = 0
+		q1_days_case_2 = 0
+		q1_days_case_3 = 0
+		q1_days_case_4 = 0
+		
+		# needed for debugging:
+		# print("Q1 Case 1:")
+		for booking in q1_case_1_eff_belegung:
+			# needed for debugging:
+			# print("start: " + str(booking.start_date) + ", ende: " + str(booking.end_date) + ", tage: " + str(date_diff(booking.end_date, booking.start_date) + 1))
+			q1_days_case_1 += date_diff(booking.end_date, booking.start_date) + 1
+		# needed for debugging:
+		# print("Q1 Case 2:")
+		for booking in q1_case_2_eff_belegung:
+			# needed for debugging:
+			# print("start: " + str(booking.start_date) + ", ende: " + str(q1_last_day) + ", tage: " + str(date_diff(q1_last_day, booking.start_date) + 1))
+			q1_days_case_2 += date_diff(q1_last_day, booking.start_date) + 1
+		# needed for debugging:
+		# print("Q1 Case 3:")
+		for booking in q1_case_3_eff_belegung:
+			# needed for debugging:
+			# print("start: " + str(q1_first_day) + ", ende: " + str(booking.end_date) + ", tage: " + str(date_diff(booking.end_date, q1_first_day) + 3))
+			q1_days_case_3 += date_diff(booking.end_date, q1_first_day) + 3
+		# needed for debugging:
+		# print("Q1 Case 4:")
+		for booking in q1_case_4_eff_belegung:
+			# needed for debugging:
+			# print("start: " + str(q1_first_day) + ", ende: " + str(q1_last_day) + ", tage: " + str(date_diff(q1_last_day, q1_first_day) + 3))
+			q1_days_case_4 += date_diff(q1_last_day, q1_first_day) + 3
+		
+		#print("days case 1: " + str(q1_days_case_1))
+		
+			
+		# Q2:
+		# case 1: start & end between 01.04.xx and 30.06.xx
+		# case 2: start between 01.04.xx and 30.06.xx & end > 30.06.xx
+		# case 3: start < 01.04.xx & end between 01.04.xx and 30.06.xx
+		# case 4: start < 01.04.xx & end > 30.06.xx
+		q2_first_day = getdate(curr_year + "-04-01")
+		q2_last_day = getdate(curr_year + "-06-30")
+		q2_case_1_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` >= '{q2_first_day}' AND `start_date` <= '{q2_last_day}' AND `end_date` <= '{q2_last_day}' AND `booking_status` = 'Booked'""".format(q2_first_day=q2_first_day, q2_last_day=q2_last_day), as_dict=True)
+		q2_case_2_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` >= '{q2_first_day}' AND `start_date` <= '{q2_last_day}' AND `end_date` > '{q2_last_day}' AND `booking_status` = 'Booked'""".format(q2_first_day=q2_first_day, q2_last_day=q2_last_day), as_dict=True)
+		q2_case_3_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` < '{q2_first_day}' AND `end_date` <= '{q2_last_day}' AND `end_date` >= '{q2_first_day}' AND `booking_status` = 'Booked'""".format(q2_first_day=q2_first_day, q2_last_day=q2_last_day), as_dict=True)
+		q2_case_4_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` < '{q2_first_day}' AND `end_date` > '{q2_last_day}' AND `booking_status` = 'Booked'""".format(q2_first_day=q2_first_day, q2_last_day=q2_last_day), as_dict=True)
+		
+		q2_days_case_1 = 0
+		q2_days_case_2 = 0
+		q2_days_case_3 = 0
+		q2_days_case_4 = 0
+		
+		for booking in q2_case_1_eff_belegung:
+			q2_days_case_1 += date_diff(booking.end_date, booking.start_date) + 1
+		for booking in q2_case_2_eff_belegung:
+			q2_days_case_2 += date_diff(q2_last_day, booking.start_date) + 1
+		for booking in q2_case_3_eff_belegung:
+			q2_days_case_3 += date_diff(booking.end_date, q2_first_day) + 1
+		for booking in q2_case_4_eff_belegung:
+			q2_days_case_4 += date_diff(q2_last_day, q2_first_day) + 1
+			
+		# Q3:
+		# case 1: start & end between 01.07.xx and 30.09.xx
+		# case 2: start between 01.07.xx and 30.09.xx & end > 30.09.xx
+		# case 3: start < 01.07.xx & end between 01.07.xx and 30.09.xx
+		# case 4: start < 01.07.xx & end > 30.09.xx
+		q3_first_day = getdate(curr_year + "-07-01")
+		q3_last_day = getdate(curr_year + "-09-30")
+		q3_case_1_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` >= '{q3_first_day}' AND `start_date` <= '{q3_last_day}' AND `end_date` <= '{q3_last_day}' AND `booking_status` = 'Booked'""".format(q3_first_day=q3_first_day, q3_last_day=q3_last_day), as_dict=True)
+		q3_case_2_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` >= '{q3_first_day}' AND `start_date` <= '{q3_last_day}' AND `end_date` > '{q3_last_day}' AND `booking_status` = 'Booked'""".format(q3_first_day=q3_first_day, q3_last_day=q3_last_day), as_dict=True)
+		q3_case_3_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` < '{q3_first_day}' AND `end_date` <= '{q3_last_day}' AND `end_date` >= '{q3_first_day}' AND `booking_status` = 'Booked'""".format(q3_first_day=q3_first_day, q3_last_day=q3_last_day), as_dict=True)
+		q3_case_4_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` < '{q3_first_day}' AND `end_date` > '{q3_last_day}' AND `booking_status` = 'Booked'""".format(q3_first_day=q3_first_day, q3_last_day=q3_last_day), as_dict=True)
+		
+		q3_days_case_1 = 0
+		q3_days_case_2 = 0
+		q3_days_case_3 = 0
+		q3_days_case_4 = 0
+		
+		for booking in q3_case_1_eff_belegung:
+			q3_days_case_1 += date_diff(booking.end_date, booking.start_date) + 1
+		for booking in q3_case_2_eff_belegung:
+			q3_days_case_2 += date_diff(q3_last_day, booking.start_date) + 1
+		for booking in q3_case_3_eff_belegung:
+			q3_days_case_3 += date_diff(booking.end_date, q3_first_day) + 1
+		for booking in q3_case_4_eff_belegung:
+			q3_days_case_4 += date_diff(q3_last_day, q3_first_day) + 1
+			
+		# Q4:
+		# case 1: start & end between 01.10.xx and 31.12.xx
+		# case 2: start between 01.10.xx and 31.12.xx & end > 31.12.xx
+		# case 3: start < 01.10.xx & end between 01.10.xx and 31.12.xx
+		# case 4: start < 01.10.xx & end > 31.12.xx
+		q4_first_day = getdate(curr_year + "-10-01")
+		q4_last_day = getdate(curr_year + "-12-31")
+		q4_case_1_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` >= '{q4_first_day}' AND `start_date` <= '{q4_last_day}' AND `end_date` <= '{q4_last_day}' AND `booking_status` = 'Booked'""".format(q4_first_day=q4_first_day, q4_last_day=q4_last_day), as_dict=True)
+		q4_case_2_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` >= '{q4_first_day}' AND `start_date` <= '{q4_last_day}' AND `end_date` > '{q4_last_day}' AND `booking_status` = 'Booked'""".format(q4_first_day=q4_first_day, q4_last_day=q4_last_day), as_dict=True)
+		q4_case_3_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` < '{q4_first_day}' AND `end_date` <= '{q4_last_day}' AND `end_date` >= '{q4_first_day}' AND `booking_status` = 'Booked'""".format(q4_first_day=q4_first_day, q4_last_day=q4_last_day), as_dict=True)
+		q4_case_4_eff_belegung = frappe.db.sql("""SELECT `start_date`, `end_date` FROM `tabBooking` WHERE `start_date` < '{q4_first_day}' AND `end_date` > '{q4_last_day}' AND `booking_status` = 'Booked'""".format(q4_first_day=q4_first_day, q4_last_day=q4_last_day), as_dict=True)
+		
+		q4_days_case_1 = 0
+		q4_days_case_2 = 0
+		q4_days_case_3 = 0
+		q4_days_case_4 = 0
+		
+		for booking in q4_case_1_eff_belegung:
+			q4_days_case_1 += date_diff(booking.end_date, booking.start_date) + 1
+		for booking in q4_case_2_eff_belegung:
+			q4_days_case_2 += date_diff(q4_last_day, booking.start_date) + 1
+		for booking in q4_case_3_eff_belegung:
+			q4_days_case_3 += date_diff(booking.end_date, q4_first_day) + 1
+		for booking in q4_case_4_eff_belegung:
+			q4_days_case_4 += date_diff(q4_last_day, q4_first_day) + 1
+			
+		total_days_q1 = q1_days_case_1 + q1_days_case_2 + q1_days_case_3 + q1_days_case_4
+		# needed for debugging:
+		# print("case 1: " + str(q1_days_case_1))
+		# print("case 2: " + str(q1_days_case_2))
+		# print("case 3: " + str(q1_days_case_3))
+		# print("case 4: " + str(q1_days_case_4))
+		# print("total: " + str(total_days_q1))
+		# /needed for debugging
+		total_days_q2 = q2_days_case_1 + q2_days_case_2 + q2_days_case_3 + q2_days_case_4
+		total_days_q3 = q3_days_case_1 + q3_days_case_2 + q3_days_case_3 + q3_days_case_4
+		total_days_q4 = q4_days_case_1 + q4_days_case_2 + q4_days_case_3 + q4_days_case_4
+		
+		return total_days_q1, total_days_q2, total_days_q3, total_days_q4
+		
+def get_percentage(year=True, quartal=False, curr_year='2019'):
+	if year:
+		return float(100.00 / get_max_belegungstage(year, quartal, curr_year)) * get_effectiv_belegung(year, quartal, curr_year)
+	if quartal:
+		_q1, _q2, _q3, _q4 = get_effectiv_belegung(year, quartal, curr_year)
+		q1 = float(100.00 / get_max_belegungstage(year, quartal, curr_year)[0]) * _q1
+		q2 = float(100.00 / get_max_belegungstage(year, quartal, curr_year)[1]) * _q2
+		q3 = float(100.00 / get_max_belegungstage(year, quartal, curr_year)[2]) * _q3
+		q4 = float(100.00 / get_max_belegungstage(year, quartal, curr_year)[3]) * _q4
+		# needed for debugging:
+		# print("Q1 max tage: " + str(get_max_belegungstage(year, quartal, curr_year)[0]))
+		# print("belegte tage: " + str(_q1))
+		# print("berechnet: " + str(q1))
+		# print("Q2 max tage: " + str(get_max_belegungstage(year, quartal, curr_year)[1]))
+		# print("belegte tage: " + str(_q2))
+		# print("berechnet: " + str(q2))
+		# print("Q3 max tage: " + str(get_max_belegungstage(year, quartal, curr_year)[2]))
+		# print("belegte tage: " + str(_q3))
+		# print("berechnet: " + str(q3))
+		# print("Q4 max tage: " + str(get_max_belegungstage(year, quartal, curr_year)[3]))
+		# print("belegte tage: " + str(_q4))
+		# print("berechnet: " + str(q4))
+		# /needed for debugging
+		return q1, q2, q3, q4
