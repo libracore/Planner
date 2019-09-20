@@ -1256,7 +1256,9 @@ def create_periodic_sinvs(order):
 			"apartment": order.apartment,
 			"customer": order.customer,
 			"booking": order.booking,
-			"due_date": _date
+			"due_date": _date,
+			"posting_date": _date,
+			"set_posting_time": 1
 		})
 
 		items_to_append = []
