@@ -1490,7 +1490,7 @@ def execute(filters=None):
 		return columns, data, None, chart
 		
 	if filters.ansicht == "Monatsweise nach Wohnung":
-		wohnungen = frappe.db.sql("""SELECT `name` FROM `tabAppartment` WHERE `disabled` = 0 AND `parking` = 0""", as_dict=True)
+		wohnungen = frappe.db.sql("""SELECT `name` FROM `tabAppartment` WHERE `disabled` = 0 AND `parking` = 0 AND `disable_statistic` = 0""", as_dict=True)
 		total_anzahl_whg = frappe.db.sql("""SELECT COUNT(`name`) FROM `tabAppartment` WHERE `disabled` = 0 AND `parking` = 0 AND `disable_statistic` = 0""", as_list=True)[0][0]
 		chart_data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		divident = 0

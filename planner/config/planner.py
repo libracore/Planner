@@ -75,9 +75,15 @@ def get_data():
 			"items": [
 				{
 					"type": "report",
-					"is_query_report": True,
-					"name": "Reinigungsplan",
-					"doctype": "Booking"
+					"doctype": "Booking",
+					"name": "Reinigunsplan",
+					"is_query_report": True
+				},
+				{
+					"type": "report",
+					"doctype": "Booking",
+					"name": "Statistik",
+					"is_query_report": True
 				}
 			]
 		}
