@@ -17,19 +17,28 @@ frappe.query_reports["Reinigunsplan"] = {
 			default: frappe.datetime.add_days(frappe.datetime.get_today(), 6)
 		}
 	],
-	"formatter":function (row, cell, value, columnDef, dataContext, default_formatter) {
-		value = default_formatter(row, cell, value, columnDef, dataContext);
-		if (columnDef.id == __("Task") && (dataContext["Task"] == "End-R" || dataContext["Task"] == "Sub-R")) {
-				value = "<span style='background-color:red!important;'>" + value + "</span>";
-		}
-		if (columnDef.id == __("Task") && dataContext["Task"] == "Control") {
-				value = "<span style='background-color:gray!important;'>" + value + "</span>";
-		}
-		if (dataContext["Name"] == "ALERT") {
-				value = "<span style='background-color:yellow!important;'>" + value + "</span>";
-		}
-		if (dataContext["Remark"] == ("KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!")) {
-				value = "<span style='background-color:orange!important;'>" + value + "</span>";
+	"formatter":function (value, row, column, data, default_formatter) {
+		value = default_formatter(value, row, column, data)
+		if (data["Name"] == "ALERT") {
+				value = $(`<span>${value}</span>`);
+				var $value = $(value).css("background-color", "yellow", "important");
+				value = $value.wrap("<p></p>").parent().html();
+				
+		} else if ((data["Task"] == "End-R")||(data["Task"] == "Sub-R")) {
+				value = $(`<span>${value}</span>`);
+				var $value = $(value).css("background-color", "red", "important");
+				value = $value.wrap("<p></p>").parent().html();
+				
+		} else if (data["Task"] == "Control") {
+				value = $(`<span>${value}</span>`);
+				var $value = $(value).css("background-color", "gray", "important");
+				value = $value.wrap("<p></p>").parent().html();
+				
+		} else if (data["Remark"] == "KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!") {
+				value = $(`<span>${value}</span>`);
+				var $value = $(value).css("background-color", "orange", "important");
+				value = $value.wrap("<p></p>").parent().html();
+				
 		}
 		return value;
 	}
