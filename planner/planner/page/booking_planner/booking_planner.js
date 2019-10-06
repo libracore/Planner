@@ -134,6 +134,7 @@ frappe.booking_planner = {
 		   callback: function(response) {
 				var houses = response.message;
 				if (houses) {
+					var i;
 					for (i=0; i < houses.length; i++) {
 						var filter_container = document.getElementById("filter_house");
 						var option = document.createElement("option");
@@ -263,8 +264,10 @@ frappe.booking_planner = {
 				console.log("ende: " + ende);
 				console.log("Defaults:");*/
 				//console.log(frappe['default_cleanings']);
+				var i;
 				for (i=1; i <= parseInt(ende); i++) {
 					if (frappe['default_cleanings'][i]) {
+						var y;
 						for (y=0; y < frappe['default_cleanings'][i].length; y++) {
 							
 							//console.log(frappe['default_cleanings'][i][y]);
