@@ -1,0 +1,38 @@
+{%
+	var report_columns = report.get_columns_for_print();
+%}
+<br><h1>Reinigungsplan ({%= frappe.datetime.str_to_user(filters.from_date) %} - {%= frappe.datetime.str_to_user(filters.to_date) %})</h1>
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			{% for(var i=0, l=report_columns.length; i<l; i++) { %}
+				<th class="text-center" style="padding-top: 100px;">{%= __(report_columns[i].label) %}</th>
+			{% } %}
+		</tr>
+	</thead>
+	<tbody>
+		{% for(var j=0, k=data.length-1; j<k; j++) { %}
+			{%
+				var row = data[j];
+				var style = '';
+				if (row["Task"] == "End-R") {
+					style = "background-color: red !important;";
+				} else if (row["Name"] == "ALERT") {
+					style = "background-color: yellow !important;";
+				} else if (row["Task"] == "Control") {
+					style = "background-color: gray !important;";
+				} else if (row["Remark"] == "KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!") {
+					style = "background-color: orange !important;";
+				}
+			%}
+			<tr style="{%= style %}">
+				{% for(var i=0, l=report_columns.length; i<l; i++) { %}
+					<td class="text-left" style="{%= style %}">
+						{% var fieldname = report_columns[i].fieldname; %}
+						{{ row[fieldname] }}
+					</td>
+				{% } %}
+			</tr>
+		{% } %}
+	</tbody>
+</table>
