@@ -33,7 +33,8 @@ frappe.booking_planner = {
 			}
         });
 		this.page.main.find("#transform-btn").on('click', function() {
-            frappe.booking_planner.transform_default_to_fixed();
+            //console.log("Trigger");
+			frappe.booking_planner.transform_default_to_fixed();
         });
 		this.page.main.find("#start_date").on('change', function() {
             // update view
@@ -246,6 +247,7 @@ frappe.booking_planner = {
         document.getElementById("myNav").style.display = "none";
     },
 	transform_default_to_fixed: function() {
+		//console.log("Funktion");
 		var d = new frappe.ui.Dialog({
 			title: __('Transform Default to Fixed Cleanings'),
 			fields: [
@@ -255,6 +257,7 @@ frappe.booking_planner = {
 				{fieldname: 'cleaning_team', fieldtype: 'Data', label:__('Cleaning Team')}*/
 			],
 			primary_action: function(){
+				//console.log("primary function");
 				d.hide();
 				frappe.booking_planner.start_wait();
 				//console.log(d.get_values());
@@ -288,8 +291,8 @@ frappe.booking_planner = {
 								async: false,
 								callback(r) {
 									//console.log(r.message);
-									if (r.message) {
-										//console.log("grösser");
+									if (r.message.length > 0) {
+										console.log("grösser");
 									} else {
 										frappe.call({
 											method: "planner.planner.page.booking_planner.booking_planner.create_booking",
