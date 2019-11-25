@@ -116,7 +116,7 @@ def execute(filters=None):
 				max_days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
 				belegung = float((float((float(100) / float(max_days))) * float(days)))
 				einnahmen = (float(x.price_per_month) / 100) * belegung
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND MONTH(`due_date`) = '{int_monat}' AND YEAR(`due_date`) = '{year}')""".format(year=filters.year, booking=x.name, int_monat=monat['int_monat']), as_list=True)[0][0]
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND MONTH(`due_date`) = '{int_monat}' AND YEAR(`due_date`) = '{year}')""".format(year=filters.year, booking=x.name, int_monat=monat['int_monat']), as_list=True)[0][0] or 0
 				if eff_verrechnet:
 					abweichung = float((float(100) / float(einnahmen)) * float(eff_verrechnet))
 					if abweichung > 100:
@@ -155,7 +155,7 @@ def execute(filters=None):
 				max_days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
 				belegung = float((float((float(100) / float(max_days))) * float(days)))
 				einnahmen = (float(x.price_per_month) / 100) * belegung
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND MONTH(`due_date`) = '{int_monat}' AND YEAR(`due_date`) = '{year}')""".format(year=filters.year, booking=x.name, int_monat=monat['int_monat']), as_list=True)[0][0]
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND MONTH(`due_date`) = '{int_monat}' AND YEAR(`due_date`) = '{year}')""".format(year=filters.year, booking=x.name, int_monat=monat['int_monat']), as_list=True)[0][0] or 0
 				if eff_verrechnet:
 					abweichung = float((float(100) / float(einnahmen)) * float(eff_verrechnet))
 					if abweichung > 100:
@@ -194,7 +194,7 @@ def execute(filters=None):
 				max_days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
 				belegung = float((float((float(100) / float(max_days))) * float(days)))
 				einnahmen = (float(x.price_per_month) / 100) * belegung
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND MONTH(`due_date`) = '{int_monat}' AND YEAR(`due_date`) = '{year}')""".format(year=filters.year, booking=x.name, int_monat=monat['int_monat']), as_list=True)[0][0]
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND MONTH(`due_date`) = '{int_monat}' AND YEAR(`due_date`) = '{year}')""".format(year=filters.year, booking=x.name, int_monat=monat['int_monat']), as_list=True)[0][0] or 0
 				if eff_verrechnet:
 					abweichung = float((float(100) / float(einnahmen)) * float(eff_verrechnet))
 					if abweichung > 100:
@@ -234,7 +234,7 @@ def execute(filters=None):
 											""".format(year=filters.year, int_monat=monat['int_monat']), as_dict=True)
 			for x in case_4_jan:
 				days = date_diff(get_last_day(filters.year + "-" + monat['string_monat'] + "-15"), get_first_day(filters.year + "-" + monat['string_monat'] + "-15")) + 1
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND MONTH(`due_date`) = '{int_monat}' AND YEAR(`due_date`) = '{year}')""".format(year=filters.year, booking=x.name, int_monat=monat['int_monat']), as_list=True)[0][0]
+				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND MONTH(`due_date`) = '{int_monat}' AND YEAR(`due_date`) = '{year}')""".format(year=filters.year, booking=x.name, int_monat=monat['int_monat']), as_list=True)[0][0] or 0
 				if eff_verrechnet:
 					abweichung = float((float(100) / float(x.price_per_month)) * float(eff_verrechnet))
 					if abweichung > 100:
@@ -433,7 +433,7 @@ def execute(filters=None):
 			q1_einnahmen = float(float(int(master['q1']['moegliche_einnahmen']) / 100) * q1_prozent)
 			q1_eff_verrechnet = 0.00
 			for y in master['q1']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '1' OR MONTH(`due_date`) = '2' OR MONTH(`due_date`) = '3'))""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '1' OR MONTH(`due_date`) = '2' OR MONTH(`due_date`) = '3'))""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					q1_eff_verrechnet = q1_eff_verrechnet + eff_verrechnet
 			if q1_einnahmen > 0:
@@ -452,7 +452,7 @@ def execute(filters=None):
 			q2_einnahmen = float(float(int(master['q2']['moegliche_einnahmen']) / 100) * q2_prozent)
 			q2_eff_verrechnet = 0.00
 			for y in master['q2']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '4' OR MONTH(`due_date`) = '5' OR MONTH(`due_date`) = '6'))""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '4' OR MONTH(`due_date`) = '5' OR MONTH(`due_date`) = '6'))""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					q2_eff_verrechnet = q2_eff_verrechnet + eff_verrechnet
 			if q2_einnahmen > 0:
@@ -471,7 +471,7 @@ def execute(filters=None):
 			q3_einnahmen = float(float(int(master['q3']['moegliche_einnahmen']) / 100) * q3_prozent)
 			q3_eff_verrechnet = 0.00
 			for y in master['q3']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '7' OR MONTH(`due_date`) = '8' OR MONTH(`due_date`) = '9'))""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '7' OR MONTH(`due_date`) = '8' OR MONTH(`due_date`) = '9'))""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					q3_eff_verrechnet = q3_eff_verrechnet + eff_verrechnet
 			if q3_einnahmen > 0:
@@ -490,7 +490,7 @@ def execute(filters=None):
 			q4_einnahmen = float(float(int(master['q4']['moegliche_einnahmen']) / 100) * q4_prozent)
 			q4_eff_verrechnet = 0.00
 			for y in master['q4']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '10' OR MONTH(`due_date`) = '11' OR MONTH(`due_date`) = '12'))""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '10' OR MONTH(`due_date`) = '11' OR MONTH(`due_date`) = '12'))""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					q4_eff_verrechnet = q4_eff_verrechnet + eff_verrechnet
 			if q4_einnahmen > 0:
@@ -544,6 +544,9 @@ def execute(filters=None):
 		
 		columns = ["Haus:Data:118", "Quartal:Data:54", "Belegung in %:Percentage:98", "Belegungsrate in CHF:Currency:124", "Eff. verrechnet in CHF:Currency:129", "Differenz in %:Percentage:98"]
 		chart = get_quartal_chart_data(chart_data, filters.year)
+		# frappe.log_error(columns, "log - columns")
+		# frappe.log_error(data, "log - data")
+		# frappe.log_error(chart, "log - chart")
 		return columns, data, None, chart
 		
 	if filters.ansicht == "Quartalsweise nach Wohnung":
@@ -728,7 +731,7 @@ def execute(filters=None):
 			q1_einnahmen = float(float(int(master['q1']['moegliche_einnahmen']) / 100) * q1_prozent)
 			q1_eff_verrechnet = 0.00
 			for y in master['q1']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '1' OR MONTH(`due_date`) = '2' OR MONTH(`due_date`) = '3'))""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '1' OR MONTH(`due_date`) = '2' OR MONTH(`due_date`) = '3'))""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					q1_eff_verrechnet = q1_eff_verrechnet + eff_verrechnet
 			if q1_einnahmen > 0:
@@ -747,7 +750,7 @@ def execute(filters=None):
 			q2_einnahmen = float(float(int(master['q2']['moegliche_einnahmen']) / 100) * q2_prozent)
 			q2_eff_verrechnet = 0.00
 			for y in master['q2']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '4' OR MONTH(`due_date`) = '5' OR MONTH(`due_date`) = '6'))""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '4' OR MONTH(`due_date`) = '5' OR MONTH(`due_date`) = '6'))""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					q2_eff_verrechnet = q2_eff_verrechnet + eff_verrechnet
 			if q2_einnahmen > 0:
@@ -766,7 +769,7 @@ def execute(filters=None):
 			q3_einnahmen = float(float(int(master['q3']['moegliche_einnahmen']) / 100) * q3_prozent)
 			q3_eff_verrechnet = 0.00
 			for y in master['q3']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '7' OR MONTH(`due_date`) = '8' OR MONTH(`due_date`) = '9'))""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '7' OR MONTH(`due_date`) = '8' OR MONTH(`due_date`) = '9'))""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					q3_eff_verrechnet = q3_eff_verrechnet + eff_verrechnet
 			if q3_einnahmen > 0:
@@ -785,7 +788,7 @@ def execute(filters=None):
 			q4_einnahmen = float(float(int(master['q4']['moegliche_einnahmen']) / 100) * q4_prozent)
 			q4_eff_verrechnet = 0.00
 			for y in master['q4']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '10' OR MONTH(`due_date`) = '11' OR MONTH(`due_date`) = '12'))""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND (MONTH(`due_date`) = '10' OR MONTH(`due_date`) = '11' OR MONTH(`due_date`) = '12'))""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					q4_eff_verrechnet = q4_eff_verrechnet + eff_verrechnet
 			if q4_einnahmen > 0:
@@ -1219,7 +1222,7 @@ def execute(filters=None):
 			jan_einnahmen = float(float(int(master['jan']['moegliche_einnahmen']) / 100) * jan_prozent)
 			jan_eff_verrechnet = 0.00
 			for y in master['jan']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '1')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '1')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					jan_eff_verrechnet = jan_eff_verrechnet + eff_verrechnet
 			if jan_einnahmen > 0:
@@ -1238,7 +1241,7 @@ def execute(filters=None):
 			feb_einnahmen = float(float(int(master['feb']['moegliche_einnahmen']) / 100) * feb_prozent)
 			feb_eff_verrechnet = 0.00
 			for y in master['feb']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '2')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '2')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					feb_eff_verrechnet = feb_eff_verrechnet + eff_verrechnet
 			if feb_einnahmen > 0:
@@ -1257,7 +1260,7 @@ def execute(filters=None):
 			mar_einnahmen = float(float(int(master['mar']['moegliche_einnahmen']) / 100) * mar_prozent)
 			mar_eff_verrechnet = 0.00
 			for y in master['mar']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '3')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '3')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					mar_eff_verrechnet = mar_eff_verrechnet + eff_verrechnet
 			if mar_einnahmen > 0:
@@ -1276,7 +1279,7 @@ def execute(filters=None):
 			apr_einnahmen = float(float(int(master['apr']['moegliche_einnahmen']) / 100) * apr_prozent)
 			apr_eff_verrechnet = 0.00
 			for y in master['apr']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '4')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '4')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					apr_eff_verrechnet = apr_eff_verrechnet + eff_verrechnet
 			if apr_einnahmen > 0:
@@ -1295,7 +1298,7 @@ def execute(filters=None):
 			mai_einnahmen = float(float(int(master['mai']['moegliche_einnahmen']) / 100) * mai_prozent)
 			mai_eff_verrechnet = 0.00
 			for y in master['mai']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '5')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '5')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					mai_eff_verrechnet = mai_eff_verrechnet + eff_verrechnet
 			if mai_einnahmen > 0:
@@ -1314,7 +1317,7 @@ def execute(filters=None):
 			jun_einnahmen = float(float(int(master['jun']['moegliche_einnahmen']) / 100) * jun_prozent)
 			jun_eff_verrechnet = 0.00
 			for y in master['jun']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '6')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '6')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					jun_eff_verrechnet = jun_eff_verrechnet + eff_verrechnet
 			if jun_einnahmen > 0:
@@ -1333,7 +1336,7 @@ def execute(filters=None):
 			jul_einnahmen = float(float(int(master['jul']['moegliche_einnahmen']) / 100) * jul_prozent)
 			jul_eff_verrechnet = 0.00
 			for y in master['jul']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '7')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '7')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					jul_eff_verrechnet = jul_eff_verrechnet + eff_verrechnet
 			if jul_einnahmen > 0:
@@ -1352,7 +1355,7 @@ def execute(filters=None):
 			aug_einnahmen = float(float(int(master['aug']['moegliche_einnahmen']) / 100) * aug_prozent)
 			aug_eff_verrechnet = 0.00
 			for y in master['aug']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '8')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '8')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					aug_eff_verrechnet = aug_eff_verrechnet + eff_verrechnet
 			if aug_einnahmen > 0:
@@ -1371,7 +1374,7 @@ def execute(filters=None):
 			sept_einnahmen = float(float(int(master['sept']['moegliche_einnahmen']) / 100) * sept_prozent)
 			sept_eff_verrechnet = 0.00
 			for y in master['sept']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '9')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '9')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					sept_eff_verrechnet = sept_eff_verrechnet + eff_verrechnet
 			if sept_einnahmen > 0:
@@ -1390,7 +1393,7 @@ def execute(filters=None):
 			okt_einnahmen = float(float(int(master['okt']['moegliche_einnahmen']) / 100) * okt_prozent)
 			okt_eff_verrechnet = 0.00
 			for y in master['okt']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '10')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '10')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					okt_eff_verrechnet = okt_eff_verrechnet + eff_verrechnet
 			if okt_einnahmen > 0:
@@ -1409,7 +1412,7 @@ def execute(filters=None):
 			nov_einnahmen = float(float(int(master['nov']['moegliche_einnahmen']) / 100) * nov_prozent)
 			nov_eff_verrechnet = 0.00
 			for y in master['nov']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '11')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '11')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					nov_eff_verrechnet = nov_eff_verrechnet + eff_verrechnet
 			if nov_einnahmen > 0:
@@ -1428,7 +1431,7 @@ def execute(filters=None):
 			dez_einnahmen = float(float(int(master['dez']['moegliche_einnahmen']) / 100) * dez_prozent)
 			dez_eff_verrechnet = 0.00
 			for y in master['dez']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '12')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '12')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					dez_eff_verrechnet = dez_eff_verrechnet + eff_verrechnet
 			if dez_einnahmen > 0:
@@ -1864,7 +1867,7 @@ def execute(filters=None):
 			jan_einnahmen = float(float(int(master['jan']['moegliche_einnahmen']) / 100) * jan_prozent)
 			jan_eff_verrechnet = 0.00
 			for y in master['jan']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '1')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '1')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					jan_eff_verrechnet = jan_eff_verrechnet + eff_verrechnet
 			if jan_einnahmen > 0:
@@ -1883,7 +1886,7 @@ def execute(filters=None):
 			feb_einnahmen = float(float(int(master['feb']['moegliche_einnahmen']) / 100) * feb_prozent)
 			feb_eff_verrechnet = 0.00
 			for y in master['feb']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '2')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '2')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					feb_eff_verrechnet = feb_eff_verrechnet + eff_verrechnet
 			if feb_einnahmen > 0:
@@ -1902,7 +1905,7 @@ def execute(filters=None):
 			mar_einnahmen = float(float(int(master['mar']['moegliche_einnahmen']) / 100) * mar_prozent)
 			mar_eff_verrechnet = 0.00
 			for y in master['mar']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '3')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '3')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					mar_eff_verrechnet = mar_eff_verrechnet + eff_verrechnet
 			if mar_einnahmen > 0:
@@ -1921,7 +1924,7 @@ def execute(filters=None):
 			apr_einnahmen = float(float(int(master['apr']['moegliche_einnahmen']) / 100) * apr_prozent)
 			apr_eff_verrechnet = 0.00
 			for y in master['apr']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '4')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '4')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					apr_eff_verrechnet = apr_eff_verrechnet + eff_verrechnet
 			if apr_einnahmen > 0:
@@ -1940,7 +1943,7 @@ def execute(filters=None):
 			mai_einnahmen = float(float(int(master['mai']['moegliche_einnahmen']) / 100) * mai_prozent)
 			mai_eff_verrechnet = 0.00
 			for y in master['mai']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '5')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '5')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					mai_eff_verrechnet = mai_eff_verrechnet + eff_verrechnet
 			if mai_einnahmen > 0:
@@ -1959,7 +1962,7 @@ def execute(filters=None):
 			jun_einnahmen = float(float(int(master['jun']['moegliche_einnahmen']) / 100) * jun_prozent)
 			jun_eff_verrechnet = 0.00
 			for y in master['jun']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '6')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '6')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					jun_eff_verrechnet = jun_eff_verrechnet + eff_verrechnet
 			if jun_einnahmen > 0:
@@ -1978,7 +1981,7 @@ def execute(filters=None):
 			jul_einnahmen = float(float(int(master['jul']['moegliche_einnahmen']) / 100) * jul_prozent)
 			jul_eff_verrechnet = 0.00
 			for y in master['jul']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '7')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '7')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					jul_eff_verrechnet = jul_eff_verrechnet + eff_verrechnet
 			if jul_einnahmen > 0:
@@ -1997,7 +2000,7 @@ def execute(filters=None):
 			aug_einnahmen = float(float(int(master['aug']['moegliche_einnahmen']) / 100) * aug_prozent)
 			aug_eff_verrechnet = 0.00
 			for y in master['aug']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '8')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '8')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					aug_eff_verrechnet = aug_eff_verrechnet + eff_verrechnet
 			if aug_einnahmen > 0:
@@ -2016,7 +2019,7 @@ def execute(filters=None):
 			sept_einnahmen = float(float(int(master['sept']['moegliche_einnahmen']) / 100) * sept_prozent)
 			sept_eff_verrechnet = 0.00
 			for y in master['sept']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '9')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '9')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					sept_eff_verrechnet = sept_eff_verrechnet + eff_verrechnet
 			if sept_einnahmen > 0:
@@ -2035,7 +2038,7 @@ def execute(filters=None):
 			okt_einnahmen = float(float(int(master['okt']['moegliche_einnahmen']) / 100) * okt_prozent)
 			okt_eff_verrechnet = 0.00
 			for y in master['okt']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '10')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '10')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					okt_eff_verrechnet = okt_eff_verrechnet + eff_verrechnet
 			if okt_einnahmen > 0:
@@ -2054,7 +2057,7 @@ def execute(filters=None):
 			nov_einnahmen = float(float(int(master['nov']['moegliche_einnahmen']) / 100) * nov_prozent)
 			nov_eff_verrechnet = 0.00
 			for y in master['nov']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '11')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '11')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					nov_eff_verrechnet = nov_eff_verrechnet + eff_verrechnet
 			if nov_einnahmen > 0:
@@ -2073,7 +2076,7 @@ def execute(filters=None):
 			dez_einnahmen = float(float(int(master['dez']['moegliche_einnahmen']) / 100) * dez_prozent)
 			dez_eff_verrechnet = 0.00
 			for y in master['dez']['buchungen']:
-				eff_verrechnet = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '12')""".format(booking=y, year=filters.year), as_list=True)[0][0]
+				eff_verrechnet = float(frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` LIKE 'Miete%' AND `parenttype` = 'Sales Invoice' AND `parentfield` = 'items' AND `parent` IN (SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{booking}' AND `docstatus` = 1 AND YEAR(`due_date`) = '{year}' AND MONTH(`due_date`) = '12')""".format(booking=y, year=filters.year), as_list=True)[0][0] or 0)
 				if eff_verrechnet > 0:
 					dez_eff_verrechnet = dez_eff_verrechnet + eff_verrechnet
 			if dez_einnahmen > 0:

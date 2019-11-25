@@ -181,8 +181,12 @@ def get_rows_for_div(calStartDate, house, from_price, to_price, from_size, to_si
 							# customer_name = u'{shortet}'.format(shortet=shortet)
 						if dauer < 2:
 							customer_name = customer_name[:6] + '...'
+						if s_start > 61:
+							s_start = 99
 						row_string += '<div class="buchung pos-{0} s{1} d{2} z{4} {3}" onclick="show_booking({5})">{6}</div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'", customer_name)
 					else:
+						if s_start > 61:
+							s_start = 99
 						row_string += '<div class="buchung pos-{0} s{1} d{2} z{4} {3}" onclick="show_booking({5})">{6}</div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'", _(bookingType))
 					z_index = 1
 			
@@ -312,6 +316,8 @@ def get_cleaning_rows_for_div(calStartDate, house, from_price, to_price, from_si
 				if dauer > 61:
 					dauer = 61
 				
+				if s_start > 61:
+					s_start = 99
 				row_string += '<div class="clean-buchung pos-{0} s{1} d{2} z{4} {3}" style="height: 36px !important; margin-top: 0px !important;{8}"{7}>{6}</div>'.format(apartment_int, s_start, dauer, color, z_index, "'" + booking + "'", _(bookingType), on_click_detail, cursor_style)
 			
 			
