@@ -15,22 +15,30 @@
 			{%
 				var row = data[j];
 				var style = '';
-				if (row["Task"] == "End-R") {
-					style = "background-color: red !important;";
-				} else if (row["Name"] == "ALERT") {
+				var tr_style = '';
+				if (row["Name"] == "ALERT") {
 					style = "background-color: yellow !important;";
+					tr_style = "background-color: yellow !important;";
+				} else if ((row["Task"] == "End-R")||(row["Task"] == "Sub-R")) {
+					style = "background-color: red !important;";
 				} else if (row["Task"] == "Control") {
 					style = "background-color: gray !important;";
 				} else if (row["Remark"] == "KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!") {
 					style = "background-color: orange !important;";
 				}
 			%}
-			<tr style="{%= style %}">
+			<tr>
 				{% for(var i=0, l=report_columns.length; i<l; i++) { %}
+					{% var fieldname = report_columns[i].fieldname; %}
+					{% if (row[fieldname] == "End-R")||(row[fieldname] == "Sub-R")||(row[fieldname] == "Control")||(row[fieldname] == "KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!") %}
 					<td class="text-left" style="{%= style %}">
-						{% var fieldname = report_columns[i].fieldname; %}
 						{{ row[fieldname] }}
 					</td>
+					{% else %}
+					<td class="text-left" style="{%= tr_style %}">
+						{{ row[fieldname] }}
+					</td>
+					{% endif %}
 				{% } %}
 			</tr>
 		{% } %}

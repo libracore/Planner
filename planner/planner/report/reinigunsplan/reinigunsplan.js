@@ -18,27 +18,27 @@ frappe.query_reports["Reinigunsplan"] = {
 		}
 	],
 	"formatter":function (value, row, column, data, default_formatter) {
-		value = default_formatter(value, row, column, data)
 		if (data["Name"] == "ALERT") {
-				value = $(`<span>${value}</span>`);
-				var $value = $(value).css("background-color", "yellow", "important");
-				value = $value.wrap("<p></p>").parent().html();
+			value = $(`<span>${value}</span>`);
+			var $value = $(value).css("background-color", "yellow", "important");
+			value = $value.wrap("<p></p>").parent().html();
 				
-		} else if ((data["Task"] == "End-R")||(data["Task"] == "Sub-R")) {
+		} else if (data["Remark"] == "KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!") {
+			value = $(`<span>${value}</span>`);
+			var $value = $(value).css("background-color", "orange", "important");
+			value = $value.wrap("<p></p>").parent().html();
+		} else {
+			if ((value == 'End-R')||(data["Task"] == "Sub-R")) {
 				value = $(`<span>${value}</span>`);
 				var $value = $(value).css("background-color", "red", "important");
 				value = $value.wrap("<p></p>").parent().html();
-				
-		} else if (data["Task"] == "Control") {
+			} else if ((value == 'Control')) {
 				value = $(`<span>${value}</span>`);
 				var $value = $(value).css("background-color", "gray", "important");
 				value = $value.wrap("<p></p>").parent().html();
-				
-		} else if (data["Remark"] == "KONFLIKT - Dieser MA arbeitet an diesem Tag nicht!") {
-				value = $(`<span>${value}</span>`);
-				var $value = $(value).css("background-color", "orange", "important");
-				value = $value.wrap("<p></p>").parent().html();
-				
+			} else {
+				value = default_formatter(value, row, column, data);
+			}
 		}
 		return value;
 	}
