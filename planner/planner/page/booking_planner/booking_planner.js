@@ -364,7 +364,7 @@ function new_booking(apartment, start_value) {
 				b_status = "Sub-Cleaning";
 			} else if (b_status == "Servicereinigung") {
 				b_status = "Service-Cleaning";
-			} else if (b_status == "Renorvation") {
+			} else if (b_status == "Renovation") {
 				b_status = "Renovation";
 			}else if (b_status == "Kontrollreinigung") {
 				b_status = "Control-Cleaning";
@@ -457,7 +457,7 @@ function new_cleaning_booking(apartment, start_value) {
 				b_status = "Sub-Cleaning";
 			} else if (b_status == "Servicereinigung") {
 				b_status = "Service-Cleaning";
-			} else if (b_status == "Renorvation") {
+			} else if (b_status == "Renovation") {
 				b_status = "Renovation";
 			}else if (b_status == "Kontrollreinigung") {
 				b_status = "Control-Cleaning";
@@ -535,7 +535,7 @@ function show_booking(_booking) {
 								b_status = "Sub-Cleaning";
 							} else if (b_status == "Servicereinigung") {
 								b_status = "Service-Cleaning";
-							} else if (b_status == "Renorvation") {
+							} else if (b_status == "Renovation") {
 								b_status = "Renovation";
 							} else if (b_status == "Kontrollreinigung") {
 								b_status = "Control-Cleaning";
@@ -624,7 +624,7 @@ function show_booking(_booking) {
 								b_status = "Sub-Cleaning";
 							} else if (b_status == "Servicereinigung") {
 								b_status = "Service-Cleaning";
-							} else if (b_status == "Renorvation") {
+							} else if (b_status == "Renovation") {
 								b_status = "Renovation";
 							} else if (b_status == "Kontrollreinigung") {
 								b_status = "Control-Cleaning";
@@ -735,7 +735,7 @@ function show_cleaning_booking(_booking) {
 								b_status = "Sub-Cleaning";
 							} else if (b_status == "Servicereinigung") {
 								b_status = "Service-Cleaning";
-							} else if (b_status == "Renorvation") {
+							} else if (b_status == "Renovation") {
 								b_status = "Renovation";
 							} else if (b_status == "Kontrollreinigung") {
 								b_status = "Control-Cleaning";
@@ -823,7 +823,7 @@ function show_cleaning_booking(_booking) {
 								b_status = "Sub-Cleaning";
 							} else if (b_status == "Servicereinigung") {
 								b_status = "Service-Cleaning";
-							} else if (b_status == "Renorvation") {
+							} else if (b_status == "Renovation") {
 								b_status = "Renovation";
 							} else if (b_status == "Kontrollreinigung") {
 								b_status = "Control-Cleaning";
