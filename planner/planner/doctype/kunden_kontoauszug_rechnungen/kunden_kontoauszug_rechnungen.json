@@ -1,0 +1,46 @@
+{
+ "creation": "2020-01-27 14:01:42.467386",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "rechnung",
+  "due_date",
+  "amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "rechnung",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Rechnung",
+   "options": "Sales Invoice",
+   "reqd": 1
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Zahlungsstichtag",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Betrag",
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-01-27 14:01:42.467386",
+ "modified_by": "Administrator",
+ "module": "Planner",
+ "name": "Kunden Kontoauszug Rechnungen",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

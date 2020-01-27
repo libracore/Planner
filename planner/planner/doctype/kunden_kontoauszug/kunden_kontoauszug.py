@@ -5,92 +5,50 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from frappe.utils.data import nowdate
 
 class KundenKontoauszug(Document):
-	def before_save(self):
-		self.details = []
-		# detail_daten = frappe.db.sql("""SELECT
-										# `invoice`.`customer_name` AS 'kunde',
-										# CASE
-											# WHEN `booking`.`diff_guest` IS NULL THEN `invoice`.`customer_name`
-											# ELSE `booking`.`diff_guest`
-										# END AS 'gast',
-										# `invoice`.`status`
-									# FROM (`tabSales Invoice` AS `invoice`
-									# INNER JOIN `tabBooking` AS `booking` ON `invoice`.`booking` = `booking`.`name`)
-									# WHERE `invoice`.`status` != 'Cancelled'
-									# AND `invoice`.`status` != 'Draft'
-									# AND `invoice`.`customer` = '{kunde}'
-									# ORDER BY `invoice`.`customer_name` ASC, `booking`.`diff_guest` ASC""".format(kunde=self.kunde), as_dict=True)
-									
-		detail_daten = frappe.db.sql("""SELECT
-										`invoice`.`customer_name` AS 'kunde',
-										`invoice`.`apartment` AS 'apartment',
-										`invoice`.`name` AS 'nr',
-										CASE
-											WHEN `booking`.`diff_guest` IS NULL THEN `invoice`.`customer_name`
-											ELSE `booking`.`diff_guest`
-										END AS 'gast',
-										`invoice`.`status`,
-										`item`.`description` AS 'description',
-										`item`.`amount` AS 'item_betrag',
-										`invoice`.`due_date` AS 'datum'
-									FROM ((`tabSales Invoice` AS `invoice`
-									INNER JOIN `tabBooking` AS `booking` ON `invoice`.`booking` = `booking`.`name`)
-									INNER JOIN `tabSales Invoice Item` AS `item` ON `invoice`.`name` = `item`.`parent`)
-									WHERE `invoice`.`status` != 'Cancelled'
-									AND `invoice`.`status` != 'Draft'
-									AND `invoice`.`customer` = '{kunde}'
-									ORDER BY `invoice`.`customer_name` ASC, `booking`.`diff_guest` ASC""".format(kunde=self.kunde), as_dict=True)
-									
-		control = []
-		mwst_control = []
-		total = 0
+	pass
 		
-		for detail in detail_daten:
-			if str(self.gast).lower() in str(detail.gast).lower():
-				if detail.status == 'Paid':
-					if not detail.nr in control:
-						control.append(detail.nr)
-						payments = frappe.db.sql("""SELECT `parent`, `allocated_amount`, `modified` FROM `tabPayment Entry Reference` WHERE `reference_name` = '{nr}'""".format(nr=detail.nr), as_dict=True)
-						for pay in payments:
-							row = self.append("details", {})
-							row.kunde = detail.kunde
-							row.gast = detail.gast
-							row.status = 'Zahlung'
-							row.apartment = detail.apartment
-							row.datum = pay.modified
-							row.nr = pay.parent
-							row.chf = pay.allocated_amount * -1
-							row.beschreibung = 'Zahlung für ' + detail.nr
-							total += pay.allocated_amount * -1
-							
-				if not detail.nr in mwst_control:
-					mwst_control.append(detail.nr)
-					sinv = frappe.get_doc("Sales Invoice", detail.nr)
-					row = self.append("details", {})
-					row.kunde = detail.kunde
-					row.gast = detail.gast
-					row.status = detail.status
-					row.apartment = detail.apartment
-					row.datum = detail.datum
-					row.nr = detail.nr
-					row.beschreibung = 'MwSt'
-					row.chf = sinv.total_taxes_and_charges
-					total += sinv.total_taxes_and_charges
-				
-				row = self.append("details", {})
-				row.kunde = detail.kunde
-				row.gast = detail.gast
-				row.status = detail.status
-				row.apartment = detail.apartment
-				row.datum = detail.datum
-				row.nr = detail.nr
-				row.beschreibung = detail.description
-				row.chf = detail.item_betrag
-				total += detail.item_betrag
-			
-		self.total = total
-			
-	def details(self):
-		throw("changed")
+@frappe.whitelist()
+def lade_daten(kunde=None, gast=None, datum=nowdate()):
+	if not kunde:
+		frappe.throw("Bitte wählen Sie mindestens einen Kunden aus.")
+		
+	rechnungen = []
+	zahlungen = []
+	gutschriften = []
+	buchungen = []
+	rueckzahlungen = []
+	
+	if gast:
+		buchungen = frappe.db.sql("""SELECT * FROM `tabBooking` WHERE ((`customer` = '{kunde}' AND `check_diff_invoice_partner` = 0) OR (`check_diff_invoice_partner` = 1 AND `diff_invoice_partner` = '{kunde}')) AND `start_date` <= '{datum}' AND `booking_status` = 'Booked' AND `diff_guest` = '{gast}' AND `check_diff_guest` = 1""".format(kunde=kunde, datum=datum, gast=gast), as_dict=True)
+	else:
+		buchungen = frappe.db.sql("""SELECT * FROM `tabBooking` WHERE ((`customer` = '{kunde}' AND `check_diff_invoice_partner` = 0) OR (`check_diff_invoice_partner` = 1 AND `diff_invoice_partner` = '{kunde}')) AND `start_date` <= '{datum}' AND `booking_status` = 'Booked'""".format(kunde=kunde, datum=datum), as_dict=True)
+	
+	for booking in buchungen:
+		_rechnungen = frappe.db.sql("""SELECT * FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `is_return` = 0 AND `due_date` <= '{datum}' ORDER BY `due_date`""".format(buchung=booking.name, datum=datum), as_dict=True)
+		_gutschriften = frappe.db.sql("""SELECT * FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `is_return` = 1 AND `posting_date` <= '{datum}' ORDER BY `posting_date`""".format(buchung=booking.name, datum=datum), as_dict=True)
+		for rech in _rechnungen:
+			rechnungen.append(rech)
+		for gut in _gutschriften:
+			gutschriften.append(gut)
+		
+	for rechnung in rechnungen:
+		_zahlungen = frappe.db.sql("""SELECT * FROM `tabPayment Entry Reference` WHERE `reference_doctype` = 'Sales Invoice' AND `reference_name` = '{rechnung}' AND `parent` IN (SELECT `name` FROM `tabPayment Entry` WHERE `docstatus` = 1 AND `payment_type` = 'Receive' AND `reference_date` <= '{datum}')""".format(rechnung=rechnung.name, datum=datum), as_dict=True)
+		_rueckzahlungen = frappe.db.sql("""SELECT * FROM `tabPayment Entry Reference` WHERE `reference_doctype` = 'Sales Invoice' AND `reference_name` = '{rechnung}' AND `parent` IN (SELECT `name` FROM `tabPayment Entry` WHERE `docstatus` = 1 AND `payment_type` = 'Pay' AND `reference_date` <= '{datum}')""".format(rechnung=rechnung.name, datum=datum), as_dict=True)
+		for zahl in _zahlungen:
+			zahlungen.append(zahl)
+		for rueck in _rueckzahlungen:
+			rueckzahlungen.append(rueck)
+	
+	
+	data = {
+			'buchungen': buchungen,
+			'rechnungen': rechnungen,
+			'zahlungen': zahlungen,
+			'gutschriften': gutschriften,
+			'rueckzahlungen': rueckzahlungen
+		}
+		
+	return data
