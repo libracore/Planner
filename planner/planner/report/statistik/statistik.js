@@ -11,11 +11,11 @@ frappe.query_reports["Statistik"] = {
 			"default": String((new Date()).getFullYear())
 		},
 		{
-			"fieldname": "ansicht",
-			"label": __("Ansicht"),
+			"fieldname": "diagram",
+			"label": __("Diagram Typ"),
 			"fieldtype": "Select",
-			"options": ["Detailiert", "Quartalsweise nach Haus", "Quartalsweise nach Wohnung", "Monatsweise nach Haus", "Monatsweise nach Wohnung"],
-			"default": "Detailiert"
+			"options": ["Quartalsweise", "Monatsweise"],
+			"default": "Quartalsweise"
 		}
 	]
 }
