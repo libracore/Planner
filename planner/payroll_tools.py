@@ -19,14 +19,45 @@ def get_total_working_hours(employee, start_date, end_date):
 	return twh
 	
 @frappe.whitelist()
-def korrektur_ma_stamm(employee, typ, ggz, fgz):
+def korrektur_ma_stamm(employee=None, typ=None, ggz=None, fgz=None, payroll=None):
+	# korrektur aus "zuordnung der gehaltsstruktur"
 	if typ == 'Monatslohn':
 		frappe.db.sql("""UPDATE `tabEmployee` SET `zusatz_monatslohn` = '{ggz}' WHERE `name` = '{employee}'""".format(ggz=ggz, employee=employee), as_list=True)
 	if typ == 'Stundenlohn':
 		frappe.db.sql("""UPDATE `tabEmployee` SET `zusatz_monatslohn` = '{ggz}', `saldo_ferien_lohn` = '{fgz}' WHERE `name` = '{employee}'""".format(ggz=ggz, fgz=fgz, employee=employee), as_list=True)
+	
+	# korrektur aus "personalabrechnung"
+	if typ == 'Personalabrechnung Monatslohn':
+		payroll = frappe.get_doc("Payroll Entry", payroll)
+		for ma in payroll.employees:
+			employee = frappe.get_doc("Employee", ma.employee)
+			_gueltige_zuweisung = get_gueltige_zuweisung(ma.employee, payroll.start_date)
+			gueltige_zuweisung = frappe.get_doc("Salary Structure Assignment", _gueltige_zuweisung)
+			korrektur = gueltige_zuweisung.base / 12
+			aktueller_stand = employee.zusatz_monatslohn
+			neuer_wert = aktueller_stand + korrektur
+			frappe.db.sql("""UPDATE `tabEmployee` SET `zusatz_monatslohn` = '{neuer_wert}' WHERE `name` = '{employee}'""".format(neuer_wert=neuer_wert, employee=employee.name), as_list=True)
+	if typ == 'Personalabrechnung Stundenlohn':
+		payroll = frappe.get_doc("Payroll Entry", payroll)
+		for ma in payroll.employees:
+			employee = frappe.get_doc("Employee", ma.employee)
+			_gueltige_zuweisung = get_gueltige_zuweisung(ma.employee, payroll.start_date)
+			gueltige_zuweisung = frappe.get_doc("Salary Structure Assignment", _gueltige_zuweisung)
+			anz_std = get_total_working_hours(employee.name, payroll.start_date, payroll.end_date)
+			
+			korrektur_ggz = ((gueltige_zuweisung.base / (100 + gueltige_zuweisung.gzg + gueltige_zuweisung.fzg)) * gueltige_zuweisung.gzg) * anz_std
+			aktueller_stand_ggz = employee.zusatz_monatslohn
+			neuer_wert_ggz = aktueller_stand_ggz + korrektur_ggz
+			frappe.db.sql("""UPDATE `tabEmployee` SET `zusatz_monatslohn` = '{neuer_wert_ggz}' WHERE `name` = '{employee}'""".format(neuer_wert_ggz=neuer_wert_ggz, employee=employee.name), as_list=True)
+			
+			korrektur_fgz = ((gueltige_zuweisung.base / (100 + gueltige_zuweisung.gzg + gueltige_zuweisung.fzg)) * gueltige_zuweisung.fzg) * anz_std
+			aktueller_stand_fgz = employee.saldo_ferien_lohn
+			neuer_wert_fgz = aktueller_stand_fgz + korrektur_fgz
+			frappe.db.sql("""UPDATE `tabEmployee` SET `saldo_ferien_lohn` = '{neuer_wert_fgz}' WHERE `name` = '{employee}'""".format(neuer_wert_fgz=neuer_wert_fgz, employee=employee.name), as_list=True)
 
-
-
+def get_gueltige_zuweisung(ma, datum):
+	gueltige_zuweisung = frappe.db.sql("""SELECT `name` FROM `tabSalary Structure Assignment` WHERE `employee` = '{ma}' AND `from_date` <= '{datum}' AND `docstatus` = 1 ORDER BY `from_date` DESC LIMIT 1""".format(ma=ma, datum=datum), as_list=True)[0][0]
+	return gueltige_zuweisung
 
 
 
