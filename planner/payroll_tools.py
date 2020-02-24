@@ -7,6 +7,28 @@ import frappe
 from erpnext.hr.doctype.leave_application.leave_application import get_leave_balance_on
 import json
 
+
+@frappe.whitelist()
+def get_total_working_hours(employee, start_date, end_date):
+	timesheets = frappe.db.sql(""" select * from `tabTimesheet` where employee = %(employee)s and start_date BETWEEN %(start_date)s AND %(end_date)s and (status = 'Submitted' or
+				status = 'Billed')""", {'employee': employee, 'start_date': start_date, 'end_date': end_date}, as_dict=1)
+	twh = 0
+	for data in timesheets:
+		twh += data.total_hours
+		
+	return twh
+
+
+
+
+
+
+
+
+
+
+
+
 @frappe.whitelist()
 def get_sal_slip_list(start_date, end_date, ss_status=0, as_dict=True):
 	"""
