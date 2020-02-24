@@ -17,6 +17,13 @@ def get_total_working_hours(employee, start_date, end_date):
 		twh += data.total_hours
 		
 	return twh
+	
+@frappe.whitelist()
+def korrektur_ma_stamm(employee, typ, ggz, fgz):
+	if typ == 'Monatslohn':
+		frappe.db.sql("""UPDATE `tabEmployee` SET `zusatz_monatslohn` = '{ggz}' WHERE `name` = '{employee}'""".format(ggz=ggz, employee=employee), as_list=True)
+	if typ == 'Stundenlohn':
+		frappe.db.sql("""UPDATE `tabEmployee` SET `zusatz_monatslohn` = '{ggz}', `saldo_ferien_lohn` = '{fgz}' WHERE `name` = '{employee}'""".format(ggz=ggz, fgz=fgz, employee=employee), as_list=True)
 
 
 
