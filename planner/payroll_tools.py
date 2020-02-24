@@ -43,7 +43,7 @@ def korrektur_ma_stamm(employee=None, typ=None, ggz=None, fgz=None, payroll=None
 			employee = frappe.get_doc("Employee", ma.employee)
 			_gueltige_zuweisung = get_gueltige_zuweisung(ma.employee, payroll.start_date)
 			gueltige_zuweisung = frappe.get_doc("Salary Structure Assignment", _gueltige_zuweisung)
-			anz_std = get_total_working_hours(employee.name, payroll.start_date, payroll.end_date)
+			anz_std = get_total_std_von_sal_slip(ma.employee, payroll.name)
 			
 			korrektur_ggz = ((gueltige_zuweisung.base / (100 + gueltige_zuweisung.gzg + gueltige_zuweisung.fzg)) * gueltige_zuweisung.gzg) * anz_std
 			aktueller_stand_ggz = employee.zusatz_monatslohn
@@ -59,7 +59,9 @@ def get_gueltige_zuweisung(ma, datum):
 	gueltige_zuweisung = frappe.db.sql("""SELECT `name` FROM `tabSalary Structure Assignment` WHERE `employee` = '{ma}' AND `from_date` <= '{datum}' AND `docstatus` = 1 ORDER BY `from_date` DESC LIMIT 1""".format(ma=ma, datum=datum), as_list=True)[0][0]
 	return gueltige_zuweisung
 
-
+def get_total_std_von_sal_slip(ma, payroll):
+	std = frappe.db.sql("""SELECT `total_working_hours` FROM `tabSalary Slip` WHERE `employee` = '{ma}' AND `payroll_entry` = '{payroll}' AND `docstatus` = 1""".format(ma=ma, payroll=payroll), as_list=True)[0][0]
+	return std
 
 
 
