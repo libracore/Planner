@@ -15,13 +15,24 @@ frappe.ui.form.on('Kunden Kontoauszug', {
 			lade_daten(frm);
 		});
 		
-		// druckformat muss noch erstellt werden....
-		/* cur_frm.page.add_action_icon(__("fa fa-print"), function() {
+		cur_frm.page.add_action_icon(__("fa fa-print"), function() {
         	var w = window.open("/api/method/frappe.utils.print_format.download_pdf?doctype=Kunden%20Kontoauszug&name=" + cur_frm.doc.name + "&format=Kunden%20Kontoauszug&no_letterhead=0&_lang=de");
         	if(!w) {
         		frappe.msgprint(__("Please enable pop-ups")); return;
         	}
-        }); */
+        });
+	},
+	rechnungen_print_hide: function(frm) {
+		cur_frm.save();
+	},
+	gutschriften_print_hide: function(frm) {
+		cur_frm.save();
+	},
+	zahlungen_print_hide: function(frm) {
+		cur_frm.save();
+	},
+	rueckzahlungen_print_hide: function(frm) {
+		cur_frm.save();
 	}
 });
 
