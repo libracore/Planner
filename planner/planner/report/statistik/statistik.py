@@ -8,7 +8,7 @@ from frappe.utils.data import getdate, get_last_day, date_diff, get_first_day
 import datetime
 
 def execute(filters=None):
-	columns, data = ['Quartal', 'Monat', 'Haus', 'Wohnung', 'Miete/Mt', 'Verfügbare Tage', 'Vermietete Tage', 'Belegungsrate in %'], []
+	columns, data = ['Quartal', 'Monat', 'Haus', 'Wohnung', 'Miete/Mt', 'Verfügbare Tage', 'Vermietete Tage', 'Belegungsrate in %', 'Effektiv verrechnet in CHF'], []
 	alle_wohnungen = frappe.db.sql("""SELECT `house`, `name`, `price_per_month` FROM `tabAppartment` WHERE `disable_statistic` = 0 AND `disabled` = 0 ORDER BY `house`, `name` ASC""", as_list=True)
 	max_jan = max_tage(filters.year, '01')
 	max_feb = max_tage(filters.year, '02')
@@ -28,6 +28,7 @@ def execute(filters=None):
 		max = max_jan
 		belegt = get_vermietete_tage(filters.year, '01', wohnung[1])
 		rate = (100 / max) * belegt
+		verrechnet = get_effektive_verrechnung(filters.year, '01', wohnung[1])
 		_data.append('Q1')
 		_data.append('Jan')
 		_data.append(wohnung[0])
@@ -36,12 +37,14 @@ def execute(filters=None):
 		_data.append(max)
 		_data.append(belegt)
 		_data.append(round(rate, 2))
+		_data.append(verrechnet)
 		data.append(_data)
 		#Februar
 		_data = []
 		max = max_feb
 		belegt = get_vermietete_tage(filters.year, '02', wohnung[1])
 		rate = (100 / max) * belegt
+		verrechnet = get_effektive_verrechnung(filters.year, '02', wohnung[1])
 		_data.append('Q1')
 		_data.append('Feb')
 		_data.append(wohnung[0])
@@ -50,12 +53,14 @@ def execute(filters=None):
 		_data.append(max)
 		_data.append(belegt)
 		_data.append(round(rate, 2))
+		_data.append(verrechnet)
 		data.append(_data)
 		#März
 		_data = []
 		max = max_mar
 		belegt = get_vermietete_tage(filters.year, '03', wohnung[1])
 		rate = (100 / max) * belegt
+		verrechnet = get_effektive_verrechnung(filters.year, '03', wohnung[1])
 		_data.append('Q1')
 		_data.append('Mar')
 		_data.append(wohnung[0])
@@ -64,12 +69,14 @@ def execute(filters=None):
 		_data.append(max)
 		_data.append(belegt)
 		_data.append(round(rate, 2))
+		_data.append(verrechnet)
 		data.append(_data)
 		#April
 		_data = []
 		max = max_apr
 		belegt = get_vermietete_tage(filters.year, '04', wohnung[1])
 		rate = (100 / max) * belegt
+		verrechnet = get_effektive_verrechnung(filters.year, '04', wohnung[1])
 		_data.append('Q2')
 		_data.append('Apr')
 		_data.append(wohnung[0])
@@ -78,12 +85,14 @@ def execute(filters=None):
 		_data.append(max)
 		_data.append(belegt)
 		_data.append(round(rate, 2))
+		_data.append(verrechnet)
 		data.append(_data)
 		#Mai
 		_data = []
 		max = max_mai
 		belegt = get_vermietete_tage(filters.year, '05', wohnung[1])
 		rate = (100 / max) * belegt
+		verrechnet = get_effektive_verrechnung(filters.year, '05', wohnung[1])
 		_data.append('Q2')
 		_data.append('Mai')
 		_data.append(wohnung[0])
@@ -92,12 +101,14 @@ def execute(filters=None):
 		_data.append(max)
 		_data.append(belegt)
 		_data.append(round(rate, 2))
+		_data.append(verrechnet)
 		data.append(_data)
 		#Juni
 		_data = []
 		max = max_jun
 		belegt = get_vermietete_tage(filters.year, '06', wohnung[1])
 		rate = (100 / max) * belegt
+		verrechnet = get_effektive_verrechnung(filters.year, '06', wohnung[1])
 		_data.append('Q2')
 		_data.append('Jun')
 		_data.append(wohnung[0])
@@ -106,12 +117,14 @@ def execute(filters=None):
 		_data.append(max)
 		_data.append(belegt)
 		_data.append(round(rate, 2))
+		_data.append(verrechnet)
 		data.append(_data)
 		#Juli
 		_data = []
 		max = max_jul
 		belegt = get_vermietete_tage(filters.year, '07', wohnung[1])
 		rate = (100 / max) * belegt
+		verrechnet = get_effektive_verrechnung(filters.year, '07', wohnung[1])
 		_data.append('Q3')
 		_data.append('Jul')
 		_data.append(wohnung[0])
@@ -120,12 +133,14 @@ def execute(filters=None):
 		_data.append(max)
 		_data.append(belegt)
 		_data.append(round(rate, 2))
+		_data.append(verrechnet)
 		data.append(_data)
 		#August
 		_data = []
 		max = max_aug
 		belegt = get_vermietete_tage(filters.year, '08', wohnung[1])
 		rate = (100 / max) * belegt
+		verrechnet = get_effektive_verrechnung(filters.year, '08', wohnung[1])
 		_data.append('Q3')
 		_data.append('Aug')
 		_data.append(wohnung[0])
@@ -134,12 +149,14 @@ def execute(filters=None):
 		_data.append(max)
 		_data.append(belegt)
 		_data.append(round(rate, 2))
+		_data.append(verrechnet)
 		data.append(_data)
 		#September
 		_data = []
 		max = max_sept
 		belegt = get_vermietete_tage(filters.year, '09', wohnung[1])
 		rate = (100 / max) * belegt
+		verrechnet = get_effektive_verrechnung(filters.year, '09', wohnung[1])
 		_data.append('Q3')
 		_data.append('Sept')
 		_data.append(wohnung[0])
@@ -148,12 +165,14 @@ def execute(filters=None):
 		_data.append(max)
 		_data.append(belegt)
 		_data.append(round(rate, 2))
+		_data.append(verrechnet)
 		data.append(_data)
 		#Oktober
 		_data = []
 		max = max_okt
 		belegt = get_vermietete_tage(filters.year, '10', wohnung[1])
 		rate = (100 / max) * belegt
+		verrechnet = get_effektive_verrechnung(filters.year, '10', wohnung[1])
 		_data.append('Q4')
 		_data.append('Okt')
 		_data.append(wohnung[0])
@@ -162,12 +181,14 @@ def execute(filters=None):
 		_data.append(max)
 		_data.append(belegt)
 		_data.append(round(rate, 2))
+		_data.append(verrechnet)
 		data.append(_data)
 		#November
 		_data = []
 		max = max_nov
 		belegt = get_vermietete_tage(filters.year, '11', wohnung[1])
 		rate = (100 / max) * belegt
+		verrechnet = get_effektive_verrechnung(filters.year, '11', wohnung[1])
 		_data.append('Q4')
 		_data.append('Nov')
 		_data.append(wohnung[0])
@@ -176,12 +197,14 @@ def execute(filters=None):
 		_data.append(max)
 		_data.append(belegt)
 		_data.append(round(rate, 2))
+		_data.append(verrechnet)
 		data.append(_data)
 		#Dezember
 		_data = []
 		max = max_dez
 		belegt = get_vermietete_tage(filters.year, '12', wohnung[1])
 		rate = (100 / max) * belegt
+		verrechnet = get_effektive_verrechnung(filters.year, '12', wohnung[1])
 		_data.append('Q4')
 		_data.append('Dez')
 		_data.append(wohnung[0])
@@ -190,6 +213,7 @@ def execute(filters=None):
 		_data.append(max)
 		_data.append(belegt)
 		_data.append(round(rate, 2))
+		_data.append(verrechnet)
 		data.append(_data)
 		
 	if filters.diagram == 'Quartalsweise':
@@ -370,3 +394,35 @@ def get_month_chart_data(chart_data, year):
 	chart["title"] = "Belegungs Übersicht in %"
 	chart["valuesOverPoints"] = 1
 	return chart
+	
+def get_effektive_verrechnung(jahr, monat, wohnung):
+	effektiv_verrechnet = 0.00
+	#case 1: start & ende innerhalb des monats
+	c1_buchungen = frappe.db.sql("""SELECT `name` FROM `tabBooking` WHERE `booking_status` = 'Booked' AND `appartment` = '{wohnung}' AND `start_date` >= '{start}' AND `end_date` <= '{ende}'""".format(wohnung=wohnung, start=get_first_day(jahr + "-" + monat + "-15"), ende=get_last_day(jahr + "-" + monat + "-15")), as_dict=True)
+	for buchung in c1_buchungen:
+		totalbetrag = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `posting_date` >= '{monats_erster}' AND `posting_date` <= '{monats_letzter}'""".format(buchung=buchung.name, monats_erster=get_first_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15")), as_list=True)[0][0]
+		if totalbetrag:
+			effektiv_verrechnet += float(totalbetrag)
+			
+	#case 2: start < monat & ende innerhalb des monats
+	c2_buchungen = frappe.db.sql("""SELECT `name` FROM `tabBooking` WHERE `booking_status` = 'Booked' AND `appartment` = '{wohnung}' AND `start_date` < '{start}' AND `end_date` <= '{ende}' AND `end_date` >= '{monats_erster}'""".format(wohnung=wohnung, start=get_first_day(jahr + "-" + monat + "-15"), monats_erster=get_first_day(jahr + "-" + monat + "-15"), ende=get_last_day(jahr + "-" + monat + "-15")), as_dict=True)
+	for buchung in c2_buchungen:
+		totalbetrag = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `posting_date` >= '{monats_erster}' AND `posting_date` <= '{monats_letzter}'""".format(buchung=buchung.name, monats_erster=get_first_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15")), as_list=True)[0][0]
+		if totalbetrag:
+			effektiv_verrechnet += float(totalbetrag)
+	
+	#case 3: start innerhalb des monats & ende > monat
+	c3_buchungen = frappe.db.sql("""SELECT `name` FROM `tabBooking` WHERE `booking_status` = 'Booked' AND `appartment` = '{wohnung}' AND `start_date` >= '{start}' AND `end_date` > '{ende}' AND `start_date` <= '{monats_letzter}'""".format(wohnung=wohnung, start=get_first_day(jahr + "-" + monat + "-15"), ende=get_last_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15")), as_dict=True)
+	for buchung in c3_buchungen:
+		totalbetrag = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `posting_date` >= '{monats_erster}' AND `posting_date` <= '{monats_letzter}'""".format(buchung=buchung.name, monats_erster=get_first_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15")), as_list=True)[0][0]
+		if totalbetrag:
+			effektiv_verrechnet += float(totalbetrag)
+	
+	#case 4: start < monat & ende > monat
+	c4_buchungen = frappe.db.sql("""SELECT `name` FROM `tabBooking` WHERE `booking_status` = 'Booked' AND `appartment` = '{wohnung}' AND `start_date` < '{start}' AND `end_date` > '{ende}'""".format(wohnung=wohnung, start=get_first_day(jahr + "-" + monat + "-15"), ende=get_last_day(jahr + "-" + monat + "-15")), as_dict=True)
+	for buchung in c4_buchungen:
+		totalbetrag = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `posting_date` >= '{monats_erster}' AND `posting_date` <= '{monats_letzter}'""".format(buchung=buchung.name, monats_erster=get_first_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15")), as_list=True)[0][0]
+		if totalbetrag:
+			effektiv_verrechnet += float(totalbetrag)
+	
+	return effektiv_verrechnet
