@@ -33,6 +33,9 @@ frappe.ui.form.on('Kunden Kontoauszug', {
 	},
 	rueckzahlungen_print_hide: function(frm) {
 		cur_frm.save();
+	},
+	total: function(frm) {
+		cur_frm.save();
 	}
 });
 
@@ -111,7 +114,8 @@ function lade_daten(frm) {
 					for (i=0; i < zahlungen.length; i++) {
 						var child = cur_frm.add_child('zahlungen');
 						frappe.model.set_value(child.doctype, child.name, 'zahlung', zahlungen[i].parent);
-						frappe.model.set_value(child.doctype, child.name, 'posting_date', zahlungen[i].due_date);
+						//frappe.model.set_value(child.doctype, child.name, 'posting_date', zahlungen[i].due_date);
+						frappe.model.set_value(child.doctype, child.name, 'posting_date', zahlungen[i].reference_date);
 						frappe.model.set_value(child.doctype, child.name, 'amount', zahlungen[i].allocated_amount);
 						cur_frm.refresh_field('zahlungen');
 						total -= zahlungen[i].allocated_amount;
@@ -125,7 +129,8 @@ function lade_daten(frm) {
 					for (i=0; i < rueckzahlungen.length; i++) {
 						var child = cur_frm.add_child('rueckzahlungen');
 						frappe.model.set_value(child.doctype, child.name, 'zahlung', rueckzahlungen[i].parent);
-						frappe.model.set_value(child.doctype, child.name, 'posting_date', rueckzahlungen[i].due_date);
+						//frappe.model.set_value(child.doctype, child.name, 'posting_date', rueckzahlungen[i].due_date);
+						frappe.model.set_value(child.doctype, child.name, 'posting_date', rueckzahlungen[i].reference_date);
 						frappe.model.set_value(child.doctype, child.name, 'amount', rueckzahlungen[i].allocated_amount);
 						cur_frm.refresh_field('rueckzahlungen');
 						total -= rueckzahlungen[i].allocated_amount;

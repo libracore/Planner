@@ -9,7 +9,7 @@ import datetime
 
 def execute(filters=None):
 	columns, data = ['Quartal', 'Monat', 'Haus', 'Wohnung', 'Miete/Mt', 'Verfügbare Tage', 'Vermietete Tage', 'Belegungsrate in %', 'Effektiv verrechnet in CHF'], []
-	alle_wohnungen = frappe.db.sql("""SELECT `house`, `name`, `price_per_month` FROM `tabAppartment` WHERE `disable_statistic` = 0 AND `disabled` = 0 ORDER BY `house`, `name` ASC""", as_list=True)
+	alle_wohnungen = frappe.db.sql("""SELECT `house`, `name`, `price_per_month` FROM `tabAppartment` WHERE `disable_statistic` = 0 AND `disabled` = 0 ORDER BY `house`, `name` ASC LIMIT 10""", as_list=True)
 	max_jan = max_tage(filters.year, '01')
 	max_feb = max_tage(filters.year, '02')
 	max_mar = max_tage(filters.year, '03')
@@ -397,31 +397,40 @@ def get_month_chart_data(chart_data, year):
 	
 def get_effektive_verrechnung(jahr, monat, wohnung):
 	effektiv_verrechnet = 0.00
+	item_liste = []
+	_item_liste = frappe.get_single('Statistik Einstellungen').item
+	for item in _item_liste:
+		item_liste.append(item.item)
+	item_liste = str(item_liste).replace('[', '').replace(']', '')
 	#case 1: start & ende innerhalb des monats
 	c1_buchungen = frappe.db.sql("""SELECT `name` FROM `tabBooking` WHERE `booking_status` = 'Booked' AND `appartment` = '{wohnung}' AND `start_date` >= '{start}' AND `end_date` <= '{ende}'""".format(wohnung=wohnung, start=get_first_day(jahr + "-" + monat + "-15"), ende=get_last_day(jahr + "-" + monat + "-15")), as_dict=True)
 	for buchung in c1_buchungen:
-		totalbetrag = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `posting_date` >= '{monats_erster}' AND `posting_date` <= '{monats_letzter}'""".format(buchung=buchung.name, monats_erster=get_first_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15")), as_list=True)[0][0]
+		alle_rechnungen_query = """SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `posting_date` >= '{monats_erster}' AND `posting_date` <= '{monats_letzter}'""".format(buchung=buchung.name, monats_erster=get_first_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15"))
+		totalbetrag = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` IN ({item_liste}) AND `parent` IN ({alle_rechnungen_query})""".format(item_liste=item_liste, alle_rechnungen_query=alle_rechnungen_query), as_list=True)[0][0]
 		if totalbetrag:
 			effektiv_verrechnet += float(totalbetrag)
 			
 	#case 2: start < monat & ende innerhalb des monats
 	c2_buchungen = frappe.db.sql("""SELECT `name` FROM `tabBooking` WHERE `booking_status` = 'Booked' AND `appartment` = '{wohnung}' AND `start_date` < '{start}' AND `end_date` <= '{ende}' AND `end_date` >= '{monats_erster}'""".format(wohnung=wohnung, start=get_first_day(jahr + "-" + monat + "-15"), monats_erster=get_first_day(jahr + "-" + monat + "-15"), ende=get_last_day(jahr + "-" + monat + "-15")), as_dict=True)
 	for buchung in c2_buchungen:
-		totalbetrag = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `posting_date` >= '{monats_erster}' AND `posting_date` <= '{monats_letzter}'""".format(buchung=buchung.name, monats_erster=get_first_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15")), as_list=True)[0][0]
+		alle_rechnungen_query = """SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `posting_date` >= '{monats_erster}' AND `posting_date` <= '{monats_letzter}'""".format(buchung=buchung.name, monats_erster=get_first_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15"))
+		totalbetrag = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` IN ({item_liste}) AND `parent` IN ({alle_rechnungen_query})""".format(item_liste=item_liste, alle_rechnungen_query=alle_rechnungen_query), as_list=True)[0][0]
 		if totalbetrag:
 			effektiv_verrechnet += float(totalbetrag)
 	
 	#case 3: start innerhalb des monats & ende > monat
 	c3_buchungen = frappe.db.sql("""SELECT `name` FROM `tabBooking` WHERE `booking_status` = 'Booked' AND `appartment` = '{wohnung}' AND `start_date` >= '{start}' AND `end_date` > '{ende}' AND `start_date` <= '{monats_letzter}'""".format(wohnung=wohnung, start=get_first_day(jahr + "-" + monat + "-15"), ende=get_last_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15")), as_dict=True)
 	for buchung in c3_buchungen:
-		totalbetrag = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `posting_date` >= '{monats_erster}' AND `posting_date` <= '{monats_letzter}'""".format(buchung=buchung.name, monats_erster=get_first_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15")), as_list=True)[0][0]
+		alle_rechnungen_query = """SELECT `name` FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `posting_date` >= '{monats_erster}' AND `posting_date` <= '{monats_letzter}'""".format(buchung=buchung.name, monats_erster=get_first_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15"))
+		totalbetrag = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` IN ({item_liste}) AND `parent` IN ({alle_rechnungen_query})""".format(item_liste=item_liste, alle_rechnungen_query=alle_rechnungen_query), as_list=True)[0][0]
 		if totalbetrag:
 			effektiv_verrechnet += float(totalbetrag)
 	
 	#case 4: start < monat & ende > monat
 	c4_buchungen = frappe.db.sql("""SELECT `name` FROM `tabBooking` WHERE `booking_status` = 'Booked' AND `appartment` = '{wohnung}' AND `start_date` < '{start}' AND `end_date` > '{ende}'""".format(wohnung=wohnung, start=get_first_day(jahr + "-" + monat + "-15"), ende=get_last_day(jahr + "-" + monat + "-15")), as_dict=True)
 	for buchung in c4_buchungen:
-		totalbetrag = frappe.db.sql("""SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `posting_date` >= '{monats_erster}' AND `posting_date` <= '{monats_letzter}'""".format(buchung=buchung.name, monats_erster=get_first_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15")), as_list=True)[0][0]
+		alle_rechnungen_query = """SELECT SUM(`grand_total`) FROM `tabSales Invoice` WHERE `booking` = '{buchung}' AND `docstatus` = 1 AND `posting_date` >= '{monats_erster}' AND `posting_date` <= '{monats_letzter}'""".format(buchung=buchung.name, monats_erster=get_first_day(jahr + "-" + monat + "-15"), monats_letzter=get_last_day(jahr + "-" + monat + "-15"))
+		totalbetrag = frappe.db.sql("""SELECT SUM(`amount`) FROM `tabSales Invoice Item` WHERE `item_code` IN ({item_liste}) AND `parent` IN ({alle_rechnungen_query})""".format(item_liste=item_liste, alle_rechnungen_query=alle_rechnungen_query), as_list=True)[0][0]
 		if totalbetrag:
 			effektiv_verrechnet += float(totalbetrag)
 	

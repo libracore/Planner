@@ -84,6 +84,12 @@ def get_data():
 					"doctype": "Booking",
 					"name": "Statistik",
 					"is_query_report": True
+				},
+				{
+					"type": "doctype",
+					"name": "Statistik Einstellungen",
+					"label": _("Statistik Einstellungen"),
+					"description": _("Statistik Einstellungen")
 				}
 			]
 		}
