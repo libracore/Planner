@@ -9,7 +9,7 @@ import datetime
 
 def execute(filters=None):
 	columns, data = ['Quartal', 'Monat', 'Haus', 'Wohnung', 'Miete/Mt', 'Verfügbare Tage', 'Vermietete Tage', 'Belegungsrate in %', 'Effektiv verrechnet in CHF'], []
-	alle_wohnungen = frappe.db.sql("""SELECT `house`, `name`, `price_per_month` FROM `tabAppartment` WHERE `disable_statistic` = 0 AND `disabled` = 0 ORDER BY `house`, `name` ASC LIMIT 10""", as_list=True)
+	alle_wohnungen = frappe.db.sql("""SELECT `house`, `name`, `price_per_month` FROM `tabAppartment` WHERE `disable_statistic` = 0 AND `disabled` = 0 ORDER BY `house`, `name` ASC""", as_list=True)
 	max_jan = max_tage(filters.year, '01')
 	max_feb = max_tage(filters.year, '02')
 	max_mar = max_tage(filters.year, '03')
