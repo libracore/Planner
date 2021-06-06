@@ -4,12 +4,6 @@
 
 frappe.query_reports["Belegungsstatistik per Freitag"] = {
 	"filters": [
-			{
-            "fieldname":"house",
-            "label": __("house"),
-            "fieldtype": "Link",
-            "options": "House"
-        },
 		{
 			"fieldname":"date",
 			"label": __("Datum"),
