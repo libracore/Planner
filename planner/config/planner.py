@@ -90,6 +90,12 @@ def get_data():
 					"name": "Statistik Einstellungen",
 					"label": _("Statistik Einstellungen"),
 					"description": _("Statistik Einstellungen")
+				},
+				{
+					"type": "report",
+					"doctype": "Booking",
+					"name": "Belegungsstatistik per Freitag",
+					"is_query_report": True
 				}
 			]
 		}
