@@ -3,42 +3,58 @@
 
 from __future__ import unicode_literals
 import frappe
+from frappe.utils.data import getdate
+from datetime import date, timedelta
 
 def execute(filters=None):
-	columns, data = [], []
-	
-	columns = ["House:Link/House:150",
-               "Total Appartments",
-               "Booked Appartments",
-               ]
-               
-	if filters:
-		data = get_house(date=filters.date, as_list=True)
-	else:
-		data = get_house(as_list=True)
+	data, columns = get_data(filters)
           
 	return columns, data
     
-# use as_list=True in case of later Export to Excel
-def get_house(date=None, as_list=True):
+def get_data(filters):
+    columns = [
+        "House:Link/House:150",
+        "Total Appartments:Int"
+    ]
     
-    sql_query = """SELECT 
-    `t1`.`title` AS Haus, 
-            (SELECT COUNT(`t3`.`title`) 
-                FROM `tabHouse` AS `t4`
-                LEFT JOIN `tabAppartment` AS `t3` ON `t4`.`title` = `t3`.`house`
-                WHERE `t3`.`house` = `t1`.`title` AND (`t3`.`parking` + `t3`.`disabled` + `t3`.`disable_statistic`) = 0
-                GROUP BY `t4`.`title`) AS MaxApp, 
-            COUNT(`t2`.`appartment`) AS Booked 
-        FROM `tabHouse` AS `t1`
-        LEFT JOIN `tabBooking` AS `t2` ON `t1`.`title` = `t2`.`house`
-        """
-    if date:
-        sql_query += """ WHERE '{0}' BETWEEN `t2`.`start_date` AND `t2`.`END_date` """.format(date)		
-    sql_query += """ GROUP BY `t1`.`title`"""
-    #sql_query += """ ORDER BY `t1`.`title` ASC, `t2`.`title` ASC, `t4`.`idx` ASC"""
-    if as_list:
-        data = frappe.db.sql(sql_query, as_list = True)
-    else:
-        data = frappe.db.sql(sql_query, as_dict = True)
-    return data
+    start_date = getdate(filters.from_date)
+    end_date = getdate(filters.to_date)
+    delta = timedelta(days=1)
+    while start_date <= end_date:
+        week_day_no = start_date.weekday()
+        if week_day_no == 4:
+            columns.append("Booked on " + start_date.strftime("%d.%m.%Y") + ":Int")
+        start_date += delta
+    
+    data = []
+    
+    houses = frappe.db.sql("""SELECT `t1`.`title` AS `house` FROM `tabHouse` AS `t1`""", as_dict=True)
+    for house in houses:
+        _data = []
+        _data.append(house.house)
+        sql_query = frappe.db.sql("""SELECT 
+                                        COUNT(`name`) AS `maxapp`
+                                    FROM `tabAppartment`
+                                    WHERE `house` = '{house}'
+                                    AND (`parking` + `disabled` + `disable_statistic`) = 0
+                    """.format(house=house.house), as_dict = True)[0]
+        _data.append(sql_query.maxapp)
+                
+        start_date = getdate(filters.from_date)
+        end_date = getdate(filters.to_date)
+        delta = timedelta(days=1)
+        while start_date <= end_date:
+            week_day_no = start_date.weekday()
+            if week_day_no == 4:
+                sql_sub_query = frappe.db.sql("""SELECT 
+                                                    COUNT(`name`) AS `booked` 
+                                                FROM `tabBooking`
+                                                WHERE '{date}' BETWEEN `start_date` AND `end_date`
+                                                AND `house` = '{house}'
+                    """.format(date=start_date, house=house.house), as_dict = True)[0]
+                _data.append(sql_sub_query.booked)
+            start_date += delta
+        data.append(_data)
+        
+    
+    return data, columns
