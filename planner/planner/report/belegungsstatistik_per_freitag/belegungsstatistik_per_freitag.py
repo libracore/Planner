@@ -48,7 +48,7 @@ def get_data(filters):
                                     FROM `tabAppartment`
                                     WHERE `apartment_size` = '{size}'
                                     AND `house` = '{house}'
-                                    AND (`parking` + `disabled` + `disable_statistic`) = 0""".format(house=house.name, size=size.size)
+                                    AND (`disabled` + `disable_statistic`) = 0""".format(house=house.name, size=size.size)
             start_date = getdate(filters.from_date)
             end_date = getdate(filters.to_date)
             delta = timedelta(days=1)
@@ -76,7 +76,7 @@ def get_houses():
     sql_query = """SELECT
                         `name`
                     FROM `tabHouse`
-                    WHERE (`parking` + `disabled` + `disable_statistic`) = 0
+                    WHERE (`disabled` + `disable_statistic`) = 0
                     ORDER BY `name` ASC"""
                     
     return frappe.db.sql(sql_query, as_dict=True)
@@ -85,7 +85,7 @@ def get_appartement_sizes(house):
     sql_query = """SELECT DISTINCT
                     `apartment_size` AS `size`
                 FROM `tabAppartment`
-                WHERE (`parking` + `disabled` + `disable_statistic`) = 0
+                WHERE (`disabled` + `disable_statistic`) = 0
                 AND `house` = '{house}'
                 ORDER BY `apartment_size` ASC""".format(house=house)
                 
@@ -97,7 +97,7 @@ def get_appartement_qty_per_sizes(house, size):
                 FROM `tabAppartment`
                 WHERE `apartment_size` = '{size}'
                 AND `house` = '{house}'
-                AND (`parking` + `disabled` + `disable_statistic`) = 0""".format(house=house, size=size)
+                AND (`disabled` + `disable_statistic`) = 0""".format(house=house, size=size)
                 
     return frappe.db.sql(sql_query, as_dict=True)[0].qty
     
